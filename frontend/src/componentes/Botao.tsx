@@ -5,7 +5,7 @@ import { areaToque } from '@/tema/tokens'
 import { Icone, type NomeIcone } from './Icone'
 import { Texto } from './Texto'
 
-export type VarianteBotao = 'primario' | 'sucesso' | 'contorno' | 'perigo' | 'texto'
+export type VarianteBotao = 'primario' | 'sucesso' | 'contorno' | 'perigo' | 'perigoCheio' | 'texto'
 
 type Props = {
     titulo: string
@@ -70,6 +70,7 @@ function coresDoBotao(tema: Tema, variante: VarianteBotao) {
         case 'sucesso': return { fundo: c.sucesso, tinta: c.sobreSucesso, borda: c.sucesso }
         case 'contorno': return { fundo: 'transparent', tinta: c.texto, borda: c.texto }
         case 'perigo': return { fundo: c.superficie, tinta: c.perigo, borda: c.perigo }
+        case 'perigoCheio': return { fundo: c.perigo, tinta: c.sobrePerigo, borda: c.perigo }
         case 'texto': return { fundo: 'transparent', tinta: c.link, borda: 'transparent' }
     }
 }

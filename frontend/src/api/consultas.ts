@@ -31,5 +31,17 @@ if (Platform.OS !== 'web') {
 
 // Chaves das consultas, num lugar só, para invalidar sempre a lista certa depois de uma ação.
 export const chaves = {
-    meusAtendimentos: ['agendamentos', 'meus'] as const
+    meusAtendimentos: ['agendamentos', 'meus'] as const,
+    tipos: ['tipos'] as const,
+    slots: (filtro: object) => ['slots', filtro] as const,
+    todosSlots: ['slots'] as const,
+    ruas: ['ruas'] as const,
+    agenda: (data: string) => ['agenda', data] as const,
+    todasAgendas: ['agenda'] as const,
+    pacientes: (q: string) => ['pacientes', 'busca', q] as const,
+    paciente: (id: number) => ['pacientes', id] as const,
+    todosPacientes: ['pacientes'] as const,
+    relogio: ['dev', 'relogio'] as const,
+    envios: ['dev', 'envios'] as const,
+    camada2: ['camada2'] as const
 }

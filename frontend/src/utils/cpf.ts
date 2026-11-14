@@ -17,3 +17,18 @@ export function mascararCpf(texto: string): string {
 export function cpfCompleto(texto: string): boolean {
     return somenteDigitos(texto).length === 11
 }
+
+// "***.456.789-**": CPF parcial para listas (a equipe confirma a pessoa sem expor o número inteiro)
+export function cpfParcial(cpf: string): string {
+    const d = somenteDigitos(cpf)
+    return `***.${d.slice(3, 6)}.${d.slice(6, 9)}-**`
+}
+
+// "51935921180" → "(51) 93592-1180"; "5135921180" → "(51) 3592-1180"
+export function formatarTelefone(texto: string): string {
+    const d = somenteDigitos(texto).slice(0, 11)
+    if (d.length <= 2) return d
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
+}
