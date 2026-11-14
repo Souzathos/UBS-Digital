@@ -1,7 +1,8 @@
 import supertest from "supertest";
 import app from "../src/app";
 import { AppDataSource } from "../src/config/dataSource";
-import { CategoriaAtendimento, OrigemSlot, Paciente, PerfilEquipe, Profissional, Slot, StatusSlot, TipoAtendimento, Ubs, UsuarioEquipe } from "../src/models";
+import { CONFIGURACAO_PADRAO } from "../src/seeds/dados/configuracao";
+import { CategoriaAtendimento, Configuracao, OrigemSlot, Paciente, PerfilEquipe, Profissional, Slot, StatusSlot, TipoAtendimento, Ubs, UsuarioEquipe } from "../src/models";
 import { cpfComDigitos } from "../src/utils/cpf";
 import { gerarHash } from "../src/utils/hash";
 
@@ -82,4 +83,10 @@ export async function criarPaciente(ubsId: number, dados: Partial<Paciente> = {}
         pontuacao: 100, vulneravel: false, vulneravelAtribuidoPor: null, vulneravelEm: null, consentimentoCanais: {},
         senhaHash: await gerarHash(SENHA), deveTrocarSenha: false, ...dados
     }))
+}
+
+// Grava os padrões da seção 7 como valores globais (o que o seed faz)
+export async function semearConfiguracao() {
+    const repo = AppDataSource.getRepository(Configuracao)
+    await repo.save(Object.entries(CONFIGURACAO_PADRAO).map(([chave, valor]) => repo.create({ chave, valor: JSON.stringify(valor), ubsId: null })))
 }

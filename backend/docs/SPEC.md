@@ -375,7 +375,7 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 0 | Estrutura base, Postgres, harness de testes, SPEC.md e CLAUDE.md | — | ☑ | (ver `git log`) |
 | 1 | Modelo de dados, migração inicial e seed | seção 5 e 7 | ☑ | |
 | 2 | `Clock` injetável, runner de jobs e endpoints `/dev` | RN-90 | ☑ | |
-| 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☐ | |
+| 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☑ | |
 | 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☐ | |
 | 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☐ | |
 | 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☐ | |
@@ -405,6 +405,8 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | RN-90: proibido ler o relógio do sistema | varredura de `services/`, `jobs/`, `notifications/`, `web/` | `tests/clock.test.ts` ("nenhum arquivo ... lê o relógio do sistema") |
 | RN-90: agendador de jobs | `JobRunner` em `src/jobs/runner.ts` (tick `JOBS_INTERVALO_MS`, iniciado em `server.ts`) | `tests/clock.test.ts` ("roda os jobs a cada passo") |
 | RN-90: avançar o relógio em dev | `avancarRelogioRodandoJobs` em `src/jobs/relogioDev.ts` (passos de 1h); rotas `/dev/*` em `src/routes/devRoutes.ts`, bloqueadas em produção por `apenasDev` | `tests/clock.test.ts` ("endpoints /dev") |
+| Seção 7: leitura com sobrescrita por UBS | `ConfiguracaoService.get` em `src/services/ConfiguracaoService.ts` (UBS → global → erro); formato de cada chave em `src/services/configuracaoChaves.ts` | `tests/configuracao.test.ts` |
+| Seção 7: nada fixo no código | `get` lança erro se a chave não existe na tabela; o seed (`src/seeds/dados/configuracao.ts`) é o único lugar com os padrões | `tests/configuracao.test.ts` ("chave ausente lança erro") |
 
 ## 13. Como rodar
 
