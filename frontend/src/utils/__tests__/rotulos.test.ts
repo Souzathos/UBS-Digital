@@ -4,14 +4,14 @@ import { concordar, esteItem, nomeDoItem, rotuloCategoria, seuItem, statusParaEq
 const TODOS: StatusAgendamento[] = ['PENDENTE', 'CONFIRMADO', 'CANCELADO_PACIENTE', 'CANCELADO_AUTO', 'REMARCADO', 'COMPARECEU', 'FALTOU']
 
 describe('RN-06: Médico × Enfermagem', () => {
-    it('CONSULTA é "Médico" e seus itens são consultas', () => {
-        expect(rotuloCategoria('CONSULTA')).toBe('Médico')
+    it('CONSULTA é "Consulta" e seus itens são consultas', () => {
+        expect(rotuloCategoria('CONSULTA')).toBe('Consulta')
         expect(nomeDoItem('CONSULTA')).toBe('consulta')
         expect(nomeDoItem('CONSULTA', true)).toBe('consultas')
     })
 
-    it('PROCEDIMENTO é "Enfermagem" e seus itens são procedimentos', () => {
-        expect(rotuloCategoria('PROCEDIMENTO')).toBe('Enfermagem')
+    it('PROCEDIMENTO é "Procedimento" e seus itens são procedimentos', () => {
+        expect(rotuloCategoria('PROCEDIMENTO')).toBe('Procedimento')
         expect(nomeDoItem('PROCEDIMENTO')).toBe('procedimento')
         expect(nomeDoItem('PROCEDIMENTO', true)).toBe('procedimentos')
     })

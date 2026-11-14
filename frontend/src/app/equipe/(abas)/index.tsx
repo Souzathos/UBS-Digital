@@ -24,8 +24,8 @@ type FiltroAgenda = 'todos' | 'CONSULTA' | 'PROCEDIMENTO' | 'faltas'
 
 const FILTROS: { id: FiltroAgenda; nome: string }[] = [
     { id: 'todos', nome: 'Todos' },
-    { id: 'CONSULTA', nome: 'Médico' },
-    { id: 'PROCEDIMENTO', nome: 'Enfermagem' },
+    { id: 'CONSULTA', nome: 'Consulta' },
+    { id: 'PROCEDIMENTO', nome: 'Procedimento' },
     { id: 'faltas', nome: 'Faltas' }
 ]
 

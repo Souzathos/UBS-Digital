@@ -16,7 +16,7 @@ type Props = {
     children?: ReactNode
 }
 
-// Opção grande de uma escolha (Médico ou Enfermagem, qual consulta). Leva para o próximo passo,
+// Opção grande de uma escolha (Consulta ou Procedimento, qual consulta). Leva para o próximo passo,
 // por isso tem a seta à direita.
 export function BotaoOpcao({ titulo, descricao, icone, nota, selecionado, onPress, children }: Props) {
     const { cores, raio } = useTheme()

@@ -33,7 +33,7 @@ function Conteudo({ variante, trocar }: { variante: Variante; trocar: () => void
     const publico = variante === 'paciente' ? 'paciente' : 'equipe'
 
     return (
-        <Tela titulo="Vitrine" exemplo leitura={`Médico. Consulta clínica geral. ${dataPorExtenso(EXEMPLO_ISO)}. Falta confirmar.`}>
+        <Tela titulo="Vitrine" exemplo leitura={`Consulta. Consulta clínica geral. ${dataPorExtenso(EXEMPLO_ISO)}. Falta confirmar.`}>
             <Botao titulo={variante === 'paciente' ? 'Ver paleta da equipe' : 'Ver paleta do paciente'} variante="contorno" onPress={trocar} />
 
             <Texto variante="secao" cor="textoSuave" titulo>

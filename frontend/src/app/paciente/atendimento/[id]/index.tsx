@@ -145,7 +145,7 @@ export default function DetalheAtendimento() {
     )
 }
 
-// Status, data grande e a linha "Médico · Consulta clínica geral · Dra. Helena · UBS Feitoria".
+// Status, data grande e a linha "Consulta · Consulta clínica geral · Dra. Helena · UBS Feitoria".
 export function ResumoAtendimento({ agendamento: a, riscado }: { agendamento: Agendamento; riscado?: boolean }) {
     return (
         <Cartao>

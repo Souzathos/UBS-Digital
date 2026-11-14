@@ -40,7 +40,7 @@ export function Etiqueta({ texto, cores, icone, grande }: Props) {
     )
 }
 
-// "Médico" ou "Enfermagem" (RN-06)
+// "Consulta" ou "Procedimento" (RN-06)
 export function EtiquetaCategoria({ categoria, grande }: { categoria: Categoria; grande?: boolean }) {
     const { cores } = useTheme()
     const medico = categoria === 'CONSULTA'

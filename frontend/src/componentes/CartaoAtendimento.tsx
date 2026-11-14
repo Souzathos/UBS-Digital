@@ -104,7 +104,7 @@ export function CartaoHistorico({ agendamento: a, aoAbrir }: { agendamento: Agen
     )
 }
 
-// Resumo de uma linha: "Médico · Consulta clínica geral · Dra. Helena · UBS Feitoria"
+// Resumo de uma linha: "Consulta · Consulta clínica geral · Dra. Helena · UBS Feitoria"
 export function linhaResumo(a: Pick<Agendamento, 'tipoAtendimento' | 'profissional'> & { ubs?: { nome: string } }) {
     return [rotuloCategoria(a.tipoAtendimento.categoria), a.tipoAtendimento.nome, a.profissional.nome, a.ubs?.nome].filter(Boolean).join(' · ')
 }

@@ -74,7 +74,8 @@ export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rol
             ) : (
                 <View />
             )}
-            {meio ? (
+            {/* Com o nome da UBS no cabeçalho não sobra espaço: o "Passo X de 4" só aparece junto do voltar. */}
+            {meio && cabecalho !== 'ubs' ? (
                 <Texto variante="secao" cor="textoSuave" numeros style={{ flex: 1, textAlign: 'center' }}>
                     {meio}
                 </Texto>

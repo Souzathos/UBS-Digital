@@ -23,7 +23,7 @@ type Passo = 'tipo' | 'item' | 'duplicado' | 'hora' | 'conferir' | 'feito'
 
 const NUMERO_DO_PASSO: Record<Passo, number> = { tipo: 1, item: 2, duplicado: 2, hora: 3, conferir: 4, feito: 4 }
 
-// Agendar pelo app em 4 passos (seção 6, RN-01 a RN-06): Médico ou Enfermagem → qual consulta ou
+// Agendar pelo app em 4 passos (seção 6, RN-01 a RN-06): Consulta ou Procedimento → qual consulta ou
 // procedimento → dia e hora → conferir. A API só devolve os tipos liberados para o app (RN-01),
 // os horários da cota do app (RN-02) e, em consulta, só os do médico da rua (RN-06).
 // Design: paciente/agendar-fluxo-completo e telas vizinhas.
@@ -101,13 +101,13 @@ export default function Agendar() {
     const meio = passo === 'feito' ? 'Pronto' : `Passo ${NUMERO_DO_PASSO[passo]} de 4`
     const comum = { cabecalho: passo === 'tipo' || passo === 'feito' ? ('ubs' as const) : ('voltar' as const), aoVoltar: voltar, meio }
 
-    // --- Passo 1: Médico ou Enfermagem ---
+    // --- Passo 1: Consulta (médico) ou Procedimento (enfermagem) ---
     if (passo === 'tipo') {
         const daCategoria = (c: Categoria) => (tipos.data ?? []).filter(t => t.categoria === c).map(t => t.nome.toLowerCase())
         return (
-            <Tela {...comum} titulo="O que você precisa?" leitura="Escolha com quem é o atendimento: Médico, para consultas, ou Enfermagem, para procedimentos.">
+            <Tela {...comum} titulo="O que você precisa?" leitura="Escolha o tipo de atendimento: consulta, com o médico, ou procedimento, com a enfermagem.">
                 <Texto cor="textoSuave" style={{ marginTop: -6 }}>
-                    Escolha com quem é o atendimento.
+                    Escolha o tipo de atendimento.
                 </Texto>
                 {tipos.isPending ? (
                     <Carregando />
@@ -116,9 +116,9 @@ export default function Agendar() {
                 ) : (
                     <>
                         <BotaoOpcao
-                            titulo="Médico"
+                            titulo="Consulta"
                             icone="medico"
-                            descricao={`Consultas: ${daCategoria('CONSULTA').join(', ')}.`}
+                            descricao={`Com o médico: ${daCategoria('CONSULTA').join(', ')}.`}
                             nota={paciente.medicoReferencia ? `Seu médico: ${paciente.medicoReferencia.nome} (pela sua rua)` : undefined}
                             onPress={() => {
                                 setCategoria('CONSULTA')
@@ -126,9 +126,9 @@ export default function Agendar() {
                             }}
                         />
                         <BotaoOpcao
-                            titulo="Enfermagem"
+                            titulo="Procedimento"
                             icone="enfermagem"
-                            descricao={`Procedimentos: ${daCategoria('PROCEDIMENTO').join(', ')}.`}
+                            descricao={`Com a enfermagem: ${daCategoria('PROCEDIMENTO').join(', ')}.`}
                             onPress={() => {
                                 setCategoria('PROCEDIMENTO')
                                 setPasso('item')

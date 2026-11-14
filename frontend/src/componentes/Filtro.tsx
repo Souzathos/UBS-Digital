@@ -15,7 +15,7 @@ type Props = {
     multiplo?: boolean
 }
 
-// Pílula de filtro ou de escolha curta (Todos · Médico · Enfermagem · Faltas; Médico ou Enfermagem
+// Pílula de filtro ou de escolha curta (Todos · Consulta · Procedimento · Faltas; Consulta ou Procedimento
 // no agendar da recepção). Design: equipe/agenda-do-dia-e-presenca.
 export function Filtro({ rotulo, selecionado, onPress, contagem, icone, multiplo }: Props) {
     const { cores, raio } = useTheme()

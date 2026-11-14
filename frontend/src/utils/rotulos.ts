@@ -2,15 +2,16 @@ import type { Categoria, PerfilEquipe, StatusAgendamento } from '@/api/tipos'
 import type { ChaveStatus } from '@/tema/paletas'
 import { dataPorExtenso } from './datas'
 
-// Textos de domínio que aparecem em várias telas. Nenhuma tela escreve "Médico" ou "Falta
+// Textos de domínio que aparecem em várias telas. Nenhuma tela escreve "Consulta" ou "Falta
 // confirmar" por conta própria: tudo sai daqui, para o vocabulário ficar igual no app inteiro.
 
-// RN-06: CONSULTA mostra "Médico", PROCEDIMENTO mostra "Enfermagem".
+// RN-06: CONSULTA mostra "Consulta" (com o médico), PROCEDIMENTO mostra "Procedimento" (com a
+// enfermagem). Até 14/11 as etiquetas eram "Médico" e "Enfermagem"; Athos pediu a troca.
 export function rotuloCategoria(categoria: Categoria): string {
-    return categoria === 'CONSULTA' ? 'Médico' : 'Enfermagem'
+    return categoria === 'CONSULTA' ? 'Consulta' : 'Procedimento'
 }
 
-// RN-06: os itens do Médico são consultas; os da Enfermagem, procedimentos.
+// RN-06: consultas são com o médico; procedimentos, com a enfermagem.
 export function nomeDoItem(categoria: Categoria, plural = false): string {
     if (categoria === 'CONSULTA') return plural ? 'consultas' : 'consulta'
     return plural ? 'procedimentos' : 'procedimento'
@@ -51,7 +52,7 @@ export function rotuloPerfil(perfil: PerfilEquipe): string {
 }
 
 // Frase de um atendimento para o leitor de tela e para "Ouvir esta tela":
-// "Médico. Consulta clínica geral. quinta-feira, 10 de dezembro, às 9 horas. Dra. Helena, UBS Feitoria. Falta confirmar."
+// "Consulta. Consulta clínica geral. quinta-feira, 10 de dezembro, às 9 horas. Dra. Helena, UBS Feitoria. Falta confirmar."
 export function leituraAtendimento(a: {
     inicio: string
     status: StatusAgendamento
