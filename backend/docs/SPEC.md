@@ -275,16 +275,16 @@ Atualizado ao fim de cada parte. ☑ = feito e verificado, ☐ = pendente.
 
 | Parte | Conteúdo | RN | Estado | Commit |
 |---|---|---|---|---|
-| 0 | Fundação: Expo Router, fontes, tokens e 3 paletas, ThemeProvider + `useTheme` + `criarEstilos`, componentes base, preferências e menu de acessibilidade, datas e rótulos, vitrine de desenvolvimento | seção 6 | ☑ | `ce0936a` |
-| 1 | Cliente da API, tipos, sessão, guardas de rota, Entrar (paciente e equipe), Crie sua senha, abas do paciente e da equipe | senha provisória, RN-52 | ☑ | `3febb65` |
-| 2 | Paciente: Meus atendimentos (próximo, depois, histórico), detalhe, confirmar, cancelar em dois passos, remarcar com grade de horários | RN-12, RN-20 a RN-22 | ☑ | `8da059b` |
-| 3 | Paciente: agendar em 4 passos (Médico/Enfermagem → item → horário → conferir), aviso de duplicado, paciente sem rua | RN-01, RN-04, RN-05, RN-06 | ☑ | `05a7a38` |
-| 4 | Paciente: Perfil com canais (PATCH na hora), seu médico, trocar senha | RN-06, RN-80 | ☑ | `fd43052` |
-| 5 | Equipe: agenda do dia com navegação, filtros, indicadores, presença, confirmar/cancelar/remarcar em nome do paciente | fluxo C, RN-20 a RN-22, RN-52, RN-82 | ☑ | `b86b7b4` |
-| 6 | Equipe: pacientes com busca, cadastro com rua → médico, senha provisória, ficha, agendar pela recepção com "Só recepção" | RN-01, RN-02, RN-06, RN-52, RN-80 | ☑ | `d1dfc72` |
-| 7 | Equipe: relógio de testes (avançar, voltar ao real, caixa de saída) | RN-90 | ☑ | `972feb6` |
-| 8 | Camada 2 com dados falsos: avisos da consulta, sem resposta, oferta, ofertas e suplentes, ofertas em andamento, alertas, contato e selo, reaproveitadas | RN-25 a RN-27, RN-30 a RN-36, RN-40, RN-50, RN-55 a RN-57 | ☑ | `bb5605c` |
-| 9 | Fechamento: acessibilidade conferida nas telas reais, rotas que faltam no backend, roteiro de demonstração | — | ☑ | `23e97db` |
+| 0 | Fundação: Expo Router, fontes, tokens e 3 paletas, ThemeProvider + `useTheme` + `criarEstilos`, componentes base, preferências e menu de acessibilidade, datas e rótulos, vitrine de desenvolvimento | seção 6 | ☑ | `9940084` |
+| 1 | Cliente da API, tipos, sessão, guardas de rota, Entrar (paciente e equipe), Crie sua senha, abas do paciente e da equipe | senha provisória, RN-52 | ☑ | `5712952` |
+| 2 | Paciente: Meus atendimentos (próximo, depois, histórico), detalhe, confirmar, cancelar em dois passos, remarcar com grade de horários | RN-12, RN-20 a RN-22 | ☑ | `e866bb2` |
+| 3 | Paciente: agendar em 4 passos (Médico/Enfermagem → item → horário → conferir), aviso de duplicado, paciente sem rua | RN-01, RN-04, RN-05, RN-06 | ☑ | `1e962f9` |
+| 4 | Paciente: Perfil com canais (PATCH na hora), seu médico, trocar senha | RN-06, RN-80 | ☑ | `864e2ee` |
+| 5 | Equipe: agenda do dia com navegação, filtros, indicadores, presença, confirmar/cancelar/remarcar em nome do paciente | fluxo C, RN-20 a RN-22, RN-52, RN-82 | ☑ | `a5789a2` |
+| 6 | Equipe: pacientes com busca, cadastro com rua → médico, senha provisória, ficha, agendar pela recepção com "Só recepção" | RN-01, RN-02, RN-06, RN-52, RN-80 | ☑ | `ded0e02` |
+| 7 | Equipe: relógio de testes (avançar, voltar ao real, caixa de saída) | RN-90 | ☑ | `911b558` |
+| 8 | Camada 2 com dados falsos: avisos da consulta, sem resposta, oferta, ofertas e suplentes, ofertas em andamento, alertas, contato e selo, reaproveitadas | RN-25 a RN-27, RN-30 a RN-36, RN-40, RN-50, RN-55 a RN-57 | ☑ | `7e25d11` |
+| 9 | Fechamento: acessibilidade conferida nas telas reais, rotas que faltam no backend, roteiro de demonstração | — | ☑ | `4b53b33` |
 
 **Verificação:** 46 testes unitários (`npm test` em `frontend/`), typecheck e lint limpos, pacote iOS e web gerados. Roteiros de ponta a ponta no Expo Web contra a API real (Chrome automatizado): login e guardas (20 cenários), paciente do primeiro acesso ao cancelamento (20), painel (20), Camada 2 (17) e acessibilidade (3: letra muito grande, alto contraste, preferências salvas). Os roteiros criam pacientes de teste próprios e não mexem nos pacientes do seed.
 
@@ -476,21 +476,20 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 
 | Parte | Item da seção 8 | RN | Estado | Commit |
 |---|---|---|---|---|
-| 0 | Estrutura base, Postgres, harness de testes, SPEC.md e CLAUDE.md | — | ☑ | `f6d4015` |
-| 1 | Modelo de dados, migração inicial e seed | seção 5 e 7 | ☑ | `35fee99` |
-| 2 | `Clock` injetável, runner de jobs e endpoints `/dev` | RN-90 | ☑ | `e0cabb3` |
-| 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☑ | `20b8d4d` |
-| 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☑ | `b78eb54` |
-| 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☑ | `e4564d0` |
-| 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☑ | `3a72ac9` |
-| 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☑ | `fc7a31e` |
-| 8 | Página do link | RN-70 a RN-73 | ☑ | `61360b8` |
-| 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☑ | `9783d29` |
-| 10 | Fechamento: estado, mapa RN → código, contrato da API, verificação de ponta a ponta | — | ☑ | `63bbaaa` |
-| 11 | Ajuste às telas (14/11): consulta × procedimento, ruas e médico de referência, endereço, canais do Perfil, filtro da agenda | RN-06, RN-80, seção 9 | ☑ | `836e9b1` |
-
-| 12 | Rotas pedidas pelo app (14/11): avisos de um agendamento, UBS na sessão, destinatário na caixa de saída de dev | RN-10 a RN-12, RN-90 | ☑ | `c5f2e01` |
-| 13 | Push pelo serviço do Expo (adiantado da Camada 3 para o vídeo da apresentação): registro do token e `ExpoPushAdapter` | RN-60, RN-80 | ☑ | `1deeac0` |
+| 0 | Estrutura base, Postgres, harness de testes, SPEC.md e CLAUDE.md | — | ☑ | `c6d41fa` |
+| 1 | Modelo de dados, migração inicial e seed | seção 5 e 7 | ☑ | `e80cee6` |
+| 2 | `Clock` injetável, runner de jobs e endpoints `/dev` | RN-90 | ☑ | `e137c3a` |
+| 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☑ | `66ac162` |
+| 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☑ | `c879680` |
+| 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☑ | `07e6269` |
+| 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☑ | `db0ddf2` |
+| 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☑ | `e715417` |
+| 8 | Página do link | RN-70 a RN-73 | ☑ | `4a5a5a3` |
+| 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☑ | `e7f8521` |
+| 10 | Fechamento: estado, mapa RN → código, contrato da API, verificação de ponta a ponta | — | ☑ | `f72bc88` |
+| 11 | Ajuste às telas (14/11): consulta × procedimento, ruas e médico de referência, endereço, canais do Perfil, filtro da agenda | RN-06, RN-80, seção 9 | ☑ | `551f417` |
+| 12 | Rotas pedidas pelo app (14/11): avisos de um agendamento, UBS na sessão, destinatário na caixa de saída de dev | RN-10 a RN-12, RN-90 | ☑ | `4a90309` |
+| 13 | Push pelo serviço do Expo (adiantado da Camada 3 para o vídeo da apresentação): registro do token e `ExpoPushAdapter` | RN-60, RN-80 | ☑ | `b93152a` |
 
 **Camada 1 concluída em 13/11/2026**, ajustada às telas em 14/11 e completada com as rotas pedidas pelo app e o push: 111 testes passando (`npm test`), typecheck limpo, e o roteiro de ponta a ponta da seção 13 rodado contra o servidor real.
 
