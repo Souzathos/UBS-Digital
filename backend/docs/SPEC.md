@@ -354,7 +354,7 @@ Decidido em 13/11: o painel da UBS fica dentro do app React Native, e o login do
 
 1. **RN-03 e RN-04 valem para recepção e app**: o texto fala do tipo/paciente, não do ator. RN-01 e RN-02 são explicitamente por ator.
 2. **Hora de envio**: D-14, D-7 e D-3 saem na mesma hora de `lembrete.d0Hora` (07:00), única chave de hora da seção 7.
-3. **Token do link (RN-70)**: um por (agendamento, destinatário), reaproveitado nas etapas seguintes; expira no horário da consulta. O banco guarda só o hash SHA-256.
+3. **Token do link (RN-70)**: cada envio gera um token aleatório novo para aquele agendamento e destinatário (como o banco guarda só o hash SHA-256, não dá para reaproveitar o token de um envio anterior). Todos valem até o horário da consulta.
 4. **Paciente sem canal** na Camada 1: a notificação é criada e "enviada" pelo adaptador mock assim mesmo (o contato vinculado só entra na Camada 2).
 5. **Campos extras** ao modelo da seção 5: `Paciente.deveTrocarSenha` (senha provisória) e `Agendamento.criadoEm` (ordenação). Nada mais foi acrescentado.
 6. **Presença** (`COMPARECEU`/`FALTOU`) só pode ser registrada a partir do início do dia da consulta.
@@ -363,6 +363,10 @@ Decidido em 13/11: o painel da UBS fica dentro do app React Native, e o login do
 9. **RN-52 desde já**: mappers e página do link nunca expõem `vulneravel`, mesmo o selo sendo Camada 2.
 10. **Fuso**: `TZ=America/Sao_Paulo` fixado em `config/env.ts`; colunas `timestamptz`.
 11. **Relógio de dev** avança em passos de 60 min rodando os jobs a cada passo, para manter a ordem D-14 → D-7 → D-3 → D-0 mesmo num salto de 14 dias.
+12. **RN-11 no mesmo dia**: etapa cujo *dia* já passou é pulada. Se o dia da etapa é hoje e a hora (`lembrete.d0Hora`) já passou, ela sai no próximo tick. Etapa que cairia no horário da consulta ou depois é pulada (ex.: exame às 07:00 não recebe D-0 às 07:00).
+13. **Canais (RN-60, RN-80)**: WhatsApp e SMS só com consentimento registrado no canal e telefone de celular; push só com `pushToken`. Sem nenhum canal, o mock registra o envio sem destino (`destino: null`).
+14. **`lembrete.etapasDias`** pode ligar ou desligar etapas, mas só entre 14, 7, 3 e 0, que são as que o enum `EtapaNotificacao` conhece.
+15. **Ações respondem a etapa (RN-62)**: qualquer ação sobre o agendamento marca as notificações já enviadas como `RESPONDIDA`. O escalonamento entre canais continua na Camada 3.
 
 ## 11. Estado da implementação
 
@@ -378,7 +382,7 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☑ | |
 | 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☑ | |
 | 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☑ | |
-| 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☐ | |
+| 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☑ | |
 | 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☐ | |
 | 8 | Página do link | RN-70 a RN-73 | ☐ | |
 | 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☐ | |
@@ -421,6 +425,14 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | RN-82: log de ações | `LogAcaoService.registrar` (mesma transação da ação; horário do Clock) | `tests/agendamento.test.ts` ("RN-82") |
 | Restrição: lock no slot | `AgendamentoService.travarSlot` (`SELECT ... FOR UPDATE`) + índice parcial | `tests/agendamento.test.ts` ("só um leva") |
 | Seção 6: "Minhas consultas" e "Agenda do dia" | `AgendamentoService.listarDoPaciente`, `agendaDoDia`, `acoesDisponiveis` | `tests/agendamento.test.ts` |
+| RN-10: até 4 lembretes no horário configurado | `LembreteService.agendar` (chamado em `AgendamentoService.criar`) cria as `Notificacao` AGENDADA; `src/jobs/lembretesJob.ts` envia quando chega a hora | `tests/lembretes.test.ts` ("RN-10", "RN-90: avançar 20 dias") |
+| RN-11: pula etapas passadas | `LembreteService.agendar` | `tests/lembretes.test.ts` ("RN-11") |
+| RN-12: confirmado = informativo | `exigeResposta` e `textoLembrete` em `src/notifications/mensagens.ts`, avaliados na hora do envio | `tests/lembretes.test.ts` ("RN-10 / RN-12") |
+| RN-13: preparo em todos os lembretes | `textoLembrete` | `tests/lembretes.test.ts` ("RN-13") |
+| RN-60 / RN-80: escolha do canal | `Despachante.escolherCanal` em `src/notifications/Despachante.ts` (ordem de `canal.ordem`, consentimento) | `tests/lembretes.test.ts` ("RN-60 / RN-80") |
+| RN-63 / RN-73: link e nome da UBS na mensagem | `textoLembrete` | `tests/lembretes.test.ts` ("RN-63 / RN-70 / RN-73") |
+| RN-70: token aleatório, só hash, expira na consulta | `LinkTokenService.criar` e `resolver` em `src/services/LinkTokenService.ts` | `tests/lembretes.test.ts` ("RN-63 / RN-70 / RN-73") |
+| Canais mock | `CanalAdapter` (interface) e `MockAdapter` + `caixaDeSaida` em `src/notifications/`; `GET /dev/envios` | `tests/lembretes.test.ts` ("GET /dev/envios") |
 
 ## 13. Como rodar
 

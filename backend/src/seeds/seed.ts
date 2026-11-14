@@ -1,14 +1,16 @@
-import { DataSource } from "typeorm";
+import { DataSource, MoreThanOrEqual } from "typeorm";
 import { env } from "../config/env";
 import { AppDataSource } from "../config/dataSource";
 import { Configuracao, Paciente, Profissional, Slot, TipoAtendimento, Ubs, UsuarioEquipe } from "../models";
-import { StatusSlot } from "../models/enums";
+import { PerfilEquipe, StatusSlot, TipoAutor } from "../models/enums";
+import { clock } from "../clock";
+import { AgendamentoService } from "../services/AgendamentoService";
 import { SlotService } from "../services/SlotService";
-import { comHorario, diasUteisAPartirDe, somarDias, somarMinutos } from "../utils/datas";
+import { comHorario, diasUteisAPartirDe, inicioDoDia, somarDias, somarMinutos } from "../utils/datas";
 import { gerarHash } from "../utils/hash";
 import { CONFIGURACAO_PADRAO } from "./dados/configuracao";
 import { EQUIPE, SENHA_PADRAO } from "./dados/equipe";
-import { PACIENTES } from "./dados/pacientes";
+import { AGENDAMENTOS_DEMO, PACIENTES } from "./dados/pacientes";
 import { DIAS_DE_AGENDA, PROFISSIONAIS } from "./dados/profissionais";
 import { TIPOS_ATENDIMENTO } from "./dados/tiposAtendimento";
 import { UBS } from "./dados/ubs";
@@ -66,9 +68,12 @@ export async function executarSeed(ds: DataSource, hoje: Date) {
     }
 
     const pontosIniciais = Number(CONFIGURACAO_PADRAO['pontos.inicial'])
-    await ds.getRepository(Paciente).save(
-        PACIENTES.map(p => ds.getRepository(Paciente).create({
-            ...p, ubsId: ubs.id, senhaHash, pontuacao: pontosIniciais, consentimentoCanais: {}
+    const consentimentoEm = hoje.toISOString()
+    const pacientes = await ds.getRepository(Paciente).save(
+        PACIENTES.map(({ consentimentos, ...p }) => ds.getRepository(Paciente).create({
+            ...p, ubsId: ubs.id, senhaHash, pontuacao: pontosIniciais,
+            // RN-80: consentimento registrado por canal
+            consentimentoCanais: Object.fromEntries(consentimentos.map(c => [c, { aceito: true, em: consentimentoEm }]))
         }))
     )
 
@@ -78,6 +83,22 @@ export async function executarSeed(ds: DataSource, hoje: Date) {
         )
     )
 
+    // Agendamentos de demonstração, criados pela recepção através do service (passam pelas regras e já
+    // geram os lembretes). Com o relógio de dev dá para ver D-14, D-7, D-3 e D-0 saírem.
+    const recepcao = await ds.getRepository(UsuarioEquipe).findOneByOrFail({ ubsId: ubs.id, perfil: PerfilEquipe.RECEPCAO })
+    const sessao = { tipo: TipoAutor.EQUIPE as const, id: recepcao.id, ubsId: ubs.id, perfil: recepcao.perfil }
+    const agendamentos = new AgendamentoService({ now: () => hoje })
+    let demos = 0
+    for(const demo of AGENDAMENTOS_DEMO) {
+        const slot = await ds.getRepository(Slot).findOne({
+            where: { tipoAtendimentoId: tipoPorChave[demo.tipo].id, status: StatusSlot.LIVRE, inicio: MoreThanOrEqual(somarDias(inicioDoDia(hoje), demo.emDias)) },
+            order: { inicio: 'ASC' }
+        })
+        if(!slot) continue
+        await agendamentos.criarPelaEquipe(pacientes[demo.paciente].id, slot.id, sessao)
+        demos += 1
+    }
+
     return {
         ubs: ubs.nome,
         equipe: EQUIPE.length,
@@ -85,7 +106,8 @@ export async function executarSeed(ds: DataSource, hoje: Date) {
         profissionais: PROFISSIONAIS.length,
         slots: totalSlots,
         pacientes: PACIENTES.length,
-        configuracoes: Object.keys(CONFIGURACAO_PADRAO).length
+        configuracoes: Object.keys(CONFIGURACAO_PADRAO).length,
+        agendamentosDemo: demos
     }
 }
 
@@ -109,7 +131,7 @@ async function main() {
         await limparTudo(AppDataSource)
     }
 
-    const resumo = await executarSeed(AppDataSource, new Date())
+    const resumo = await executarSeed(AppDataSource, clock.now())
     console.log('Seed aplicado:', resumo)
     console.log(`Logins: ${EQUIPE.map(e => e.email).join(', ')} e CPF dos pacientes, todos com a senha ${SENHA_PADRAO}`)
 

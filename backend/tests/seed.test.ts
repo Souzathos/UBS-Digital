@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { after, before, beforeEach, describe, it } from "node:test";
 import { AppDataSource } from "../src/config/dataSource";
-import { Configuracao, OrigemSlot, Paciente, Profissional, Slot } from "../src/models";
+import { Agendamento, Configuracao, Notificacao, OrigemSlot, Paciente, Profissional, Slot } from "../src/models";
 import { executarSeed } from "../src/seeds/seed";
 import { CONFIGURACAO_PADRAO } from "../src/seeds/dados/configuracao";
 import { SlotService } from "../src/services/SlotService";
@@ -52,6 +52,19 @@ describe('seed de demonstração (seções 5 e 7)', () => {
         assert.equal(pacientes.length, 5)
         assert.ok(pacientes.every(p => p.pontuacao === 100))
         assert.equal(pacientes.filter(p => p.deveTrocarSenha).length, 1)
+    })
+
+    it('seed: 3 agendamentos de demonstração passam pelas regras e geram os lembretes (RN-05, RN-10, RN-11)', async () => {
+        const resumo = await executarSeed(AppDataSource, new Date('2026-11-13T10:00:00'))
+        assert.equal(resumo.agendamentosDemo, 3)
+
+        const agendamentos = await AppDataSource.getRepository(Agendamento).find({ relations: { paciente: true }, order: { id: 'ASC' } })
+        assert.deepEqual(agendamentos.map(a => a.paciente.nome), ['Maria da Silva', 'José Pereira', 'Carlos Henrique Oliveira'])
+        assert.deepEqual(agendamentos.map(a => a.status), ['PENDENTE', 'PENDENTE', 'CONFIRMADO'])
+
+        const etapas = async (id: number) => (await AppDataSource.getRepository(Notificacao).find({ where: { agendamentoId: id }, order: { agendadaPara: 'ASC' } })).map(n => n.etapa)
+        assert.deepEqual(await etapas(agendamentos[0].id), ['D14', 'D7', 'D3', 'D0'])
+        assert.deepEqual(await etapas(agendamentos[1].id), ['D3', 'D0'])
     })
 
     it('RN-02: marcarCota distribui exatamente o percentual pedido', () => {

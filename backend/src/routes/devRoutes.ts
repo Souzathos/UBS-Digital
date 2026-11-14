@@ -16,5 +16,7 @@ devRoutes.post('/relogio/avancar', validateBody(AvancarRelogioDTO), dev.avancar.
 devRoutes.post('/relogio/definir', validateBody(DefinirRelogioDTO), dev.definir.bind(dev))
 devRoutes.post('/relogio/zerar', dev.zerar.bind(dev))
 devRoutes.post('/jobs/rodar', dev.rodarJobs.bind(dev))
+devRoutes.get('/envios', dev.envios.bind(dev))
+devRoutes.delete('/envios', dev.limparEnvios.bind(dev))
 
 export default devRoutes

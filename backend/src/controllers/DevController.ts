@@ -3,6 +3,7 @@ import { relogioAjustavel } from "../clock";
 import { AvancarRelogioInput, DefinirRelogioInput } from "../dtos/dev";
 import { jobRunner } from "../jobs";
 import { avancarRelogioRodandoJobs } from "../jobs/relogioDev";
+import { caixaDeSaida } from "../notifications/adapters/MockAdapter";
 
 // Endpoints de desenvolvimento (RN-90). Só existem fora de produção (ver apenasDev).
 export class DevController {
@@ -50,5 +51,16 @@ export class DevController {
         const resumo = await jobRunner.rodar()
 
         return res.status(200).json({ ...this.estado(), resultadoJobs: resumo })
+    }
+
+    // Caixa de saída do adaptador mock: o que teria saído por push/WhatsApp/SMS
+    async envios(req: Request, res: Response) {
+        const limite = Math.min(Number(req.query.limite) || 100, 500)
+        return res.status(200).json(caixaDeSaida.listar(limite))
+    }
+
+    async limparEnvios(_req: Request, res: Response) {
+        caixaDeSaida.limpar()
+        return res.status(204).send()
     }
 }

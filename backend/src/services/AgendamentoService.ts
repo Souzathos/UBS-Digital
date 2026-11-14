@@ -10,6 +10,7 @@ import { AgendaDoDiaInput } from "../dtos/agendamento";
 import { somarDias } from "../utils/datas";
 import { SessaoEquipe, SessaoPaciente } from "../utils/jwt";
 import { ConfiguracaoService } from "./ConfiguracaoService";
+import { LembreteService } from "./LembreteService";
 import { AcaoLog, LogAcaoService } from "./LogAcaoService";
 import { Autor } from "./tipos";
 
@@ -25,9 +26,11 @@ export interface AcoesDisponiveis {
 
 export class AgendamentoService {
     private logs: LogAcaoService
+    private lembretes: LembreteService
 
     constructor(private readonly clock: Clock = relogioPadrao) {
         this.logs = new LogAcaoService(clock)
+        this.lembretes = new LembreteService(clock)
     }
 
     // ---------- Criação (RN-01 a RN-05) ----------
@@ -75,7 +78,8 @@ export class AgendamentoService {
             await this.logs.registrar(manager, agendamento.id, AcaoLog.CRIADO, autor, {
                 slotId: slot.id, status: agendamento.status, confirmadoAutomatico: confirmadoNaHora
             })
-            await this.aoCriar(manager, agendamento.id, agora)
+            // RN-10 / RN-11: lembretes do agendamento novo
+            await this.lembretes.agendar(manager, agendamento.id, agora)
 
             return agendamento.id
         })
@@ -119,9 +123,6 @@ export class AgendamentoService {
 
         if(await query.getExists()) throw new ConflictError('Você já tem um agendamento ativo deste tipo. Cancele ou remarque o atual')
     }
-
-    // Ponto de extensão: lembretes do agendamento novo (Parte 6)
-    protected async aoCriar(_manager: EntityManager, _agendamentoId: number, _agora: Date) {}
 
     // ---------- Leitura ----------
 

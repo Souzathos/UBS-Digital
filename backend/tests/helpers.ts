@@ -83,7 +83,8 @@ export async function criarPaciente(ubsId: number, dados: Partial<Paciente> = {}
     return repo.save(repo.create({
         ubsId, nome: `Paciente ${sequencia}`, cpf: cpfValidoUnico(), cns: null, dataNascimento: '1980-01-01',
         telefone: `5199999${String(sequencia).padStart(4, '0')}`, email: null, possuiCelular: true, pushToken: null,
-        pontuacao: 100, vulneravel: false, vulneravelAtribuidoPor: null, vulneravelEm: null, consentimentoCanais: {},
+        pontuacao: 100, vulneravel: false, vulneravelAtribuidoPor: null, vulneravelEm: null,
+        consentimentoCanais: { WHATSAPP: { aceito: true, em: '2026-01-01T00:00:00.000Z' }, SMS: { aceito: true, em: '2026-01-01T00:00:00.000Z' } },
         senhaHash: await gerarHash(SENHA), deveTrocarSenha: false, ...dados
     }))
 }
