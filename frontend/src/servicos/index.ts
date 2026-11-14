@@ -1,6 +1,8 @@
 import { agendamentosApi, type AgendamentosServico } from './agendamentos'
 import { authApi, type AuthServico } from './auth'
 import { catalogoApi, type CatalogoServico } from './catalogo'
+import { devApi, type DevServico } from './dev'
+import { agendaEquipeApi, pacientesApi, type AgendaEquipeServico, type PacientesServico } from './equipe'
 
 // Registro único dos serviços. As telas e os hooks pedem `servicos.auth`, `servicos.ofertas`…
 // e nunca importam uma implementação direto. Quando uma rota da Camada 2 sair no backend, a troca
@@ -9,10 +11,16 @@ export type Servicos = {
     auth: AuthServico
     agendamentos: AgendamentosServico
     catalogo: CatalogoServico
+    agendaEquipe: AgendaEquipeServico
+    pacientes: PacientesServico
+    dev: DevServico
 }
 
 export const servicos: Servicos = {
     auth: authApi,
     agendamentos: agendamentosApi,
-    catalogo: catalogoApi
+    catalogo: catalogoApi,
+    agendaEquipe: agendaEquipeApi,
+    pacientes: pacientesApi,
+    dev: devApi
 }

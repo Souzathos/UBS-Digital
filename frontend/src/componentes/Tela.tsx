@@ -34,11 +34,13 @@ type Props = {
     aoVoltar?: () => void
     // Texto no meio do cabeçalho ("Passo 2 de 4").
     meio?: string
+    // Ação principal ao lado do título (o "Agendar" e o "Cadastrar" do painel).
+    acaoTitulo?: ReactNode
 }
 
 // Moldura de todas as telas do app. Garante em um lugar só o que o handoff pede para todas:
 // botão de acessibilidade, área segura, fundo da paleta certa e título marcado para leitor de tela.
-export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rolagem = true, atualizando, aoAtualizar, exemplo, aoVoltar, meio }: Props) {
+export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rolagem = true, atualizando, aoAtualizar, exemplo, aoVoltar, meio, acaoTitulo }: Props) {
     const tema = useTheme()
     const e = useEstilos()
     const insets = useSafeAreaInsets()
@@ -89,9 +91,12 @@ export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rol
             {topo}
             {exemplo ? <EtiquetaExemplo /> : null}
             {titulo ? (
-                <Texto variante="titulo" titulo>
-                    {titulo}
-                </Texto>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <Texto variante="titulo" titulo style={{ flexShrink: 1 }}>
+                        {titulo}
+                    </Texto>
+                    {acaoTitulo}
+                </View>
             ) : null}
             {children}
         </>
