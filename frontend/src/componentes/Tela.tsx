@@ -30,11 +30,15 @@ type Props = {
     aoAtualizar?: () => void
     // Tela da Camada 2 com dados falsos: mostra a etiqueta "Exemplo" em desenvolvimento.
     exemplo?: boolean
+    // O que o botão de voltar faz (padrão: voltar na pilha). Fluxos em passos voltam um passo.
+    aoVoltar?: () => void
+    // Texto no meio do cabeçalho ("Passo 2 de 4").
+    meio?: string
 }
 
 // Moldura de todas as telas do app. Garante em um lugar só o que o handoff pede para todas:
 // botão de acessibilidade, área segura, fundo da paleta certa e título marcado para leitor de tela.
-export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rolagem = true, atualizando, aoAtualizar, exemplo }: Props) {
+export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rolagem = true, atualizando, aoAtualizar, exemplo, aoVoltar, meio }: Props) {
     const tema = useTheme()
     const e = useEstilos()
     const insets = useSafeAreaInsets()
@@ -60,12 +64,17 @@ export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rol
                     </View>
                 </View>
             ) : cabecalho === 'voltar' ? (
-                <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Voltar" style={e.voltar}>
+                <Pressable onPress={aoVoltar ?? (() => (router.canGoBack() ? router.back() : router.replace('/')))} accessibilityRole="button" accessibilityLabel="Voltar" style={e.voltar}>
                     <Icone nome="voltar" cor={tema.cores.texto} tamanho={24} traco={2.2} />
                 </Pressable>
             ) : (
                 <View />
             )}
+            {meio ? (
+                <Texto variante="secao" cor="textoSuave" numeros style={{ flex: 1, textAlign: 'center' }}>
+                    {meio}
+                </Texto>
+            ) : null}
             <Pressable onPress={() => setMenuAberto(true)} accessibilityRole="button" accessibilityLabel="Acessibilidade" accessibilityHint="Tamanho da letra, alto contraste e ouvir esta tela" style={e.botaoAcessibilidade}>
                 <Icone nome="acessibilidade" cor={tema.cores.texto} tamanho={22} />
                 <Texto variante="rotulo" style={{ fontSize: tema.fonte(14) }}>
