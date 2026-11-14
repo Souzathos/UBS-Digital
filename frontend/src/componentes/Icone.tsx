@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 
 // Ícones de traço das telas do design (viewBox 24 × 24). Os caminhos foram copiados dos
@@ -39,6 +40,12 @@ type Props = {
     traco?: number
 }
 
+// No celular, `accessible={false}` esconde o ícone do VoiceOver/TalkBack. Na web o react-native-svg
+// repassaria essas props cruas para o <svg> (o React reclama); lá o equivalente é aria-hidden.
+const ESCONDIDO_DO_LEITOR = (Platform.OS === 'web'
+    ? { 'aria-hidden': true }
+    : { accessible: false, importantForAccessibility: 'no-hide-descendants' }) as object
+
 export function Icone({ nome, tamanho = 22, cor, traco = 2 }: Props) {
     return (
         <Svg
@@ -50,8 +57,7 @@ export function Icone({ nome, tamanho = 22, cor, traco = 2 }: Props) {
             strokeWidth={traco}
             strokeLinecap="round"
             strokeLinejoin="round"
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
+            {...ESCONDIDO_DO_LEITOR}
         >
             <Path d={icones[nome]} />
         </Svg>

@@ -10,6 +10,8 @@ import { Texto } from './Texto'
 type Props = Omit<TextInputProps, 'style'> & {
     rotulo: string
     erro?: string
+    // Orientação abaixo do campo ("Use pelo menos 6 letras ou números."). O erro, se houver, toma o lugar.
+    dica?: string
     // Fonte monoespaçada e grande, como CPF e senha na tela Entrar.
     mono?: boolean
     // Campo de senha com o botão de mostrar e esconder.
@@ -17,7 +19,7 @@ type Props = Omit<TextInputProps, 'style'> & {
     ref?: Ref<TextInputInstance>
 }
 
-export function Campo({ rotulo, erro, mono, senha, ref, ...resto }: Props) {
+export function Campo({ rotulo, erro, dica, mono, senha, ref, ...resto }: Props) {
     const tema = useTheme()
     const e = useEstilos()
     const id = useId()
@@ -33,7 +35,7 @@ export function Campo({ rotulo, erro, mono, senha, ref, ...resto }: Props) {
                     ref={ref}
                     accessibilityLabel={rotulo}
                     accessibilityLabelledBy={id}
-                    accessibilityHint={erro}
+                    accessibilityHint={erro ?? dica}
                     placeholderTextColor={tema.cores.textoSuave}
                     secureTextEntry={senha && !mostrando}
                     maxFontSizeMultiplier={1.4}
@@ -49,7 +51,7 @@ export function Campo({ rotulo, erro, mono, senha, ref, ...resto }: Props) {
                     <Pressable
                         onPress={() => setMostrando(m => !m)}
                         accessibilityRole="button"
-                        accessibilityLabel={mostrando ? 'Esconder senha' : 'Mostrar senha'}
+                        accessibilityLabel={`${mostrando ? 'Esconder' : 'Mostrar'} ${rotulo.toLowerCase()}`}
                         accessibilityState={{ selected: mostrando }}
                         style={e.olho}
                     >
@@ -61,6 +63,8 @@ export function Campo({ rotulo, erro, mono, senha, ref, ...resto }: Props) {
                 <Texto variante="corpo" cor="perigo" peso="600" accessibilityLiveRegion="polite">
                     {erro}
                 </Texto>
+            ) : dica ? (
+                <Texto cor="textoSuave">{dica}</Texto>
             ) : null}
         </View>
     )

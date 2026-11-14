@@ -106,7 +106,7 @@ npm run typecheck && npm run lint && npm test
 
 - **Modelo de atendimento (RN-06):** Médico faz **consultas** (`CONSULTA`), sempre com o médico de referência da rua do paciente. Enfermagem faz **procedimentos** (`PROCEDIMENTO`), que não dependem da rua.
 - **Próximo passo do backend:** a Camada 2, que começa pelos pontos de extensão `AgendamentoService.aoLiberarVaga` e `PresencaService.aoRegistrarPresenca`. Falta decidir a RN-56.
-- **Front:** arquitetura aprovada em 14/11 (plano em partes 0 a 9, estado em "Estado do front" na seção 6 do SPEC). Parte 0 (fundação: tema, acessibilidade, componentes base) concluída; próxima: Parte 1 (API, sessão, login).
+- **Front:** arquitetura aprovada em 14/11 (plano em partes 0 a 9, estado em "Estado do front" na seção 6 do SPEC). Partes 0 (fundação) e 1 (API, sessão, login, guardas de rota) concluídas; próxima: Parte 2 (Meus atendimentos, confirmar, cancelar).
 
 ## Git
 

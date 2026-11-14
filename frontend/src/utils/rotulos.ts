@@ -1,4 +1,4 @@
-import type { Categoria, StatusAgendamento } from '@/api/tipos'
+import type { Categoria, PerfilEquipe, StatusAgendamento } from '@/api/tipos'
 import type { ChaveStatus } from '@/tema/paletas'
 
 // Textos de domínio que aparecem em várias telas. Nenhuma tela escreve "Médico" ou "Falta
@@ -41,4 +41,10 @@ export function statusParaEquipe(status: StatusAgendamento): StatusVisual {
         case 'COMPARECEU': return { chave: 'compareceu', texto: 'Compareceu' }
         case 'FALTOU': return { chave: 'faltou', texto: 'Faltou' }
     }
+}
+
+export function rotuloPerfil(perfil: PerfilEquipe): string {
+    if (perfil === 'RECEPCAO') return 'Recepção'
+    if (perfil === 'ACS') return 'Agente comunitário de saúde'
+    return 'Gestão'
 }

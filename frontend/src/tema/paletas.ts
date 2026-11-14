@@ -121,7 +121,7 @@ export const escuro: Paleta = {
     abaAtiva: CLARO_EQUIPE,
     abaAtivaFundo: '#14498F',
     abaInativa: '#B5C8E2',
-    barraAbas: FUNDO_EQUIPE
+    barraAbas: '#0C2A5A'
 }
 
 const PRETO = '#000000'

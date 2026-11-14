@@ -39,18 +39,23 @@ export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rol
     const e = useEstilos()
     const insets = useSafeAreaInsets()
     const [menuAberto, setMenuAberto] = useState(false)
+    // No painel, o subtítulo diz onde a pessoa está e o logo ganha uma caixa branca (design da equipe).
+    const painel = tema.variante === 'equipe'
+    const subtitulo = painel ? 'Painel da equipe' : REDE_NOME
 
     const topo = (
         <View style={e.cabecalho}>
             {cabecalho === 'ubs' ? (
-                <View style={e.marca} accessible accessibilityLabel={`${UBS_NOME}, ${REDE_NOME}`}>
-                    <Image source={require('../../assets/imagens/logo-ubs.png')} style={e.logo} resizeMode="contain" accessible={false} />
+                <View style={e.marca} accessible accessibilityLabel={`${UBS_NOME}, ${subtitulo}`}>
+                    <View style={painel ? e.caixaLogo : undefined}>
+                        <Image source={require('../../assets/imagens/logo-ubs.png')} style={painel ? e.logoPainel : e.logo} resizeMode="contain" accessible={false} />
+                    </View>
                     <View>
                         <Texto variante="subtitulo" peso="600" style={{ lineHeight: tema.fonte(21) }}>
                             {UBS_NOME}
                         </Texto>
                         <Texto variante="legenda" cor="textoSuave" style={{ fontSize: tema.fonte(12) }}>
-                            {REDE_NOME}
+                            {subtitulo}
                         </Texto>
                     </View>
                 </View>
@@ -113,6 +118,8 @@ const useEstilos = criarEstilos(t => ({
     cabecalho: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
     marca: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
     logo: { width: 49, height: 36 },
+    caixaLogo: { paddingVertical: 3, paddingHorizontal: 5, borderRadius: 8, backgroundColor: '#FFFFFF' },
+    logoPainel: { width: 42, height: 31 },
     voltar: {
         width: areaToque,
         height: areaToque,

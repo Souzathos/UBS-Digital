@@ -1,7 +1,12 @@
 import { Redirect } from 'expo-router'
 
-// Parte 0: ainda não há sessão nem telas reais; a entrada leva à vitrine dos componentes.
-// Na Parte 1 este arquivo passa a redirecionar conforme a sessão (paciente, equipe ou login).
+import { destinoInicial } from '@/sessao/guardas'
+import { useSessao } from '@/sessao/SessaoProvider'
+
+// Entrada do app: não mostra nada, só manda cada sessão para a sua área.
+// Sem login → Entrar · senha provisória → Crie sua senha · paciente → atendimentos · equipe → agenda
 export default function Entrada() {
-    return <Redirect href="/vitrine" />
+    const { sessao } = useSessao()
+    const destino = destinoInicial(sessao)
+    return destino ? <Redirect href={destino} /> : null
 }

@@ -266,6 +266,7 @@ A pontuação não aparece como número. Quando estiver abaixo de 50, o app most
 - **13/11:** o app vai usar **`useTheme`** para cores e tema.
 - **14/11:** ThemeProvider próprio + `useTheme` + `StyleSheet`, sem biblioteca de UI. Expo Router com rotas em `src/app/` (pedido pelo `frontend/AGENTS.md`). As telas que dependem da Camada 2 são construídas com dados falsos atrás da mesma interface de serviço e ligadas à API depois. As telas desenhadas no Claude Design ficam exportadas em `frontend/design/`. O handoff completo está em [`HANDOFF-FRONTEND.md`](../../HANDOFF-FRONTEND.md).
 - **Textos:** no tipo Médico, fale em "consulta"; no tipo Enfermagem, em "procedimento"; para os dois, "atendimento". Toda consulta e procedimento leva a etiqueta "Médico" ou "Enfermagem".
+- **Rotas do app:** `/entrar`, `/entrar-equipe`, `/trocar-senha`, `/paciente/...` (abas Atendimentos, Agendar, Perfil) e `/equipe/...` (abas Agenda, Ofertas, Alertas, Pacientes). Pastas reais `paciente/` e `equipe/` em vez de grupos `(paciente)`, para as URLs das duas áreas não colidirem. A vitrine (`/vitrine`) só existe em desenvolvimento.
 - **14/11, arquitetura do app aprovada:** TanStack Query para buscar dados e invalidar listas depois de cada ação; testes unitários das peças-chave (`jest-expo`); etiqueta "Exemplo" nas telas com dados falsos, só em desenvolvimento; trabalho na branch `feat/camada-1`. Datas no fuso de São Paulo por subtração fixa de 3h (sem horário de verão desde 2019), sem depender do Intl do Hermes. Ícones com `react-native-svg`, copiando os caminhos SVG das telas.
 
 ### Estado do front (app Expo)
@@ -274,8 +275,8 @@ Atualizado ao fim de cada parte. ☑ = feito e verificado, ☐ = pendente.
 
 | Parte | Conteúdo | RN | Estado | Commit |
 |---|---|---|---|---|
-| 0 | Fundação: Expo Router, fontes, tokens e 3 paletas, ThemeProvider + `useTheme` + `criarEstilos`, componentes base, preferências e menu de acessibilidade, datas e rótulos, vitrine de desenvolvimento | seção 6 | ☑ | — |
-| 1 | Cliente da API, tipos, sessão, guardas de rota, Entrar (paciente e equipe), Crie sua senha | senha provisória | ☐ | |
+| 0 | Fundação: Expo Router, fontes, tokens e 3 paletas, ThemeProvider + `useTheme` + `criarEstilos`, componentes base, preferências e menu de acessibilidade, datas e rótulos, vitrine de desenvolvimento | seção 6 | ☑ | `ce0936a` |
+| 1 | Cliente da API, tipos, sessão, guardas de rota, Entrar (paciente e equipe), Crie sua senha, abas do paciente e da equipe | senha provisória, RN-52 | ☑ | — |
 | 2 | Paciente: Meus atendimentos, detalhe, Confirmar, Cancelar | RN-12, RN-20, RN-21 | ☐ | |
 | 3 | Paciente: Agendar 1 a 4, erros, Remarcar | RN-01, RN-04, RN-06, RN-22 | ☐ | |
 | 4 | Paciente: Perfil e ouvir esta tela | RN-06, RN-80 | ☐ | |
@@ -297,6 +298,13 @@ Atualizado ao fim de cada parte. ☑ = feito e verificado, ☐ = pendente.
 | Moldura de toda tela (cabeçalho, botão de acessibilidade, rolagem, rodapé) | `componentes/Tela.tsx` |
 | RN-06 "Médico"/"Enfermagem" e status sempre escrito | `utils/rotulos.ts`, `componentes/Etiqueta.tsx` |
 | Datas "Qui, 10/12 · 9h" e por extenso, no fuso de São Paulo | `utils/datas.ts` |
+| Tipos do contrato (seção 14); RN-52: `PacienteProprio` não tem selo nem pontuação | `api/tipos.ts` |
+| Cliente HTTP: token, `ApiErro` com a `message` da API, 401 encerra a sessão, sem conexão = status 0 | `api/cliente.ts` |
+| TanStack Query (cache, nova tentativa só sem conexão, recarrega ao voltar ao app) | `api/consultas.ts` |
+| Registro único dos serviços (API real ou dados falsos) | `servicos/index.ts` |
+| Sessão: token no SecureStore (localStorage na web), restaura com `/auth/eu` | `sessao/SessaoProvider.tsx`, `sessao/armazenamento.ts` |
+| Senha provisória: só "Crie sua senha"; cada perfil só na sua área | `sessao/guardas.ts` + `Stack.Protected` em `app/_layout.tsx` |
+| Barras de abas do design (paciente e equipe) | `componentes/BarraAbas.tsx` |
 
 ## 7. Configurações
 
