@@ -111,9 +111,12 @@ export type AgendamentoEquipe = Agendamento & {
 
 // --- Respostas de autenticação ---
 
-export type RespostaEntrarPaciente = { token: string; deveTrocarSenha: boolean; paciente: PacienteProprio }
-export type RespostaEntrarEquipe = { token: string; usuario: UsuarioEquipe }
-export type RespostaEu = { tipo: 'EQUIPE'; usuario: UsuarioEquipe } | { tipo: 'PACIENTE'; paciente: PacienteProprio }
+// A UBS de quem está logado (nome no cabeçalho do app).
+export type UbsSessao = { id: number; nome: string; endereco: string; telefone: string }
+
+export type RespostaEntrarPaciente = { token: string; deveTrocarSenha: boolean; paciente: PacienteProprio; ubs: UbsSessao }
+export type RespostaEntrarEquipe = { token: string; usuario: UsuarioEquipe; ubs: UbsSessao }
+export type RespostaEu = ({ tipo: 'EQUIPE'; usuario: UsuarioEquipe } | { tipo: 'PACIENTE'; paciente: PacienteProprio }) & { ubs: UbsSessao }
 
 // --- Erros ---
 

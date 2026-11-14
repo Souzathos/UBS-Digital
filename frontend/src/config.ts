@@ -3,7 +3,7 @@
 
 export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3333').replace(/\/$/, '')
 
-// Nome da UBS no cabeçalho. A API ainda não devolve a UBS na sessão (/auth/eu traz só ubsId),
-// então o nome fica aqui até o backend expor isso. A rede aparece embaixo, como nas telas.
+// Nome da UBS antes do login (tela Entrar). Depois do login, o nome vem da sessão (campo `ubs`
+// do login e de /auth/eu; ver useNomeUbs). A rede aparece embaixo, como nas telas.
 export const UBS_NOME = 'UBS Feitoria'
 export const REDE_NOME = 'UBS Vale do Sinos'

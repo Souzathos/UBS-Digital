@@ -10,15 +10,15 @@ import { Cartao } from '@/componentes/Cartao'
 import { Interruptor } from '@/componentes/Interruptor'
 import { Tela } from '@/componentes/Tela'
 import { Texto } from '@/componentes/Texto'
-import { UBS_NOME } from '@/config'
 import { servicos } from '@/servicos'
-import { usePacienteLogado, useSessao } from '@/sessao/SessaoProvider'
+import { usePacienteLogado, useSessao, useNomeUbs } from '@/sessao/SessaoProvider'
 import { formatarTelefone, mascararCpf } from '@/utils/cpf'
 
 // Perfil (seção 6, "Notificações"): seu médico pela rua (RN-06) e os canais de aviso (RN-80).
 // Cada canal liga e desliga na hora; canal desligado nunca é usado, nem o push.
 // Design: paciente/perfil-do-paciente.
 export default function Perfil() {
+    const nomeUbs = useNomeUbs()
     const paciente = usePacienteLogado()
     const { sair, atualizar } = useSessao()
     const [salvando, setSalvando] = useState<Canal | null>(null)
@@ -56,7 +56,7 @@ export default function Perfil() {
                 <Texto cor="textoSuave" numeros>
                     CPF {mascararCpf(paciente.cpf)}
                 </Texto>
-                <Texto cor="textoSuave">{UBS_NOME}</Texto>
+                <Texto cor="textoSuave">{nomeUbs}</Texto>
                 {paciente.medicoReferencia ? (
                     <View style={{ gap: 2, paddingTop: 4 }}>
                         <Texto variante="corpoForte">

@@ -286,7 +286,7 @@ Atualizado ao fim de cada parte. ☑ = feito e verificado, ☐ = pendente.
 | 8 | Camada 2 com dados falsos: avisos da consulta, sem resposta, oferta, ofertas e suplentes, ofertas em andamento, alertas, contato e selo, reaproveitadas | RN-25 a RN-27, RN-30 a RN-36, RN-40, RN-50, RN-55 a RN-57 | ☑ | `bb5605c` |
 | 9 | Fechamento: acessibilidade conferida nas telas reais, rotas que faltam no backend, roteiro de demonstração | — | ☑ | `23e97db` |
 
-**Verificação:** 46 testes unitários (`npm test` em `frontend/`), typecheck e lint limpos, pacote iOS e web gerados. Roteiros de ponta a ponta no Expo Web contra a API real (Chrome automatizado): login e guardas (20 cenários), paciente do primeiro acesso ao cancelamento (20), painel (19), Camada 2 (16) e acessibilidade (3: letra muito grande, alto contraste, preferências salvas). Os roteiros criam pacientes de teste próprios e não mexem nos pacientes do seed.
+**Verificação:** 46 testes unitários (`npm test` em `frontend/`), typecheck e lint limpos, pacote iOS e web gerados. Roteiros de ponta a ponta no Expo Web contra a API real (Chrome automatizado): login e guardas (20 cenários), paciente do primeiro acesso ao cancelamento (20), painel (20), Camada 2 (17) e acessibilidade (3: letra muito grande, alto contraste, preferências salvas). Os roteiros criam pacientes de teste próprios e não mexem nos pacientes do seed.
 
 **Decisões tomadas durante a construção (14/11):**
 - O detalhe de um agendamento sai da lista (`/agendamentos/meus` ou `/equipe/agenda` do dia), porque não existe rota de um agendamento só.
@@ -348,6 +348,7 @@ Para ligar uma rota quando ela sair: escrever a implementação real da interfac
 | Cadastro, senha provisória, ficha | `app/equipe/paciente/novo.tsx`, `app/equipe/senha-gerada.tsx`, `app/equipe/paciente/[id].tsx` |
 | RN-90: relógio de testes | `app/equipe/relogio.tsx` |
 | Camada 2: contratos, falsos e registro | `servicos/camada2/contratos.ts`, `servicos/camada2/falsos.ts`, `servicos/index.ts` |
+| Avisos da consulta pela API real (paciente e painel) e UBS da sessão no cabeçalho | `servicos/avisos.ts`, `componentes/AvisosDaConsulta.tsx`, `useNomeUbs` em `sessao/SessaoProvider.tsx` |
 
 ## 7. Configurações
 

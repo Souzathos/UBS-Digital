@@ -2,7 +2,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { ApiErro, ligarSessao } from '@/api/cliente'
-import type { PacienteProprio, UsuarioEquipe } from '@/api/tipos'
+import type { PacienteProprio, UbsSessao, UsuarioEquipe } from '@/api/tipos'
+import { UBS_NOME } from '@/config'
 import { servicos } from '@/servicos'
 import { apagarToken, gravarToken, lerToken } from './armazenamento'
 import type { Sessao } from './guardas'
@@ -54,10 +55,10 @@ export function SessaoProvider({ children }: { children: ReactNode }) {
         setSessao({ estado: 'anonimo' })
     }, [queryClient, setSessao])
 
-    const aplicar = useCallback(async (token: string, quem: { paciente: PacienteProprio } | { usuario: UsuarioEquipe }) => {
+    const aplicar = useCallback(async (token: string, quem: { paciente: PacienteProprio } | { usuario: UsuarioEquipe }, ubs: UbsSessao) => {
         tokenAtual.current = token
         await gravarToken(token)
-        setSessao('paciente' in quem ? { estado: 'paciente', token, paciente: quem.paciente } : { estado: 'equipe', token, usuario: quem.usuario })
+        setSessao('paciente' in quem ? { estado: 'paciente', token, paciente: quem.paciente, ubs } : { estado: 'equipe', token, usuario: quem.usuario, ubs })
     }, [setSessao])
 
     useEffect(() => {
@@ -83,7 +84,7 @@ export function SessaoProvider({ children }: { children: ReactNode }) {
                 const eu = await servicos.auth.eu(token)
                 if (!ativo) return
                 tokenAtual.current = token
-                setSessao(eu.tipo === 'PACIENTE' ? { estado: 'paciente', token, paciente: eu.paciente } : { estado: 'equipe', token, usuario: eu.usuario })
+                setSessao(eu.tipo === 'PACIENTE' ? { estado: 'paciente', token, paciente: eu.paciente, ubs: eu.ubs } : { estado: 'equipe', token, usuario: eu.usuario, ubs: eu.ubs })
             } catch (erro) {
                 if (!ativo) return
                 if (erro instanceof ApiErro && erro.status === 0) {
@@ -103,25 +104,25 @@ export function SessaoProvider({ children }: { children: ReactNode }) {
 
     const entrarPaciente = useCallback(async (cpf: string, senha: string) => {
         const r = await servicos.auth.entrarPaciente(cpf, senha)
-        await aplicar(r.token, { paciente: { ...r.paciente, deveTrocarSenha: r.deveTrocarSenha } })
+        await aplicar(r.token, { paciente: { ...r.paciente, deveTrocarSenha: r.deveTrocarSenha } }, r.ubs)
     }, [aplicar])
 
     const entrarEquipe = useCallback(async (email: string, senha: string) => {
         const r = await servicos.auth.entrarEquipe(email, senha)
-        await aplicar(r.token, { usuario: r.usuario })
+        await aplicar(r.token, { usuario: r.usuario }, r.ubs)
     }, [aplicar])
 
     const trocarSenha = useCallback(async (senhaAtual: string, novaSenha: string) => {
         if (sessao.estado !== 'paciente') return
         const r = await servicos.auth.trocarSenha(sessao.token, senhaAtual, novaSenha)
         // O token antigo carregava deveTrocarSenha = true; a partir daqui vale o novo.
-        await aplicar(r.token, { paciente: { ...r.paciente, deveTrocarSenha: false } })
+        await aplicar(r.token, { paciente: { ...r.paciente, deveTrocarSenha: false } }, r.ubs)
     }, [sessao, aplicar])
 
     const atualizar = useCallback(async () => {
         if (sessao.estado !== 'paciente' && sessao.estado !== 'equipe') return
         const eu = await servicos.auth.eu(sessao.token)
-        await aplicar(sessao.token, eu.tipo === 'PACIENTE' ? { paciente: eu.paciente } : { usuario: eu.usuario })
+        await aplicar(sessao.token, eu.tipo === 'PACIENTE' ? { paciente: eu.paciente } : { usuario: eu.usuario }, eu.ubs)
     }, [sessao, aplicar])
 
     const tentarDeNovo = useCallback(() => {
@@ -155,4 +156,10 @@ export function useEquipeLogada(): UsuarioEquipe {
     const { ultimoUsuario } = useSessao()
     if (!ultimoUsuario) throw new Error('Tela da equipe aberta sem sessão de equipe')
     return ultimoUsuario
+}
+
+// Nome da UBS de quem está logado (vem do login e de /auth/eu). Antes do login, o nome padrão.
+export function useNomeUbs(): string {
+    const { sessao } = useSessao()
+    return sessao.estado === 'paciente' || sessao.estado === 'equipe' ? sessao.ubs.nome : UBS_NOME
 }

@@ -13,7 +13,7 @@ import { Texto } from '@/componentes/Texto'
 import { useRelogio } from '@/hooks/equipe'
 import { servicos } from '@/servicos'
 import { useTheme } from '@/tema/ThemeProvider'
-import { formatarDia, formatarHoraRelogio } from '@/utils/datas'
+import { formatarDia, formatarDiaHoraCurto, formatarHoraRelogio } from '@/utils/datas'
 
 const SALTOS = [
     { rotulo: '+1 hora', tempo: { horas: 1 } },
@@ -116,8 +116,11 @@ export default function Relogio() {
                             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
                                 <Etiqueta texto={ETAPA[m.etapa] ?? m.etapa} cores={tema.cores.status.confirmado} />
                                 <Texto variante="rotulo">{CANAL[m.canal] ?? m.canal}</Texto>
+                                <Texto variante="mono" style={{ fontSize: tema.fonte(13) }}>
+                                    {formatarDiaHoraCurto(m.enviadaEm)}
+                                </Texto>
                                 <Texto variante="legenda" cor="textoSuave">
-                                    {m.destinatarioTipo === 'PACIENTE' ? `paciente nº ${m.destinatarioId}` : `${m.destinatarioTipo.toLowerCase()} nº ${m.destinatarioId}`}
+                                    {m.destinatarioNome ?? `${m.destinatarioTipo === 'PACIENTE' ? 'paciente' : m.destinatarioTipo.toLowerCase()} nº ${m.destinatarioId}`}
                                     {m.destino ? ` · ${m.destino}` : ' · sem canal próprio'}
                                 </Texto>
                             </View>

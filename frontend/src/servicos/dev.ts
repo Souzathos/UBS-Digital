@@ -9,10 +9,12 @@ export type Envio = {
     canal: string
     destinatarioTipo: string
     destinatarioId: number
+    destinatarioNome?: string
     destino: string | null
     etapa: string
     texto: string
     link: string
+    enviadaEm: string
 }
 
 export interface DevServico {

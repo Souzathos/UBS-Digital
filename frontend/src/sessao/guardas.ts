@@ -1,11 +1,11 @@
-import type { PacienteProprio, UsuarioEquipe } from '@/api/tipos'
+import type { PacienteProprio, UbsSessao, UsuarioEquipe } from '@/api/tipos'
 
 export type Sessao =
     | { estado: 'carregando' }
     | { estado: 'semConexao' }
     | { estado: 'anonimo' }
-    | { estado: 'paciente'; token: string; paciente: PacienteProprio }
-    | { estado: 'equipe'; token: string; usuario: UsuarioEquipe }
+    | { estado: 'paciente'; token: string; paciente: PacienteProprio; ubs: UbsSessao }
+    | { estado: 'equipe'; token: string; usuario: UsuarioEquipe; ubs: UbsSessao }
 
 // Quais áreas do app a sessão libera. As quatro são exclusivas: em qualquer momento, só uma é
 // verdadeira (ou nenhuma, enquanto carrega). O layout raiz usa isso nos Stack.Protected.

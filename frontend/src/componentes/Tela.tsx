@@ -5,13 +5,14 @@ import { Image, KeyboardAvoidingView, Platform, Pressable, RefreshControl, Scrol
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { MenuAcessibilidade } from '@/acessibilidade/MenuAcessibilidade'
-import { REDE_NOME, UBS_NOME } from '@/config'
+import { REDE_NOME } from '@/config'
 import { criarEstilos } from '@/tema/criarEstilos'
 import { useTheme } from '@/tema/ThemeProvider'
 import { areaToque } from '@/tema/tokens'
 import { EtiquetaExemplo } from './Estados'
 import { Icone } from './Icone'
 import { Texto } from './Texto'
+import { useNomeUbs } from '@/sessao/SessaoProvider'
 
 type Props = {
     children: ReactNode
@@ -44,6 +45,7 @@ export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rol
     const tema = useTheme()
     const e = useEstilos()
     const insets = useSafeAreaInsets()
+    const nomeUbs = useNomeUbs()
     const [menuAberto, setMenuAberto] = useState(false)
     // No painel, o subtítulo diz onde a pessoa está e o logo ganha uma caixa branca (design da equipe).
     const painel = tema.variante === 'equipe'
@@ -52,13 +54,13 @@ export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rol
     const topo = (
         <View style={e.cabecalho}>
             {cabecalho === 'ubs' ? (
-                <View style={e.marca} accessible accessibilityLabel={`${UBS_NOME}, ${subtitulo}`}>
+                <View style={e.marca} accessible accessibilityLabel={`${nomeUbs}, ${subtitulo}`}>
                     <View style={painel ? e.caixaLogo : undefined}>
                         <Image source={require('../../assets/imagens/logo-ubs.png')} style={painel ? e.logoPainel : e.logo} resizeMode="contain" accessible={false} />
                     </View>
                     <View style={{ flexShrink: 1 }}>
                         <Texto variante="subtitulo" peso="600" style={{ lineHeight: tema.fonte(21) }}>
-                            {UBS_NOME}
+                            {nomeUbs}
                         </Texto>
                         <Texto variante="legenda" cor="textoSuave" style={{ fontSize: tema.fonte(12) }}>
                             {subtitulo}

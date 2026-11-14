@@ -13,10 +13,9 @@ import { Icone } from '@/componentes/Icone'
 import { IconeSelo, Indicador, nomeCurto } from '@/componentes/Painel'
 import { Tela } from '@/componentes/Tela'
 import { Texto } from '@/componentes/Texto'
-import { UBS_NOME } from '@/config'
 import { useReaproveitadas } from '@/hooks/camada2'
 import { useAcoesEquipe, useAgendaDoDia, useAgora, usePodeAgir, useRelogio } from '@/hooks/equipe'
-import { useEquipeLogada, useSessao } from '@/sessao/SessaoProvider'
+import { useEquipeLogada, useSessao, useNomeUbs } from '@/sessao/SessaoProvider'
 import { useTheme } from '@/tema/ThemeProvider'
 import { dataPorExtenso, diaISO, formatarDiaDeISO, formatarHoraRelogio, somarDiasISO } from '@/utils/datas'
 import { rotuloCategoria, rotuloPerfil, statusParaEquipe } from '@/utils/rotulos'
@@ -33,6 +32,7 @@ const FILTROS: { id: FiltroAgenda; nome: string }[] = [
 // Agenda do dia com filtros e registro de comparecimento ou falta (seção 6, fluxo C, RN-82).
 // Design: equipe/agenda-do-dia-e-presenca.
 export default function Agenda() {
+    const nomeUbs = useNomeUbs()
     const usuario = useEquipeLogada()
     const { sair } = useSessao()
     const podeAgir = usePodeAgir()
@@ -68,7 +68,7 @@ export default function Agenda() {
                 <BotaoDia icone="voltar" rotulo="Dia anterior" onPress={() => setDiaEscolhido(somarDiasISO(dia, -1))} />
                 <View style={{ flex: 1 }}>
                     <Texto cor="textoSuave" numeros>
-                        {formatarDiaDeISO(dia)} · {UBS_NOME}
+                        {formatarDiaDeISO(dia)} · {nomeUbs}
                     </Texto>
                     {dia !== hoje ? <Botao titulo="Voltar para hoje" variante="texto" onPress={() => setDiaEscolhido(null)} style={{ alignSelf: 'flex-start', paddingHorizontal: 0 }} /> : null}
                 </View>

@@ -1,10 +1,11 @@
 import { agendamentosApi, type AgendamentosServico } from './agendamentos'
+import { avisosApi } from './avisos'
 import { authApi, type AuthServico } from './auth'
 import { catalogoApi, type CatalogoServico } from './catalogo'
 import { devApi, type DevServico } from './dev'
 import { agendaEquipeApi, pacientesApi, type AgendaEquipeServico, type PacientesServico } from './equipe'
 import type { AlertasServico, AvisosServico, CompromissoServico, FichaCamada2Servico, OfertasEquipeServico, OfertasServico } from './camada2/contratos'
-import { alertasFalso, avisosFalso, compromissoFalso, fichaFalsa, ofertasEquipeFalso, ofertasFalso } from './camada2/falsos'
+import { alertasFalso, compromissoFalso, fichaFalsa, ofertasEquipeFalso, ofertasFalso } from './camada2/falsos'
 
 // Registro único dos serviços. As telas e os hooks pedem `servicos.auth`, `servicos.ofertas`…
 // e nunca importam uma implementação direto. Quando uma rota da Camada 2 sair no backend, a troca
@@ -16,8 +17,8 @@ export type Servicos = {
     agendaEquipe: AgendaEquipeServico
     pacientes: PacientesServico
     dev: DevServico
-    // Camada 2 (dados falsos até as rotas existirem no backend)
     avisos: AvisosServico
+    // Camada 2 (dados falsos até as rotas existirem no backend)
     ofertas: OfertasServico
     compromisso: CompromissoServico
     ofertasEquipe: OfertasEquipeServico
@@ -32,8 +33,8 @@ export const servicos: Servicos = {
     agendaEquipe: agendaEquipeApi,
     pacientes: pacientesApi,
     dev: devApi,
-    // ↓ Troque cada um pela implementação real quando a rota sair (ex.: ofertas: ofertasApi).
-    avisos: avisosFalso,
+    avisos: avisosApi,
+    // ↓ Camada 2 ainda falsa. Troque cada um pela implementação real quando a rota sair (ex.: ofertas: ofertasApi).
     ofertas: ofertasFalso,
     compromisso: compromissoFalso,
     ofertasEquipe: ofertasEquipeFalso,

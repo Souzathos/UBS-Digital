@@ -5,6 +5,7 @@ import { View } from 'react-native'
 import { ApiErro, mensagemDeErro } from '@/api/cliente'
 import type { Slot } from '@/api/tipos'
 import { Aviso } from '@/componentes/Aviso'
+import { AvisosDaConsulta } from '@/componentes/AvisosDaConsulta'
 import { Botao } from '@/componentes/Botao'
 import { Cartao } from '@/componentes/Cartao'
 import { Carregando, ErroTela } from '@/componentes/Estados'
@@ -162,6 +163,7 @@ export default function AgendamentoEquipeTela() {
             ) : (
                 <Aviso tipo="info">Seu perfil só consulta a agenda. Para confirmar, remarcar ou cancelar, fale com a recepção.</Aviso>
             )}
+            <AvisosDaConsulta agendamento={a} publico="equipe" />
             <Botao titulo="Abrir ficha do paciente" variante="texto" onPress={() => router.push({ pathname: '/equipe/paciente/[id]', params: { id: String(a.paciente.id) } })} />
         </Tela>
     )

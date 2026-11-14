@@ -11,14 +11,15 @@ import { IconeSelo } from '@/componentes/Painel'
 import { Aviso } from '@/componentes/Aviso'
 import { Tela } from '@/componentes/Tela'
 import { Texto } from '@/componentes/Texto'
-import { UBS_NOME } from '@/config'
 import { useAgora, usePacientes, usePodeAgir } from '@/hooks/equipe'
 import { cpfParcial } from '@/utils/cpf'
 import { idade } from '@/utils/datas'
+import { useNomeUbs } from '@/sessao/SessaoProvider'
 
 // Pacientes com busca por nome ou início do CPF (seção 6, painel 2). A busca é da API (?q=).
 // Design: equipe/pacientes-com-busca.
 export default function Pacientes() {
+    const nomeUbs = useNomeUbs()
     const podeAgir = usePodeAgir()
     const agora = useAgora()
     const [digitado, setDigitado] = useState('')
@@ -32,7 +33,7 @@ export default function Pacientes() {
     }, [digitado])
 
     const lista = busca.data ?? []
-    const contagem = !q ? `${lista.length} pacientes da ${UBS_NOME}` : lista.length === 1 ? '1 encontrado' : `${lista.length} encontrados`
+    const contagem = !q ? `${lista.length} pacientes da ${nomeUbs}` : lista.length === 1 ? '1 encontrado' : `${lista.length} encontrados`
 
     return (
         <Tela

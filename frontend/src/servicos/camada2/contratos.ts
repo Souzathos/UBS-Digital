@@ -6,7 +6,8 @@ import type { Agendamento, Canal, Categoria, Referencia } from '@/api/tipos'
 // Estes tipos são também a proposta de contrato para o backend (ver SPEC, seção 6).
 
 // --- Avisos de um agendamento (RN-10 a RN-13, RN-25, RN-26) ---
-// Rota proposta: GET /agendamentos/:id/avisos
+// JÁ EXISTE no backend desde 14/11: GET /agendamentos/:id/avisos e GET /equipe/agendamentos/:id/avisos
+// (implementação real em servicos/avisos.ts). `prazoResposta` vem null até a RN-26 existir.
 
 export type EtapaAviso = 'D14' | 'D7' | 'D3' | 'D0'
 
@@ -30,7 +31,7 @@ export type AvisosDaConsulta = {
 
 export interface AvisosServico {
     // A implementação real só usa o id; a falsa precisa das datas para montar o exemplo.
-    listar(agendamento: Pick<Agendamento, 'id' | 'inicio' | 'status' | 'criadoEm' | 'confirmadoEm'>): Promise<AvisosDaConsulta>
+    listar(agendamento: Pick<Agendamento, 'id' | 'inicio' | 'status' | 'criadoEm' | 'confirmadoEm'>, publico?: 'paciente' | 'equipe'): Promise<AvisosDaConsulta>
 }
 
 // --- Ofertas de vaga mais cedo para o paciente (RN-30 a RN-35) ---

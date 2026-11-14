@@ -8,19 +8,19 @@ import { formatarDataHora, formatarDiaMes } from '@/utils/datas'
 import { concordar, oItem } from '@/utils/rotulos'
 import { Aviso } from './Aviso'
 import { Cartao } from './Cartao'
-import { Carregando, EtiquetaExemplo } from './Estados'
+import { Carregando } from './Estados'
 import { Etiqueta } from './Etiqueta'
 import { Texto } from './Texto'
 
 const QUANDO: Record<AvisoConsulta['etapa'], string> = { D14: '2 semanas antes', D7: '1 semana antes', D3: '3 dias antes', D0: 'No dia' }
 const CANAL: Record<string, string> = { PUSH: 'App', WHATSAPP: 'WhatsApp', SMS: 'SMS', EMAIL: 'E-mail' }
 
-// "Avisos desta consulta": a linha do tempo D-14, D-7, D-3 e D-0 (RN-10 a RN-12). Ainda sem
-// rota no backend (GET /agendamentos/:id/avisos): vem do serviço falso, com a etiqueta "Exemplo".
+// "Avisos desta consulta": a linha do tempo D-14, D-7, D-3 e D-0 (RN-10 a RN-12), vinda de
+// GET /agendamentos/:id/avisos (ou da rota da equipe, no painel).
 // Design: paciente/lembrete-confirmar-cancelar-remarcar.
-export function AvisosDaConsulta({ agendamento }: { agendamento: Agendamento }) {
+export function AvisosDaConsulta({ agendamento, publico = 'paciente' }: { agendamento: Agendamento; publico?: 'paciente' | 'equipe' }) {
     const { cores } = useTheme()
-    const consulta = useAvisos(agendamento)
+    const consulta = useAvisos(agendamento, publico)
 
     const estadoVisual = (a: AvisoConsulta) => {
         switch (a.estado) {
@@ -38,7 +38,6 @@ export function AvisosDaConsulta({ agendamento }: { agendamento: Agendamento }) 
                 <Texto variante="subtitulo" titulo>
                     Avisos {concordar(agendamento.tipoAtendimento.categoria, 'desta', 'deste')} {agendamento.tipoAtendimento.categoria === 'CONSULTA' ? 'consulta' : 'procedimento'}
                 </Texto>
-                <EtiquetaExemplo />
             </View>
             {consulta.isPending ? (
                 <Carregando texto="Carregando avisos…" />
@@ -70,11 +69,12 @@ export function AvisosDaConsulta({ agendamento }: { agendamento: Agendamento }) 
                             )
                         })}
                     </Cartao>
+                    {consulta.data.avisos.length === 0 ? <Texto cor="textoSuave">Nenhum aviso programado.</Texto> : null}
                     {consulta.data.prazoResposta ? (
                         <Texto cor="textoSuave">
                             Responda pelo app, WhatsApp ou SMS. Sem resposta até {formatarDataHora(consulta.data.prazoResposta)}, {oItem(agendamento.tipoAtendimento.categoria)} é {concordar(agendamento.tipoAtendimento.categoria, 'cancelada', 'cancelado')} e a vaga vai para outra pessoa.
                         </Texto>
-                    ) : agendamento.status === 'CONFIRMADO' ? (
+                    ) : publico === 'paciente' && agendamento.status === 'CONFIRMADO' ? (
                         <Texto cor="textoSuave">Você já respondeu, a vaga está garantida. Os próximos avisos só lembram e trazem as opções de cancelar e remarcar.</Texto>
                     ) : null}
                 </>
@@ -94,7 +94,6 @@ export function ExplicacaoSemResposta({ agendamento }: { agendamento: Agendament
                 <Texto variante="subtitulo" titulo>
                     O que aconteceu
                 </Texto>
-                <EtiquetaExemplo />
             </View>
             <Texto>Não recebemos resposta aos avisos. Por isso, antes {concordar(agendamento.tipoAtendimento.categoria, 'da consulta', 'do procedimento')}, a vaga foi para outra pessoa.</Texto>
             {consulta.data ? (

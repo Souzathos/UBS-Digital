@@ -9,10 +9,11 @@ import { servicos } from '@/servicos'
 
 const k = (...partes: (string | number)[]) => [...chaves.camada2, ...partes]
 
-export function useAvisos(a: Agendamento | null | undefined) {
+// Avisos de um agendamento: rota real (não é mais Camada 2), mesma interface de antes.
+export function useAvisos(a: Agendamento | null | undefined, publico: 'paciente' | 'equipe' = 'paciente') {
     return useQuery({
-        queryKey: k('avisos', a?.id ?? 0, a?.status ?? ''),
-        queryFn: () => servicos.avisos.listar(a!),
+        queryKey: ['avisos', publico, a?.id ?? 0, a?.status ?? ''],
+        queryFn: () => servicos.avisos.listar(a!, publico),
         enabled: !!a
     })
 }
