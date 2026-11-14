@@ -1,5 +1,5 @@
 import type { StatusAgendamento } from '@/api/tipos'
-import { nomeDoItem, rotuloCategoria, statusParaEquipe, statusParaPaciente } from '../rotulos'
+import { concordar, esteItem, nomeDoItem, rotuloCategoria, seuItem, statusParaEquipe, statusParaPaciente } from '../rotulos'
 
 const TODOS: StatusAgendamento[] = ['PENDENTE', 'CONFIRMADO', 'CANCELADO_PACIENTE', 'CANCELADO_AUTO', 'REMARCADO', 'COMPARECEU', 'FALTOU']
 
@@ -26,5 +26,14 @@ describe('status sempre escrito (handoff, seção 3)', () => {
     it('o paciente lê "Falta confirmar"; a equipe lê "Pendente"', () => {
         expect(statusParaPaciente('PENDENTE')).toEqual({ chave: 'pendente', texto: 'Falta confirmar' })
         expect(statusParaEquipe('PENDENTE')).toEqual({ chave: 'pendente', texto: 'Pendente' })
+    })
+})
+
+describe('concordância de consulta (feminino) e procedimento (masculino)', () => {
+    it('sua consulta / seu procedimento', () => {
+        expect(seuItem('CONSULTA')).toBe('sua consulta')
+        expect(seuItem('PROCEDIMENTO')).toBe('seu procedimento')
+        expect(esteItem('PROCEDIMENTO')).toBe('este procedimento')
+        expect(concordar('PROCEDIMENTO', 'cancelada', 'cancelado')).toBe('cancelado')
     })
 })

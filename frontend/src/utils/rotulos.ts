@@ -62,3 +62,28 @@ export function leituraAtendimento(a: {
     const onde = [a.profissional.nome, a.ubs?.nome].filter(Boolean).join(', ')
     return `${rotuloCategoria(a.tipoAtendimento.categoria)}. ${a.tipoAtendimento.nome}. ${dataPorExtenso(a.inicio)}. ${onde}. ${statusParaPaciente(a.status).texto}.`
 }
+
+// Concordância: consulta é feminino, procedimento é masculino.
+// "sua consulta" / "seu procedimento"
+export function seuItem(categoria: Categoria): string {
+    return categoria === 'CONSULTA' ? 'sua consulta' : 'seu procedimento'
+}
+
+// "esta consulta" / "este procedimento"
+export function esteItem(categoria: Categoria): string {
+    return categoria === 'CONSULTA' ? 'esta consulta' : 'este procedimento'
+}
+
+// "a consulta" / "o procedimento"
+export function oItem(categoria: Categoria): string {
+    return categoria === 'CONSULTA' ? 'a consulta' : 'o procedimento'
+}
+
+// "cancelada" / "cancelado"
+export function concordar(categoria: Categoria, feminino: string, masculino: string): string {
+    return categoria === 'CONSULTA' ? feminino : masculino
+}
+
+export function maiuscula(texto: string): string {
+    return texto.charAt(0).toUpperCase() + texto.slice(1)
+}

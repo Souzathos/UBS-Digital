@@ -8,7 +8,7 @@ import { Botao } from '@/componentes/Botao'
 import { Campo } from '@/componentes/Campo'
 import { Cartao } from '@/componentes/Cartao'
 import { Carregando, ErroTela } from '@/componentes/Estados'
-import { IconeSelo } from '@/componentes/Painel'
+import { FichaCamada2 } from '@/componentes/FichaCamada2'
 import { SeletorRua } from '@/componentes/SeletorRua'
 import { Tela } from '@/componentes/Tela'
 import { Texto } from '@/componentes/Texto'
@@ -126,26 +126,17 @@ export default function FichaPaciente() {
                 )}
             </View>
 
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-                <Cartao style={{ flex: 1 }}>
-                    <Texto variante="rotulo" cor="textoSuave">
-                        Pontuação de compromisso
-                    </Texto>
-                    {/* Só a equipe vê o número (seção 6). */}
-                    <Texto peso="700" numeros style={{ fontSize: tema.fonte(28), lineHeight: tema.fonte(32) }}>
-                        {String(p.pontuacao)}
-                    </Texto>
-                </Cartao>
-                <Cartao style={{ flex: 1 }}>
-                    <Texto variante="rotulo" cor="textoSuave">
-                        Selo de vulnerável
-                    </Texto>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                        {p.vulneravel ? <IconeSelo /> : null}
-                        <Texto variante="corpoForte">{p.vulneravel ? 'Ativo' : 'Inativo'}</Texto>
-                    </View>
-                </Cartao>
-            </View>
+            <Cartao>
+                <Texto variante="rotulo" cor="textoSuave">
+                    Pontuação de compromisso
+                </Texto>
+                {/* Só a equipe vê o número (seção 6). */}
+                <Texto peso="700" numeros style={{ fontSize: tema.fonte(28), lineHeight: tema.fonte(32) }}>
+                    {String(p.pontuacao)}
+                </Texto>
+            </Cartao>
+
+            <FichaCamada2 paciente={p} podeAgir={podeAgir} />
 
             {podeAgir ? (
                 <View style={{ gap: 8 }}>

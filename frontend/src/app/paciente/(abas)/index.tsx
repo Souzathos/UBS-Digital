@@ -7,11 +7,14 @@ import type { Agendamento } from '@/api/tipos'
 import { Aviso } from '@/componentes/Aviso'
 import { CartaoCompacto, CartaoHistorico, CartaoProximo } from '@/componentes/CartaoAtendimento'
 import { CartaoMedico } from '@/componentes/CartaoMedico'
-import { Carregando, ErroTela, Vazio } from '@/componentes/Estados'
+import { Carregando, ErroTela, EtiquetaExemplo, Vazio } from '@/componentes/Estados'
+import { Cartao } from '@/componentes/Cartao'
 import { Botao } from '@/componentes/Botao'
 import { Tela } from '@/componentes/Tela'
 import { Texto } from '@/componentes/Texto'
+import { useOfertas } from '@/hooks/camada2'
 import { useAcoesPaciente, useMeusAtendimentos } from '@/hooks/paciente'
+import { formatarDataHora } from '@/utils/datas'
 import { usePacienteLogado } from '@/sessao/SessaoProvider'
 import { leituraAtendimento } from '@/utils/rotulos'
 
@@ -21,6 +24,8 @@ export default function MeusAtendimentos() {
     const paciente = usePacienteLogado()
     const consulta = useMeusAtendimentos()
     const { confirmar } = useAcoesPaciente()
+    // Camada 2 (exemplo): oferta de vaga mais cedo pendente.
+    const oferta = useOfertas().data?.find(o => o.status === 'PENDENTE')
     const [erroAcao, setErroAcao] = useState<string>()
 
     const abrir = (a: Agendamento, acao?: 'cancelar') =>
@@ -51,6 +56,16 @@ export default function MeusAtendimentos() {
             ) : (
                 <>
                     {erroAcao ? <Aviso tipo="perigo" titulo="Não foi possível confirmar">{erroAcao}</Aviso> : null}
+
+                    {oferta ? (
+                        <Cartao onPress={() => router.push({ pathname: '/paciente/oferta/[id]', params: { id: String(oferta.id) } })} rotulo={`Abriu uma vaga mais cedo: ${formatarDataHora(oferta.vaga.inicio)}`} dica="Abre a oferta">
+                            <EtiquetaExemplo />
+                            <Texto variante="subtitulo">Abriu uma vaga mais cedo</Texto>
+                            <Texto>
+                                {oferta.vaga.tipoAtendimento.nome}: {formatarDataHora(oferta.vaga.inicio)}. Toque para aceitar ou manter seu horário.
+                            </Texto>
+                        </Cartao>
+                    ) : null}
 
                     <Secao titulo="Próximo">
                         {proximo ? (

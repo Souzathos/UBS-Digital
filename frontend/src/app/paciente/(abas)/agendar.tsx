@@ -17,7 +17,7 @@ import { Texto } from '@/componentes/Texto'
 import { estaAtivo, useAcoesPaciente, useMeusAtendimentos, useSlots, useTipos } from '@/hooks/paciente'
 import { usePacienteLogado } from '@/sessao/SessaoProvider'
 import { dataPorExtenso, formatarDataHora } from '@/utils/datas'
-import { leituraAtendimento, nomeDoItem, rotuloCategoria } from '@/utils/rotulos'
+import { concordar, leituraAtendimento, nomeDoItem, rotuloCategoria } from '@/utils/rotulos'
 
 type Passo = 'tipo' | 'item' | 'duplicado' | 'hora' | 'conferir' | 'feito'
 
@@ -171,7 +171,7 @@ export default function Agendar() {
     if (passo === 'duplicado' && tipo) {
         const existente = jaTem(tipo)
         return (
-            <Tela {...comum} titulo={`Você já tem ${tipo.nome} marcada`} leitura={existente ? `Você já tem ${leituraAtendimento(existente)}` : undefined}>
+            <Tela {...comum} titulo={`${tipo.nome}: você já tem ${concordar(tipo.categoria, 'uma marcada', 'um marcado')}`} leitura={existente ? `Você já tem ${leituraAtendimento(existente)}` : undefined}>
                 <View accessibilityRole="alert" style={{ gap: 14 }}>
                     {existente ? (
                         <Cartao>

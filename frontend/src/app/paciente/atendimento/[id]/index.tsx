@@ -5,6 +5,7 @@ import { View } from 'react-native'
 import { mensagemDeErro } from '@/api/cliente'
 import type { Agendamento } from '@/api/tipos'
 import { Aviso } from '@/componentes/Aviso'
+import { AvisosDaConsulta, ExplicacaoSemResposta } from '@/componentes/AvisosDaConsulta'
 import { Botao } from '@/componentes/Botao'
 import { Cartao } from '@/componentes/Cartao'
 import { linhaResumo } from '@/componentes/CartaoAtendimento'
@@ -14,7 +15,7 @@ import { Tela } from '@/componentes/Tela'
 import { Texto } from '@/componentes/Texto'
 import { estaAtivo, useAcoesPaciente, useAgendamento } from '@/hooks/paciente'
 import { formatarDataHora, quandoRelativo } from '@/utils/datas'
-import { leituraAtendimento, nomeDoItem } from '@/utils/rotulos'
+import { concordar, esteItem, leituraAtendimento, maiuscula, nomeDoItem, seuItem } from '@/utils/rotulos'
 
 type Etapa = 'ver' | 'confirmarCancelamento' | 'cancelado'
 
@@ -58,7 +59,7 @@ export default function DetalheAtendimento() {
 
     if (etapa === 'confirmarCancelamento' && a.acoes.cancelar) {
         return (
-            <Tela cabecalho="voltar" titulo={`Cancelar ${item === 'consulta' ? 'esta consulta' : 'este procedimento'}?`} leitura={`${leituraAtendimento(a)} A vaga fica livre para outra pessoa. Cancelar não prejudica você.`}>
+            <Tela cabecalho="voltar" titulo={`Cancelar ${esteItem(a.tipoAtendimento.categoria)}?`} leitura={`${leituraAtendimento(a)} A vaga fica livre para outra pessoa. Cancelar não prejudica você.`}>
                 <Texto cor="textoSuave" style={{ marginTop: -6 }}>
                     A vaga fica livre para outra pessoa.
                 </Texto>
@@ -89,9 +90,21 @@ export default function DetalheAtendimento() {
         )
     }
 
+    // RN-26: cancelada por falta de resposta (Camada 2; a explicação ainda vem de dados de exemplo).
+    if (a.status === 'CANCELADO_AUTO') {
+        return (
+            <Tela cabecalho="voltar" titulo={`${maiuscula(seuItem(a.tipoAtendimento.categoria))} foi ${concordar(a.tipoAtendimento.categoria, 'cancelada', 'cancelado')}`} leitura={`${leituraAtendimento(a)} Não recebemos resposta aos avisos. Isso não prejudica você.`}>
+                <ResumoAtendimento agendamento={a} riscado />
+                <ExplicacaoSemResposta agendamento={a} />
+                <Botao titulo={item === 'consulta' ? 'Marcar nova consulta' : 'Marcar novo procedimento'} onPress={() => router.navigate('/paciente/agendar')} />
+                <Botao titulo="Ver meus atendimentos" variante="contorno" onPress={() => router.navigate('/paciente')} />
+            </Tela>
+        )
+    }
+
     const ativo = estaAtivo(a)
     const confirmado = a.status === 'CONFIRMADO'
-    const titulo = !ativo ? 'Seu atendimento' : confirmado ? 'Presença confirmada' : `Sua ${item} ${quandoRelativo(a.inicio, new Date())}`
+    const titulo = !ativo ? 'Seu atendimento' : confirmado ? 'Presença confirmada' : `${maiuscula(seuItem(a.tipoAtendimento.categoria))} ${quandoRelativo(a.inicio, new Date())}`
 
     return (
         <Tela cabecalho="voltar" titulo={titulo} leitura={leituraAtendimento(a)}>
@@ -111,6 +124,9 @@ export default function DetalheAtendimento() {
                 </View>
             ) : null}
             {confirmado ? <Texto cor="textoSuave">Cancelar ou remarcar não prejudica você, nem depois de confirmar.</Texto> : null}
+
+            {ativo ? <AvisosDaConsulta agendamento={a} /> : null}
+            {ativo ? <Botao titulo="Como funcionam as ofertas de vaga mais cedo" variante="texto" onPress={() => router.push('/paciente/ofertas')} /> : null}
 
             {a.tipoAtendimento.instrucoesPreparo ? (
                 <Aviso tipo="aviso" titulo="Preparo">

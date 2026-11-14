@@ -14,6 +14,7 @@ import { IconeSelo, Indicador, nomeCurto } from '@/componentes/Painel'
 import { Tela } from '@/componentes/Tela'
 import { Texto } from '@/componentes/Texto'
 import { UBS_NOME } from '@/config'
+import { useReaproveitadas } from '@/hooks/camada2'
 import { useAcoesEquipe, useAgendaDoDia, useAgora, usePodeAgir, useRelogio } from '@/hooks/equipe'
 import { useEquipeLogada, useSessao } from '@/sessao/SessaoProvider'
 import { useTheme } from '@/tema/ThemeProvider'
@@ -43,6 +44,8 @@ export default function Agenda() {
     const agenda = useAgendaDoDia(dia)
     const [filtro, setFiltro] = useState<FiltroAgenda>('todos')
     const [aberto, setAberto] = useState<number | null>(null)
+    // Camada 2 (exemplo): vagas liberadas e ocupadas por adiantamento no dia.
+    const reaproveitadas = useReaproveitadas(dia)
 
     const lista = agenda.data ?? []
     const passa = (a: AgendamentoEquipe, f: FiltroAgenda) => (f === 'todos' ? true : f === 'faltas' ? a.status === 'FALTOU' : a.tipoAtendimento.categoria === f)
@@ -81,6 +84,7 @@ export default function Agenda() {
             <View style={{ flexDirection: 'row', gap: 8 }}>
                 <Indicador valor={compareceram} rotulo={compareceram === 1 ? 'compareceu' : 'compareceram'} />
                 <Indicador valor={faltaram} rotulo={faltaram === 1 ? 'faltou' : 'faltaram'} />
+                <Indicador valor={reaproveitadas.data ?? 0} rotulo="reaproveitadas" exemplo />
             </View>
 
             {agenda.isPending ? (
