@@ -2,7 +2,7 @@ import supertest from "supertest";
 import app from "../src/app";
 import { AppDataSource } from "../src/config/dataSource";
 import { CONFIGURACAO_PADRAO } from "../src/seeds/dados/configuracao";
-import { CategoriaAtendimento, Configuracao, OrigemSlot, Paciente, PerfilEquipe, Profissional, Slot, StatusSlot, TipoAtendimento, Ubs, UsuarioEquipe } from "../src/models";
+import { CategoriaAtendimento, Configuracao, OrigemSlot, Rua, Paciente, PerfilEquipe, Profissional, Slot, StatusSlot, TipoAtendimento, Ubs, UsuarioEquipe } from "../src/models";
 import { cpfComDigitos } from "../src/utils/cpf";
 import { gerarHash } from "../src/utils/hash";
 import { gerarToken } from "../src/utils/jwt";
@@ -21,6 +21,7 @@ export async function startDb() {
 }
 
 export async function clearDb() {
+    ruaPadraoId = null
     const tables = AppDataSource.entityMetadatas.map(entity => `"${entity.tableName}"`)
     if(tables.length === 0) return
 
@@ -35,6 +36,9 @@ export async function stopDb() {
 
 export const SENHA = '123456'
 let sequencia = 0
+// Rua usada por criarPaciente quando o teste não informa outra. O montarCenario define a rua do médico
+// do cenário, para os pacientes criados nele poderem marcar consulta médica (regra do médico pela rua).
+let ruaPadraoId: number | null = null
 
 // CPF válido e diferente a cada chamada
 export function cpfValidoUnico() {
@@ -59,7 +63,13 @@ export async function criarEquipe(ubsId: number, perfil = PerfilEquipe.RECEPCAO,
 export async function criarProfissional(ubsId: number, dados: Partial<Profissional> = {}) {
     sequencia += 1
     const repo = AppDataSource.getRepository(Profissional)
-    return repo.save(repo.create({ ubsId, nome: `Profissional ${sequencia}`, funcao: 'médico', ...dados }))
+    return repo.save(repo.create({ ubsId, nome: `Profissional ${sequencia}`, funcao: 'médico', categoria: CategoriaAtendimento.CONSULTA, ...dados }))
+}
+
+export async function criarRua(ubsId: number, medicoReferenciaId: number, nome?: string) {
+    sequencia += 1
+    const repo = AppDataSource.getRepository(Rua)
+    return repo.save(repo.create({ ubsId, medicoReferenciaId, nome: nome ?? `Rua ${sequencia}` }))
 }
 
 export async function criarTipo(ubsId: number, dados: Partial<TipoAtendimento> = {}) {
@@ -82,6 +92,7 @@ export async function criarPaciente(ubsId: number, dados: Partial<Paciente> = {}
     const repo = AppDataSource.getRepository(Paciente)
     return repo.save(repo.create({
         ubsId, nome: `Paciente ${sequencia}`, cpf: cpfValidoUnico(), cns: null, dataNascimento: '1980-01-01',
+        ruaId: ruaPadraoId, numero: ruaPadraoId ? '10' : null,
         telefone: `5199999${String(sequencia).padStart(4, '0')}`, email: null, possuiCelular: true, pushToken: null,
         pontuacao: 100, vulneravel: false, vulneravelAtribuidoPor: null, vulneravelEm: null,
         consentimentoCanais: { WHATSAPP: { aceito: true, em: '2026-01-01T00:00:00.000Z' }, SMS: { aceito: true, em: '2026-01-01T00:00:00.000Z' } },
@@ -114,7 +125,8 @@ export function zerarRelogio() {
 }
 
 // Cenário-base dos testes de agendamento: relógio congelado na segunda 16/11/2026 às 10:00,
-// configuração padrão, uma UBS com recepção, um profissional, um tipo liberado para o app e um só de balcão.
+// configuração padrão, uma UBS com recepção, um médico com uma rua (médico de referência), duas consultas
+// médicas (uma liberada no app, outra só de balcão) e um paciente morando na rua do médico.
 export const AGORA = '2026-11-16T10:00:00'
 
 export function emDias(dias: number, hora = '09:00') {
@@ -128,13 +140,15 @@ export async function montarCenario() {
     congelarEm(AGORA)
     const ubs = await criarUbs()
     const recepcao = await criarEquipe(ubs.id, PerfilEquipe.RECEPCAO)
-    const profissional = await criarProfissional(ubs.id)
-    const tipoApp = await criarTipo(ubs.id, { nome: 'Consulta médica', permiteAgendamentoApp: true, antecedenciaMaximaDias: 60 })
-    const tipoBalcao = await criarTipo(ubs.id, { nome: 'Enfermagem', permiteAgendamentoApp: false, antecedenciaMaximaDias: 30 })
+    const profissional = await criarProfissional(ubs.id, { nome: 'Dra. Helena' })
+    const rua = await criarRua(ubs.id, profissional.id, 'Rua das Flores')
+    ruaPadraoId = rua.id
+    const tipoApp = await criarTipo(ubs.id, { nome: 'Consulta clínica geral', permiteAgendamentoApp: true, antecedenciaMaximaDias: 60 })
+    const tipoBalcao = await criarTipo(ubs.id, { nome: 'Renovação de receita', permiteAgendamentoApp: false, antecedenciaMaximaDias: 30 })
     const paciente = await criarPaciente(ubs.id)
 
     return {
-        ubs, recepcao, profissional, tipoApp, tipoBalcao, paciente,
+        ubs, recepcao, profissional, rua, tipoApp, tipoBalcao, paciente,
         authRecepcao: authEquipe(recepcao),
         authPaciente: authPaciente(paciente),
         slot: (dias: number, dados: Partial<Slot> = {}, hora = '09:00') =>

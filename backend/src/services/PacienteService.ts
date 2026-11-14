@@ -1,14 +1,17 @@
 import { Brackets } from "typeorm";
 import { Clock, clock as relogioPadrao } from "../clock";
 import { AppDataSource } from "../config/dataSource";
-import { ConflictError, NotFoundError } from "../errors";
-import { Paciente } from "../models";
+import { BadRequestError, ConflictError, NotFoundError } from "../errors";
+import { Canal, Paciente, Rua } from "../models";
 import { ConsentimentoCanais } from "../models/Paciente";
-import { BuscarPacientesInput, CadastrarPacienteInput } from "../dtos/paciente";
+import { AtualizarCanaisInput, AtualizarEnderecoInput, BuscarPacientesInput, CadastrarPacienteInput } from "../dtos/paciente";
 import { gerarHash } from "../utils/hash";
-import { SessaoEquipe } from "../utils/jwt";
+import { SessaoEquipe, SessaoPaciente } from "../utils/jwt";
 import { gerarSenhaProvisoria } from "../utils/token";
 import { ConfiguracaoService } from "./ConfiguracaoService";
+
+// O paciente sempre volta com a rua e o médico de referência (telas "Seu médico", cadastro, ficha)
+export const RELACOES_PACIENTE = { rua: { medicoReferencia: true } } as const
 
 export class PacienteService {
     private repo = AppDataSource.getRepository(Paciente)
@@ -19,6 +22,7 @@ export class PacienteService {
     // vez na resposta; o paciente troca no primeiro acesso.
     async cadastrar(dados: CadastrarPacienteInput, sessao: SessaoEquipe) {
         if(await this.repo.existsBy({ cpf: dados.cpf })) throw new ConflictError('Já existe paciente com este CPF')
+        await this.validarRua(dados.ruaId, sessao.ubsId)
 
         const agora = this.clock.now().toISOString()
         // RN-80: consentimento registrado por canal, com data
@@ -33,6 +37,8 @@ export class PacienteService {
             cpf: dados.cpf,
             cns: dados.cns ?? null,
             dataNascimento: dados.dataNascimento,
+            ruaId: dados.ruaId,
+            numero: dados.numero,
             telefone: dados.telefone ?? null,
             email: dados.email ?? null,
             possuiCelular: dados.possuiCelular,
@@ -44,12 +50,15 @@ export class PacienteService {
             deveTrocarSenha: true
         })
 
-        return { paciente: await this.repo.save(paciente), senhaProvisoria }
+        const salvo = await this.repo.save(paciente)
+        return { paciente: await this.carregar(salvo.id), senhaProvisoria }
     }
 
     // Busca por nome (parcial, sem acento importar na digitação) ou por CPF, só na UBS da equipe
     async buscar({ q }: BuscarPacientesInput, sessao: SessaoEquipe) {
         const query = this.repo.createQueryBuilder('p')
+            .leftJoinAndSelect('p.rua', 'rua')
+            .leftJoinAndSelect('rua.medicoReferencia', 'medico')
             .where('p.ubsId = :ubsId', { ubsId: sessao.ubsId })
             .orderBy('p.nome', 'ASC')
             .take(50)
@@ -67,9 +76,45 @@ export class PacienteService {
     }
 
     async obter(id: number, sessao: SessaoEquipe) {
-        const paciente = await this.repo.findOneBy({ id, ubsId: sessao.ubsId })
+        const paciente = await this.repo.findOne({ where: { id, ubsId: sessao.ubsId }, relations: RELACOES_PACIENTE })
         if(!paciente) throw new NotFoundError('Paciente não encontrado')
         return paciente
+    }
+
+    async carregar(id: number) {
+        return this.repo.findOneOrFail({ where: { id }, relations: RELACOES_PACIENTE })
+    }
+
+    // "Mudou de endereço? Avise a recepção": a rua nova troca o médico de referência das próximas consultas
+    async atualizarEndereco(id: number, { ruaId, numero }: AtualizarEnderecoInput, sessao: SessaoEquipe) {
+        const paciente = await this.obter(id, sessao)
+        await this.validarRua(ruaId, sessao.ubsId)
+        await this.repo.update({ id: paciente.id }, { ruaId, numero })
+        return this.carregar(paciente.id)
+    }
+
+    // RN-80: o paciente liga e desliga cada canal no Perfil. Mantém a data de quem já tinha aceitado e
+    // registra a data da recusa de quem desligou.
+    async atualizarCanais(sessao: SessaoPaciente, { canais }: AtualizarCanaisInput) {
+        const paciente = await this.carregar(sessao.id)
+        const agora = this.clock.now().toISOString()
+        const atual = paciente.consentimentoCanais ?? {}
+        const novo: ConsentimentoCanais = {}
+
+        for(const canal of Object.values(Canal)) {
+            const antes = atual[canal]
+            // Canal fora da lista fica registrado como recusado, mesmo sem registro anterior (ex.: push,
+            // que antes dependia só do app instalado)
+            if(canais.includes(canal)) novo[canal] = antes?.aceito ? antes : { aceito: true, em: agora }
+            else novo[canal] = antes && !antes.aceito ? antes : { aceito: false, em: agora }
+        }
+
+        await this.repo.update({ id: paciente.id }, { consentimentoCanais: novo })
+        return this.carregar(paciente.id)
+    }
+
+    private async validarRua(ruaId: number, ubsId: number) {
+        if(!await this.repo.manager.getRepository(Rua).existsBy({ id: ruaId, ubsId })) throw new BadRequestError('Rua não encontrada nesta UBS')
     }
 
     // A recepção pode redefinir a senha pelo painel: nova senha provisória, troca obrigatória de novo
@@ -81,6 +126,6 @@ export class PacienteService {
         paciente.deveTrocarSenha = true
         await this.repo.save(paciente)
 
-        return { paciente, senhaProvisoria }
+        return { paciente: await this.carregar(paciente.id), senhaProvisoria }
     }
 }

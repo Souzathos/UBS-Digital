@@ -1,5 +1,5 @@
 export const UBS = {
-    nome: 'UBS Centro',
-    endereco: 'Rua da Saúde, 100 - Centro',
-    telefone: '(51) 3000-0000'
+    nome: 'UBS Feitoria',
+    endereco: 'Rua da Saúde, 100 - Feitoria, São Leopoldo',
+    telefone: '(51) 3592-1100'
 }

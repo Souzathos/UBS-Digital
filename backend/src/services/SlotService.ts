@@ -2,11 +2,12 @@ import { Between, EntityManager, FindOptionsWhere, In, MoreThan } from "typeorm"
 import { Clock, clock as relogioPadrao } from "../clock";
 import { AppDataSource } from "../config/dataSource";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../errors";
-import { OrigemSlot, Profissional, Slot, StatusSlot, TipoAtendimento } from "../models";
+import { CategoriaAtendimento, OrigemSlot, Paciente, Profissional, Slot, StatusSlot, TipoAtendimento } from "../models";
 import { CriarSlotsEmLoteInput, ListarSlotsInput } from "../dtos/slot";
 import { comHorario, ehDiaUtil, inicioDoDia, somarDias, somarMinutos } from "../utils/datas";
 import { SessaoEquipe, SessaoPaciente } from "../utils/jwt";
 import { ConfiguracaoService } from "./ConfiguracaoService";
+import { exigirMedicoDaRua } from "./medicoDeReferencia";
 
 const LIMITE_LISTAGEM = 500
 const MAX_DIAS_LOTE = 92
@@ -43,6 +44,11 @@ export class SlotService {
         if(!profissional) throw new NotFoundError('Profissional não encontrado')
         const tipo = await this.manager.getRepository(TipoAtendimento).findOneBy({ id: dados.tipoAtendimentoId, ubsId: sessao.ubsId })
         if(!tipo) throw new NotFoundError('Tipo de atendimento não encontrado')
+        if(profissional.categoria !== tipo.categoria) {
+            throw new BadRequestError(tipo.categoria === CategoriaAtendimento.CONSULTA
+                ? 'Consultas são feitas por médicos. Escolha um médico para este horário'
+                : 'Procedimentos são feitos pela enfermagem. Escolha um profissional da enfermagem')
+        }
 
         const agora = this.clock.now()
         const primeiroDia = new Date(`${dados.dataInicio}T00:00:00`)
@@ -92,15 +98,21 @@ export class SlotService {
         if(!tipo) throw new NotFoundError('Tipo de atendimento não encontrado')
         if(!tipo.permiteAgendamentoApp) throw new ForbiddenError('Este tipo de atendimento só pode ser agendado na recepção da UBS')
 
+        // 14/11: consulta médica só mostra horários do médico da rua do paciente
+        const paciente = await this.manager.getRepository(Paciente).findOneByOrFail({ id: sessao.id })
+        const medico = await exigirMedicoDaRua(this.manager, paciente, tipo.categoria)
+        if(medico && filtros.profissionalId && filtros.profissionalId !== medico.id) return []
+
         const agora = this.clock.now()
         const limite = somarDias(agora, tipo.antecedenciaMaximaDias)
         const { de, ate } = this.janela(filtros, agora, limite)
+        const profissionalId = medico?.id ?? filtros.profissionalId
 
         return this.buscar({
             tipoAtendimentoId: tipo.id,
             origem: OrigemSlot.APP,
             status: StatusSlot.LIVRE,
-            ...(filtros.profissionalId ? { profissionalId: filtros.profissionalId } : {}),
+            ...(profissionalId ? { profissionalId } : {}),
             inicio: Between(de, ate)
         })
     }
@@ -113,10 +125,22 @@ export class SlotService {
         const idsTipos = tipos.map(t => t.id).filter(id => !filtros.tipoAtendimentoId || id === filtros.tipoAtendimentoId)
         if(idsTipos.length === 0) return []
 
+        // "Agendar pela recepção": com o paciente escolhido, consulta médica só com o médico da rua dele
+        let profissionalId = filtros.profissionalId
+        if(filtros.pacienteId) {
+            if(!filtros.tipoAtendimentoId) throw new BadRequestError('Informe o tipo de atendimento')
+            const paciente = await this.manager.getRepository(Paciente).findOneBy({ id: filtros.pacienteId, ubsId: sessao.ubsId })
+            if(!paciente) throw new NotFoundError('Paciente não encontrado')
+            const tipo = await this.manager.getRepository(TipoAtendimento).findOneByOrFail({ id: filtros.tipoAtendimentoId })
+            const medico = await exigirMedicoDaRua(this.manager, paciente, tipo.categoria)
+            if(medico && profissionalId && profissionalId !== medico.id) return []
+            profissionalId = medico?.id ?? profissionalId
+        }
+
         return this.buscar({
             tipoAtendimentoId: In(idsTipos),
             status: filtros.status ?? StatusSlot.LIVRE,
-            ...(filtros.profissionalId ? { profissionalId: filtros.profissionalId } : {}),
+            ...(profissionalId ? { profissionalId } : {}),
             inicio: ate ? Between(de, ate) : MoreThan(de)
         })
     }

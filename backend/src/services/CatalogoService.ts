@@ -1,5 +1,5 @@
 import { AppDataSource } from "../config/dataSource";
-import { Profissional, TipoAtendimento, TipoAutor } from "../models";
+import { Profissional, Rua, TipoAtendimento, TipoAutor } from "../models";
 import { Sessao } from "../utils/jwt";
 
 export class CatalogoService {
@@ -11,6 +11,11 @@ export class CatalogoService {
                 : { ubsId: sessao.ubsId },
             order: { nome: 'ASC' }
         })
+    }
+
+    // Cadastro do paciente: cada rua já mostra o médico de referência
+    async listarRuas(sessao: Sessao) {
+        return AppDataSource.getRepository(Rua).find({ where: { ubsId: sessao.ubsId }, relations: { medicoReferencia: true }, order: { nome: 'ASC' } })
     }
 
     async listarProfissionais(sessao: Sessao) {

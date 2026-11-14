@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { BuscarPacientesInput } from "../dtos/paciente";
 import { PacienteMapper } from "../mappers/PacienteMapper";
-import { sessaoEquipe } from "../middlewares/auth";
+import { sessaoEquipe, sessaoPaciente } from "../middlewares/auth";
 import { PacienteService } from "../services/PacienteService";
 
 export class PacienteController {
@@ -20,6 +20,16 @@ export class PacienteController {
     async obter(req: Request, res: Response) {
         const paciente = await this.service.obter(Number(req.params.id), sessaoEquipe(req))
         return res.status(200).json(PacienteMapper.paraEquipe(paciente))
+    }
+
+    async atualizarEndereco(req: Request, res: Response) {
+        const paciente = await this.service.atualizarEndereco(Number(req.params.id), req.body, sessaoEquipe(req))
+        return res.status(200).json(PacienteMapper.paraEquipe(paciente))
+    }
+
+    async atualizarCanais(req: Request, res: Response) {
+        const paciente = await this.service.atualizarCanais(sessaoPaciente(req), req.body)
+        return res.status(200).json(PacienteMapper.paraPaciente(paciente))
     }
 
     async redefinirSenha(req: Request, res: Response) {

@@ -6,7 +6,10 @@ export type CanalDeEnvio = Exclude<Canal, Canal.EMAIL>
 
 // RN-80: só usa canal com consentimento registrado. Push depende do app instalado (token válido).
 function canalDisponivel(paciente: Paciente, canal: CanalDeEnvio) {
-    const consentiu = paciente.consentimentoCanais?.[canal]?.aceito === true
+    const consentimento = paciente.consentimentoCanais?.[canal]
+    // Canal desligado no Perfil nunca é usado, nem o push
+    if(consentimento?.aceito === false) return false
+    const consentiu = consentimento?.aceito === true
     if(canal === Canal.PUSH) return Boolean(paciente.pushToken)
     return consentiu && Boolean(paciente.telefone) && paciente.possuiCelular
 }

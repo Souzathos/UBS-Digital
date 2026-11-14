@@ -31,9 +31,11 @@ export enum StatusSlot {
     BLOQUEADO = 'BLOQUEADO'
 }
 
+// CONSULTA é feita por médico (app: "Médico · consultas"); PROCEDIMENTO pela enfermagem
+// (app: "Enfermagem · procedimentos"). Decidido em 14/11.
 export enum CategoriaAtendimento {
     CONSULTA = 'CONSULTA',
-    EXAME = 'EXAME'
+    PROCEDIMENTO = 'PROCEDIMENTO'
 }
 
 export enum EtapaNotificacao {

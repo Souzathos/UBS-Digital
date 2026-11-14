@@ -1,5 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Canal } from "./enums";
+import { Rua } from "./Rua";
 import { Ubs } from "./Ubs";
 import { UsuarioEquipe } from "./UsuarioEquipe";
 
@@ -30,6 +31,18 @@ export class Paciente {
 
     @Column({ type: 'date' })
     dataNascimento: string
+
+    // Define o médico de referência (Rua.medicoReferenciaId). Opcional no banco por causa de
+    // cadastros antigos; o cadastro novo exige.
+    @Column({ type: 'int', nullable: true })
+    ruaId: number | null
+
+    @ManyToOne(() => Rua)
+    @JoinColumn({ name: 'ruaId' })
+    rua: Rua | null
+
+    @Column({ type: 'varchar', length: 10, nullable: true })
+    numero: string | null
 
     @Column({ type: 'varchar', nullable: true })
     telefone: string | null

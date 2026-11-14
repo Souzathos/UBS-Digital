@@ -11,6 +11,7 @@ import { somarDias } from "../utils/datas";
 import { SessaoEquipe, SessaoPaciente } from "../utils/jwt";
 import { ConfiguracaoService } from "./ConfiguracaoService";
 import { LembreteService } from "./LembreteService";
+import { exigirMedicoDaRua, validarMedicoDoSlot } from "./medicoDeReferencia";
 import { AcaoLog, LogAcaoService } from "./LogAcaoService";
 import { Autor } from "./tipos";
 
@@ -68,7 +69,7 @@ export class AgendamentoService {
             if(!paciente || paciente.ubsId !== ubsId) throw new NotFoundError('Paciente não encontrado')
 
             const { slot, tipo } = await this.travarSlot(manager, slotId, ubsId)
-            this.validarSlotParaAgendar(slot, tipo, autor, agora)
+            await this.validarSlotParaAgendar(manager, slot, tipo, paciente, autor, agora)
             await this.validarUmAtivoPorTipo(manager, paciente.id, tipo.id)
 
             // RN-05 [sugestão confirmada]: criado com menos de N dias de antecedência já nasce CONFIRMADO
@@ -113,7 +114,7 @@ export class AgendamentoService {
         return { slot, tipo }
     }
 
-    validarSlotParaAgendar(slot: Slot, tipo: TipoAtendimento, autor: Autor, agora: Date) {
+    async validarSlotParaAgendar(manager: EntityManager, slot: Slot, tipo: TipoAtendimento, paciente: Paciente, autor: Autor, agora: Date) {
         if(slot.status !== StatusSlot.LIVRE) throw new ConflictError('Este horário não está mais disponível')
         if(slot.inicio <= agora) throw new BadRequestError('Este horário já passou')
 
@@ -126,6 +127,8 @@ export class AgendamentoService {
         if(slot.inicio > somarDias(agora, tipo.antecedenciaMaximaDias)) {
             throw new BadRequestError(`Este atendimento pode ser agendado com até ${tipo.antecedenciaMaximaDias} dias de antecedência`)
         }
+        // 14/11: consulta médica só com o médico de referência da rua do paciente (app e recepção)
+        validarMedicoDoSlot(await exigirMedicoDaRua(manager, paciente, tipo.categoria), slot.profissionalId)
     }
 
     // RN-04 [sugestão confirmada]: no máximo 1 agendamento ativo por tipo de atendimento
@@ -208,7 +211,7 @@ export class AgendamentoService {
             if(!estaAtivo(antigo)) throw new ConflictError(mensagemDeEstado(antigo.status))
             if(novoSlotId === antigo.slotId) throw new BadRequestError('Escolha um horário diferente do atual')
 
-            await manager.getRepository(Paciente).findOne({ where: { id: antigo.pacienteId }, lock: { mode: 'pessimistic_write' } })
+            const paciente = await manager.getRepository(Paciente).findOneOrFail({ where: { id: antigo.pacienteId }, lock: { mode: 'pessimistic_write' } })
             const slots = await this.travarSlots(manager, [antigo.slotId, novoSlotId])
             const slotAntigo = slots.find(s => s.id === antigo.slotId)!
             const slotNovo = slots.find(s => s.id === novoSlotId)
@@ -218,7 +221,7 @@ export class AgendamentoService {
             const tipo = await manager.getRepository(TipoAtendimento).findOneBy({ id: slotNovo.tipoAtendimentoId })
             if(!tipo || tipo.ubsId !== ubsId) throw new NotFoundError('Horário não encontrado')
             if(slotNovo.tipoAtendimentoId !== slotAntigo.tipoAtendimentoId) throw new BadRequestError('Escolha um horário do mesmo tipo de atendimento')
-            this.validarSlotParaAgendar(slotNovo, tipo, autor, agora)
+            await this.validarSlotParaAgendar(manager, slotNovo, tipo, paciente, autor, agora)
             await this.validarUmAtivoPorTipo(manager, antigo.pacienteId, tipo.id, antigo.id)
 
             const repo = manager.getRepository(Agendamento)
@@ -302,7 +305,7 @@ export class AgendamentoService {
     }
 
     // Painel, "Agenda do dia": todos os agendamentos do dia na UBS, por horário
-    async agendaDoDia({ data, profissionalId }: AgendaDoDiaInput, sessao: SessaoEquipe) {
+    async agendaDoDia({ data, profissionalId, categoria }: AgendaDoDiaInput, sessao: SessaoEquipe) {
         const inicio = new Date(`${data}T00:00:00`)
         const query = AppDataSource.getRepository(Agendamento).createQueryBuilder('a')
             .innerJoinAndSelect('a.slot', 's')
@@ -316,6 +319,7 @@ export class AgendamentoService {
             .addOrderBy('prof.nome', 'ASC')
             .addOrderBy('a.id', 'ASC')
         if(profissionalId) query.andWhere('s.profissionalId = :profissionalId', { profissionalId })
+        if(categoria) query.andWhere('tipo.categoria = :categoria', { categoria })
 
         const agora = this.clock.now()
         return (await query.getMany()).map(a => ({ agendamento: a, acoes: this.acoesDisponiveis(a, agora) }))

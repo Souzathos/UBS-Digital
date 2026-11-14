@@ -4,12 +4,13 @@ import { AppDataSource } from "../src/config/dataSource";
 import { Paciente, PerfilEquipe } from "../src/models";
 import { ConfiguracaoService } from "../src/services/ConfiguracaoService";
 import { cpfComDigitos } from "../src/utils/cpf";
-import { api, authEquipe, authPaciente, clearDb, congelarEm, criarEquipe, criarPaciente, criarUbs, semearConfiguracao, startDb, stopDb, zerarRelogio } from "./helpers";
+import { api, authEquipe, authPaciente, clearDb, congelarEm, criarEquipe, criarPaciente, criarProfissional, criarRua, criarUbs, semearConfiguracao, startDb, stopDb, zerarRelogio } from "./helpers";
 
 const novoPaciente = (dados: Record<string, unknown> = {}) => ({
     nome: 'Joana Teste',
     cpf: cpfComDigitos('987654321'),
     dataNascimento: '1970-05-10',
+    numero: '210',
     telefone: '(51) 99999-0000',
     possuiCelular: true,
     consentimentoCanais: ['WHATSAPP', 'SMS'],
@@ -28,20 +29,23 @@ describe('pacientes no painel da UBS', () => {
 
     it('senha provisória: recepção cadastra e recebe a senha provisória uma única vez', async () => {
         const ubs = await criarUbs()
+        const rua = await criarRua(ubs.id, (await criarProfissional(ubs.id, { nome: 'Dra. Helena' })).id, 'Rua das Flores')
         const recepcao = await criarEquipe(ubs.id, PerfilEquipe.RECEPCAO)
 
-        const res = await api().post('/pacientes').set('Authorization', authEquipe(recepcao)).send(novoPaciente())
+        const res = await api().post('/pacientes').set('Authorization', authEquipe(recepcao)).send(novoPaciente({ ruaId: rua.id }))
 
         assert.equal(res.status, 201)
         assert.match(res.body.senhaProvisoria, /^\d{6}$/)
         assert.equal(res.body.paciente.deveTrocarSenha, true)
         assert.equal(res.body.paciente.telefone, '51999990000')
         assert.equal(res.body.paciente.ubsId, ubs.id)
+        assert.deepEqual(res.body.paciente.rua, { id: rua.id, nome: 'Rua das Flores' })
+        assert.equal(res.body.paciente.medicoReferencia.nome, 'Dra. Helena')
 
         // RN-80: consentimento por canal com data
         assert.deepEqual(res.body.paciente.consentimentoCanais.WHATSAPP, { aceito: true, em: new Date('2026-11-16T10:00:00').toISOString() })
 
-        const login = await api().post('/auth/paciente/entrar').send({ cpf: novoPaciente().cpf, senha: res.body.senhaProvisoria })
+        const login = await api().post('/auth/paciente/entrar').send({ cpf: novoPaciente({ ruaId: rua.id }).cpf, senha: res.body.senhaProvisoria })
         assert.equal(login.status, 200)
         assert.equal(login.body.deveTrocarSenha, true)
 
@@ -51,23 +55,25 @@ describe('pacientes no painel da UBS', () => {
 
     it('seção 7: pontuação inicial do paciente vem da configuração da UBS', async () => {
         const ubs = await criarUbs()
+        const rua = await criarRua(ubs.id, (await criarProfissional(ubs.id, { nome: 'Dra. Helena' })).id, 'Rua das Flores')
         const recepcao = await criarEquipe(ubs.id, PerfilEquipe.RECEPCAO)
         await new ConfiguracaoService().set('pontos.inicial', 90, ubs.id)
 
-        const res = await api().post('/pacientes').set('Authorization', authEquipe(recepcao)).send(novoPaciente())
+        const res = await api().post('/pacientes').set('Authorization', authEquipe(recepcao)).send(novoPaciente({ ruaId: rua.id }))
 
         assert.equal(res.body.paciente.pontuacao, 90)
     })
 
     it('perfil: ACS não cadastra paciente; CPF inválido 400; CPF repetido 409', async () => {
         const ubs = await criarUbs()
+        const rua = await criarRua(ubs.id, (await criarProfissional(ubs.id, { nome: 'Dra. Helena' })).id, 'Rua das Flores')
         const acs = await criarEquipe(ubs.id, PerfilEquipe.ACS)
         const gestor = await criarEquipe(ubs.id, PerfilEquipe.GESTOR)
 
-        assert.equal((await api().post('/pacientes').set('Authorization', authEquipe(acs)).send(novoPaciente())).status, 403)
-        assert.equal((await api().post('/pacientes').set('Authorization', authEquipe(gestor)).send(novoPaciente({ cpf: '11111111111' }))).status, 400)
-        assert.equal((await api().post('/pacientes').set('Authorization', authEquipe(gestor)).send(novoPaciente())).status, 201)
-        assert.equal((await api().post('/pacientes').set('Authorization', authEquipe(gestor)).send(novoPaciente())).status, 409)
+        assert.equal((await api().post('/pacientes').set('Authorization', authEquipe(acs)).send(novoPaciente({ ruaId: rua.id }))).status, 403)
+        assert.equal((await api().post('/pacientes').set('Authorization', authEquipe(gestor)).send(novoPaciente({ cpf: '11111111111', ruaId: rua.id }))).status, 400)
+        assert.equal((await api().post('/pacientes').set('Authorization', authEquipe(gestor)).send(novoPaciente({ ruaId: rua.id }))).status, 201)
+        assert.equal((await api().post('/pacientes').set('Authorization', authEquipe(gestor)).send(novoPaciente({ ruaId: rua.id }))).status, 409)
     })
 
     it('busca por nome ou CPF, só dentro da UBS da equipe', async () => {

@@ -4,6 +4,7 @@ import { Paciente, TipoAutor, UsuarioEquipe } from "../models";
 import { EntrarEquipeInput, EntrarPacienteInput, TrocarSenhaInput } from "../dtos/auth";
 import { compararHash, gerarHash } from "../utils/hash";
 import { gerarToken, Sessao, SessaoPaciente } from "../utils/jwt";
+import { RELACOES_PACIENTE } from "./PacienteService";
 
 export class AuthService {
     private equipeRepo = AppDataSource.getRepository(UsuarioEquipe)
@@ -20,7 +21,7 @@ export class AuthService {
 
     // Seção 6: paciente entra com CPF + senha
     async entrarPaciente({ cpf, senha }: EntrarPacienteInput) {
-        const paciente = await this.pacienteRepo.findOneBy({ cpf })
+        const paciente = await this.pacienteRepo.findOne({ where: { cpf }, relations: RELACOES_PACIENTE })
         if(!paciente?.senhaHash || !await compararHash(senha, paciente.senhaHash)) throw new UnauthorizedError('CPF ou senha inválidos')
 
         return { token: this.tokenPaciente(paciente), paciente }
@@ -28,7 +29,7 @@ export class AuthService {
 
     // Senha provisória: a troca é obrigatória no primeiro acesso e devolve um token já liberado
     async trocarSenhaPaciente(sessao: SessaoPaciente, { senhaAtual, novaSenha }: TrocarSenhaInput) {
-        const paciente = await this.pacienteRepo.findOneBy({ id: sessao.id })
+        const paciente = await this.pacienteRepo.findOne({ where: { id: sessao.id }, relations: RELACOES_PACIENTE })
         if(!paciente?.senhaHash) throw new NotFoundError('Paciente não encontrado')
         if(!await compararHash(senhaAtual, paciente.senhaHash)) throw new UnauthorizedError('Senha atual incorreta')
 
@@ -46,7 +47,7 @@ export class AuthService {
             return { tipo: TipoAutor.EQUIPE as const, usuario }
         }
 
-        const paciente = await this.pacienteRepo.findOneBy({ id: sessao.id })
+        const paciente = await this.pacienteRepo.findOne({ where: { id: sessao.id }, relations: RELACOES_PACIENTE })
         if(!paciente) throw new UnauthorizedError('Paciente não existe mais')
         return { tipo: TipoAutor.PACIENTE as const, paciente }
     }

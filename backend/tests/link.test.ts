@@ -37,7 +37,7 @@ describe('página do link de ação (RN-70 a RN-73)', () => {
         assert.match(res.headers['content-type'], /text\/html/)
         assert.match(res.text, /<p class="ubs">UBS Vila Nova<\/p>/)
         assert.match(res.text, /às 09:00/)
-        assert.match(res.text, /Consulta médica/)
+        assert.match(res.text, /Consulta clínica geral/)
         assert.match(res.text, /Confirmar presença/)
         assert.match(res.text, /noindex/)
         assert.doesNotMatch(res.text, /<script/)

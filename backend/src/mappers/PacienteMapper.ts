@@ -11,6 +11,10 @@ export class PacienteMapper {
             cpf: p.cpf,
             cns: p.cns,
             dataNascimento: p.dataNascimento,
+            rua: p.rua ? { id: p.rua.id, nome: p.rua.nome } : null,
+            numero: p.numero,
+            // "Seu médico: Dra. Helena (pela sua rua)"
+            medicoReferencia: p.rua?.medicoReferencia ? { id: p.rua.medicoReferencia.id, nome: p.rua.medicoReferencia.nome } : null,
             telefone: p.telefone,
             email: p.email,
             possuiCelular: p.possuiCelular,

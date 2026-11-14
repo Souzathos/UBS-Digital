@@ -1,10 +1,11 @@
 import { DataSource, MoreThanOrEqual } from "typeorm";
 import { env } from "../config/env";
 import { AppDataSource } from "../config/dataSource";
-import { Configuracao, Paciente, Profissional, Slot, TipoAtendimento, Ubs, UsuarioEquipe } from "../models";
-import { PerfilEquipe, StatusSlot, TipoAutor } from "../models/enums";
+import { Configuracao, Paciente, Profissional, Rua, Slot, TipoAtendimento, Ubs, UsuarioEquipe } from "../models";
+import { CategoriaAtendimento, PerfilEquipe, StatusSlot, TipoAutor } from "../models/enums";
 import { clock } from "../clock";
 import { AgendamentoService } from "../services/AgendamentoService";
+import { medicoDeReferencia } from "../services/medicoDeReferencia";
 import { SlotService } from "../services/SlotService";
 import { comHorario, diasUteisAPartirDe, inicioDoDia, somarDias, somarMinutos } from "../utils/datas";
 import { gerarHash } from "../utils/hash";
@@ -33,22 +34,31 @@ export async function executarSeed(ds: DataSource, hoje: Date) {
 
     const cotaApp = Number(CONFIGURACAO_PADRAO['agendamento.cotaAppPercentual'])
     const dias = diasUteisAPartirDe(somarDias(hoje, 1), DIAS_DE_AGENDA)
+    const ruaPorNome: Record<string, Rua> = {}
     let totalSlots = 0
 
     for(const dados of PROFISSIONAIS) {
         const profissional = await ds.getRepository(Profissional).save(
-            ds.getRepository(Profissional).create({ nome: dados.nome, funcao: dados.funcao, ubsId: ubs.id })
+            ds.getRepository(Profissional).create({ nome: dados.nome, funcao: dados.funcao, categoria: dados.categoria, ubsId: ubs.id })
         )
-        const tipo = tipoPorChave[dados.tipo]
-        const horarios: { inicio: Date, fim: Date }[] = []
 
+        // Médico de referência das ruas da área dele
+        for(const nome of dados.ruas ?? []) {
+            ruaPorNome[nome] = await ds.getRepository(Rua).save(ds.getRepository(Rua).create({ ubsId: ubs.id, nome, medicoReferenciaId: profissional.id }))
+        }
+
+        // Horários dos turnos; os tipos entram em rodízio pela lista do profissional
+        const horarios: { inicio: Date, fim: Date, tipoAtendimentoId: number }[] = []
         for(const dia of dias) {
             for(const [abre, fecha] of dados.turnos) {
                 let inicio = comHorario(dia, abre)
                 const fimTurno = comHorario(dia, fecha)
-                while(somarMinutos(inicio, tipo.duracaoMin) <= fimTurno) {
-                    horarios.push({ inicio, fim: somarMinutos(inicio, tipo.duracaoMin) })
-                    inicio = somarMinutos(inicio, tipo.duracaoMin)
+                while(true) {
+                    const tipo = tipoPorChave[dados.tipos[horarios.length % dados.tipos.length]]
+                    const fim = somarMinutos(inicio, tipo.duracaoMin)
+                    if(fim > fimTurno) break
+                    horarios.push({ inicio, fim, tipoAtendimentoId: tipo.id })
+                    inicio = fim
                 }
             }
         }
@@ -57,7 +67,7 @@ export async function executarSeed(ds: DataSource, hoje: Date) {
         const origens = SlotService.marcarCota(horarios.length, cotaApp)
         const slots = horarios.map((h, i) => ds.getRepository(Slot).create({
             profissionalId: profissional.id,
-            tipoAtendimentoId: tipo.id,
+            tipoAtendimentoId: h.tipoAtendimentoId,
             inicio: h.inicio,
             fim: h.fim,
             origem: origens[i],
@@ -70,8 +80,9 @@ export async function executarSeed(ds: DataSource, hoje: Date) {
     const pontosIniciais = Number(CONFIGURACAO_PADRAO['pontos.inicial'])
     const consentimentoEm = hoje.toISOString()
     const pacientes = await ds.getRepository(Paciente).save(
-        PACIENTES.map(({ consentimentos, ...p }) => ds.getRepository(Paciente).create({
+        PACIENTES.map(({ consentimentos, rua, ...p }) => ds.getRepository(Paciente).create({
             ...p, ubsId: ubs.id, senhaHash, pontuacao: pontosIniciais,
+            ruaId: rua ? ruaPorNome[rua].id : null,
             // RN-80: consentimento registrado por canal
             consentimentoCanais: Object.fromEntries(consentimentos.map(c => [c, { aceito: true, em: consentimentoEm }]))
         }))
@@ -90,12 +101,21 @@ export async function executarSeed(ds: DataSource, hoje: Date) {
     const agendamentos = new AgendamentoService({ now: () => hoje })
     let demos = 0
     for(const demo of AGENDAMENTOS_DEMO) {
+        const paciente = pacientes[demo.paciente]
+        const tipo = tipoPorChave[demo.tipo]
+        // Consulta médica: só horários do médico da rua do paciente
+        const medico = tipo.categoria === CategoriaAtendimento.CONSULTA ? await medicoDeReferencia(ds.manager, paciente) : null
         const slot = await ds.getRepository(Slot).findOne({
-            where: { tipoAtendimentoId: tipoPorChave[demo.tipo].id, status: StatusSlot.LIVRE, inicio: MoreThanOrEqual(somarDias(inicioDoDia(hoje), demo.emDias)) },
+            where: {
+                tipoAtendimentoId: tipo.id,
+                status: StatusSlot.LIVRE,
+                inicio: MoreThanOrEqual(somarDias(inicioDoDia(hoje), demo.emDias)),
+                ...(medico ? { profissionalId: medico.id } : {})
+            },
             order: { inicio: 'ASC' }
         })
         if(!slot) continue
-        await agendamentos.criarPelaEquipe(pacientes[demo.paciente].id, slot.id, sessao)
+        await agendamentos.criarPelaEquipe(paciente.id, slot.id, sessao)
         demos += 1
     }
 
@@ -104,6 +124,7 @@ export async function executarSeed(ds: DataSource, hoje: Date) {
         equipe: EQUIPE.length,
         tipos: tipos.length,
         profissionais: PROFISSIONAIS.length,
+        ruas: Object.keys(ruaPorNome).length,
         slots: totalSlots,
         pacientes: PACIENTES.length,
         configuracoes: Object.keys(CONFIGURACAO_PADRAO).length,

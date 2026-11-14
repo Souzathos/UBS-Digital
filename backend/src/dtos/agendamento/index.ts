@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CategoriaAtendimento } from "../../models/enums";
 
 const id = z.coerce.number().int().positive()
 
@@ -10,7 +11,9 @@ export type CriarAgendamentoEquipeInput = z.infer<typeof CriarAgendamentoEquipeD
 
 export const AgendaDoDiaDTO = z.object({
     data: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data no formato AAAA-MM-DD'),
-    profissionalId: id.optional()
+    profissionalId: id.optional(),
+    // Filtros Médico (CONSULTA) e Enfermagem (PROCEDIMENTO) da agenda
+    categoria: z.enum(CategoriaAtendimento).optional()
 })
 export type AgendaDoDiaInput = z.infer<typeof AgendaDoDiaDTO>
 

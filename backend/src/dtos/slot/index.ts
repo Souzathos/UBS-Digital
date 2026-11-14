@@ -19,6 +19,8 @@ export type CriarSlotsEmLoteInput = z.infer<typeof CriarSlotsEmLoteDTO>
 export const ListarSlotsDTO = z.object({
     tipoAtendimentoId: id.optional(),
     profissionalId: id.optional(),
+    // Só a equipe usa: aplica a regra do médico pela rua desse paciente
+    pacienteId: id.optional(),
     de: data.optional(),
     ate: data.optional(),
     // Só a equipe usa: por padrão LIVRE

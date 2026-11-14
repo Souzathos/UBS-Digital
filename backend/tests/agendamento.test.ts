@@ -32,8 +32,8 @@ describe('agendamento pela recepção e pelo app (RN-01 a RN-05, RN-82)', () => 
         const doPaciente = await api().get('/tipos-atendimento').set('Authorization', c.authPaciente)
         const daEquipe = await api().get('/tipos-atendimento').set('Authorization', c.authRecepcao)
 
-        assert.deepEqual(doPaciente.body.map((t: any) => t.nome), ['Consulta médica'])
-        assert.deepEqual(daEquipe.body.map((t: any) => t.nome).sort(), ['Consulta médica', 'Enfermagem'])
+        assert.deepEqual(doPaciente.body.map((t: any) => t.nome), ['Consulta clínica geral'])
+        assert.deepEqual(daEquipe.body.map((t: any) => t.nome).sort(), ['Consulta clínica geral', 'Renovação de receita'])
 
         const slotsBalcao = await api().get(`/slots?tipoAtendimentoId=${c.tipoBalcao.id}`).set('Authorization', c.authPaciente)
         assert.equal(slotsBalcao.status, 403)

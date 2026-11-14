@@ -1,4 +1,4 @@
-import { Profissional, TipoAtendimento } from "../models";
+import { Profissional, Rua, TipoAtendimento } from "../models";
 
 export class CatalogoMapper {
     static tipo(t: TipoAtendimento) {
@@ -14,6 +14,10 @@ export class CatalogoMapper {
     }
 
     static profissional(p: Profissional) {
-        return { id: p.id, nome: p.nome, funcao: p.funcao }
+        return { id: p.id, nome: p.nome, funcao: p.funcao, categoria: p.categoria }
+    }
+
+    static rua(r: Rua) {
+        return { id: r.id, nome: r.nome, medicoReferencia: { id: r.medicoReferencia.id, nome: r.medicoReferencia.nome } }
     }
 }
