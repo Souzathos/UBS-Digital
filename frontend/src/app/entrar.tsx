@@ -7,14 +7,15 @@ import { Aviso } from '@/componentes/Aviso'
 import { Botao } from '@/componentes/Botao'
 import { Campo } from '@/componentes/Campo'
 import { Tela } from '@/componentes/Tela'
-import { Texto } from '@/componentes/Texto'
-import { REDE_NOME } from '@/config'
+import { LOGO_COMPLETA, NOME_MARCA } from '@/config'
 import { useSessao } from '@/sessao/SessaoProvider'
+import { useTheme } from '@/tema/ThemeProvider'
 import { cpfCompleto, mascararCpf, somenteDigitos } from '@/utils/cpf'
 
 // Entrar do paciente: CPF + senha (seção 6). Design: paciente/entrar-paciente-com-cpf-e-senha.
 export default function Entrar() {
     const { entrarPaciente } = useSessao()
+    const tema = useTheme()
     const senhaRef = useRef<TextInputInstance>(null)
     const [cpf, setCpf] = useState('')
     const [senha, setSenha] = useState('')
@@ -53,11 +54,15 @@ export default function Entrar() {
 
     return (
         <Tela cabecalho="simples" leitura="Entrar. Digite seu CPF e sua senha.">
-            <View style={{ alignItems: 'center', gap: 12, paddingTop: 8, paddingBottom: 20 }}>
-                <Image source={require('../../assets/imagens/logo-ubs.png')} style={{ width: 150, height: 110 }} resizeMode="contain" accessible={false} />
-                <Texto variante="titulo" peso="700" alinhar="center" titulo>
-                    {REDE_NOME}
-                </Texto>
+            {/* A logo completa já traz o nome: vira o título da tela para o leitor de tela. */}
+            {/* Em fundo escuro (alto contraste), a logo de texto azul-marinho vai sobre um cartão branco. */}
+            <View
+                style={[{ alignItems: 'center', paddingTop: 8, paddingBottom: 20 }, tema.cores.escuro && { marginBottom: 8, paddingHorizontal: 16, paddingVertical: 12, borderRadius: tema.raio.lg, backgroundColor: '#FFFFFF' }]}
+                accessible
+                accessibilityRole="header"
+                accessibilityLabel={NOME_MARCA}
+            >
+                <Image source={LOGO_COMPLETA} style={{ width: 300, height: 115 }} resizeMode="contain" accessible={false} />
             </View>
 
             {erroGeral ? <Aviso tipo="perigo" titulo={erroGeral.titulo}>{erroGeral.texto}</Aviso> : null}

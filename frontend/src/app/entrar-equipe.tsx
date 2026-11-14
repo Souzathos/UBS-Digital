@@ -1,6 +1,6 @@
 import { router } from 'expo-router'
 import { useRef, useState } from 'react'
-import { View, type TextInputInstance } from 'react-native'
+import { Image, View, type TextInputInstance } from 'react-native'
 
 import { ApiErro, mensagemDeErro } from '@/api/cliente'
 import { Aviso } from '@/componentes/Aviso'
@@ -8,6 +8,7 @@ import { Botao } from '@/componentes/Botao'
 import { Campo } from '@/componentes/Campo'
 import { Tela } from '@/componentes/Tela'
 import { Texto } from '@/componentes/Texto'
+import { LOGO_COMPLETA, NOME_MARCA } from '@/config'
 import { useSessao } from '@/sessao/SessaoProvider'
 import { ThemeProvider, useTheme } from '@/tema/ThemeProvider'
 
@@ -61,6 +62,10 @@ function Formulario() {
             <Texto cor="textoSuave" style={{ marginTop: -8 }}>
                 Recepção, enfermagem, médicos e ACS. Use seu e-mail da UBS.
             </Texto>
+            {/* No painel escuro, a logo (texto azul-marinho) vai sobre um cartão branco. */}
+            <View accessible accessibilityLabel={NOME_MARCA} style={{ alignSelf: 'stretch', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 16, borderRadius: tema.raio.lg, backgroundColor: '#FFFFFF' }}>
+                <Image source={LOGO_COMPLETA} style={{ width: 260, height: 100 }} resizeMode="contain" accessible={false} />
+            </View>
 
             {erroGeral ? <Aviso tipo="perigo" titulo={erroGeral.titulo}>{erroGeral.texto}</Aviso> : null}
 

@@ -5,7 +5,7 @@ import { Image, KeyboardAvoidingView, Platform, Pressable, RefreshControl, Scrol
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { MenuAcessibilidade } from '@/acessibilidade/MenuAcessibilidade'
-import { REDE_NOME } from '@/config'
+import { LOGO_SIMBOLO, REDE_NOME } from '@/config'
 import { criarEstilos } from '@/tema/criarEstilos'
 import { useTheme } from '@/tema/ThemeProvider'
 import { areaToque } from '@/tema/tokens'
@@ -56,7 +56,7 @@ export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rol
             {cabecalho === 'ubs' ? (
                 <View style={e.marca} accessible accessibilityLabel={`${nomeUbs}, ${subtitulo}`}>
                     <View style={painel ? e.caixaLogo : undefined}>
-                        <Image source={require('../../assets/imagens/logo-ubs.png')} style={painel ? e.logoPainel : e.logo} resizeMode="contain" accessible={false} />
+                        <Image source={LOGO_SIMBOLO} style={painel ? e.logoPainel : e.logo} resizeMode="contain" accessible={false} />
                     </View>
                     <View style={{ flexShrink: 1 }}>
                         <Texto variante="subtitulo" peso="600" style={{ lineHeight: tema.fonte(21) }}>
@@ -133,9 +133,9 @@ const useEstilos = criarEstilos(t => ({
     conteudo: { paddingHorizontal: t.espaco.lg, paddingBottom: t.espaco.xl, gap: 14 },
     cabecalho: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
     marca: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 },
-    logo: { width: 49, height: 36 },
+    logo: { width: 50, height: 36 },
     caixaLogo: { paddingVertical: 3, paddingHorizontal: 5, borderRadius: 8, backgroundColor: '#FFFFFF' },
-    logoPainel: { width: 42, height: 31 },
+    logoPainel: { width: 43, height: 31 },
     voltar: {
         width: areaToque,
         height: areaToque,
