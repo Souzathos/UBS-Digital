@@ -4,6 +4,7 @@ import { AgendamentoMapper } from "../mappers/AgendamentoMapper";
 import { sessaoEquipe } from "../middlewares/auth";
 import { RegistrarPresencaInput } from "../dtos/presenca";
 import { AgendamentoService } from "../services/AgendamentoService";
+import { AvisoService } from "../services/AvisoService";
 import { PresencaService } from "../services/PresencaService";
 import { autorEquipe } from "../services/autor";
 
@@ -11,6 +12,7 @@ import { autorEquipe } from "../services/autor";
 export class EquipeController {
     private agendamentos = new AgendamentoService()
     private presencas = new PresencaService()
+    private avisos = new AvisoService()
 
     async agendar(req: Request, res: Response) {
         const { pacienteId, slotId } = req.body as CriarAgendamentoEquipeInput
@@ -48,5 +50,11 @@ export class EquipeController {
         const { resultado } = req.body as RegistrarPresencaInput
         const agendamento = await this.presencas.registrar(Number(req.params.id), resultado, autorEquipe(sessao), sessao.ubsId)
         return res.status(200).json(AgendamentoMapper.paraEquipe(agendamento, this.agendamentos.acoesDisponiveis(agendamento)))
+    }
+
+    // Mesma linha do tempo de avisos do app, para a equipe da UBS do paciente
+    async avisosDoAgendamento(req: Request, res: Response) {
+        const sessao = sessaoEquipe(req)
+        return res.status(200).json(await this.avisos.doAgendamento(Number(req.params.id), autorEquipe(sessao), sessao.ubsId))
     }
 }

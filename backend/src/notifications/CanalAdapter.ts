@@ -6,6 +6,8 @@ export interface MensagemSaida {
     canal: Canal
     destinatarioTipo: TipoAutor
     destinatarioId: number
+    // Nome de quem recebe (para o relógio de testes e para a saudação dos canais reais)
+    destinatarioNome: string
     // Telefone, e-mail ou push token; null quando o paciente não tem canal próprio (Camada 1, premissa 4)
     destino: string | null
     etapa: EtapaNotificacao

@@ -1,6 +1,6 @@
 import { AppDataSource } from "../config/dataSource";
 import { NotFoundError, UnauthorizedError } from "../errors";
-import { Paciente, TipoAutor, UsuarioEquipe } from "../models";
+import { Paciente, TipoAutor, Ubs, UsuarioEquipe } from "../models";
 import { EntrarEquipeInput, EntrarPacienteInput, TrocarSenhaInput } from "../dtos/auth";
 import { compararHash, gerarHash } from "../utils/hash";
 import { gerarToken, Sessao, SessaoPaciente } from "../utils/jwt";
@@ -50,6 +50,13 @@ export class AuthService {
         const paciente = await this.pacienteRepo.findOne({ where: { id: sessao.id }, relations: RELACOES_PACIENTE })
         if(!paciente) throw new UnauthorizedError('Paciente não existe mais')
         return { tipo: TipoAutor.PACIENTE as const, paciente }
+    }
+
+    // A UBS de quem está logado: o app mostra o nome no cabeçalho
+    async ubsDa(ubsId: number) {
+        const ubs = await AppDataSource.getRepository(Ubs).findOneBy({ id: ubsId })
+        if(!ubs) throw new NotFoundError('UBS não encontrada')
+        return ubs
     }
 
     private tokenPaciente(paciente: Paciente) {

@@ -296,18 +296,15 @@ Atualizado ao fim de cada parte. ☑ = feito e verificado, ☐ = pendente.
 - A senha provisória passa da tela de cadastro para a tela da senha só em memória, nunca pela URL.
 - Nenhum valor da seção 7 aparece fixo nas telas (ex.: o app não escreve "48 horas" nem "−30 pontos"); os textos de prazo usam as datas que o serviço devolve.
 
-**O que falta no backend para o app** (nenhuma rota foi criada no backend; os contratos propostos estão em `frontend/src/servicos/camada2/contratos.ts`):
+**O que falta no backend para o app** (todas da Camada 2; os contratos propostos estão em `frontend/src/servicos/camada2/contratos.ts`). Já resolvidas em 14/11: `GET /agendamentos/:id/avisos`, a UBS na sessão e o destinatário em `/dev/envios`.
 
 | Rota proposta | Para quê | Hoje no app |
 |---|---|---|
-| `GET /agendamentos/:id/avisos` | Linha do tempo D-14 a D-0 no detalhe, prazo de resposta (RN-26) e explicação de cancelada sem resposta | Dados falsos (`AvisosServico`) |
-| Nome da UBS em `/auth/eu` (ou `GET /ubs/atual`) | Cabeçalho "UBS Feitoria" | Fixo em `src/config.ts` |
 | `GET /ofertas/minhas`, `POST /ofertas/:id/aceitar`, `POST /ofertas/:id/manter` | Oferta de vaga mais cedo (RN-30 a RN-35) | Dados falsos |
 | `GET /pacientes/eu/compromisso`, `GET/POST/DELETE /suplentes` | Aviso de pontuação sem número (RN-40) e lista de suplentes (RN-36) | Dados falsos |
 | `GET /equipe/ofertas` e o número de vagas reaproveitadas no dia | Ofertas em andamento e indicador da agenda | Dados falsos |
 | `GET /equipe/alertas`, `POST /equipe/alertas/:id/atribuir`, `/resolver` | Alertas de vulneráveis (RN-27) | Dados falsos |
 | `GET/POST /pacientes/:id/contatos`, `PATCH /pacientes/:id/selo` | Contato vinculado (RN-55 a RN-58) e selo (RN-50) na ficha | Dados falsos |
-| Horário e nome do destinatário em `GET /dev/envios` | Relógio de testes mostrar "26/11 07:00 · Osvaldo M." | Mostra "paciente nº 12" |
 
 Para ligar uma rota quando ela sair: escrever a implementação real da interface (ex.: `ofertasApi` com `requisitar`) e trocar a linha correspondente em `frontend/src/servicos/index.ts`. As telas não mudam.
 
@@ -490,7 +487,9 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 10 | Fechamento: estado, mapa RN → código, contrato da API, verificação de ponta a ponta | — | ☑ | `63bbaaa` |
 | 11 | Ajuste às telas (14/11): consulta × procedimento, ruas e médico de referência, endereço, canais do Perfil, filtro da agenda | RN-06, RN-80, seção 9 | ☑ | `836e9b1` |
 
-**Camada 1 concluída em 13/11/2026** e ajustada às telas em 14/11: 97 testes passando (`npm test`), typecheck limpo, e o roteiro de ponta a ponta da seção 13 rodado contra o servidor real.
+| 12 | Rotas pedidas pelo app (14/11): avisos de um agendamento, UBS na sessão, destinatário na caixa de saída de dev | RN-10 a RN-12, RN-90 | ☑ | — |
+
+**Camada 1 concluída em 13/11/2026**, ajustada às telas em 14/11 e completada com as rotas pedidas pelo app: 105 testes passando (`npm test`), typecheck limpo, e o roteiro de ponta a ponta da seção 13 rodado contra o servidor real.
 
 **O que a Camada 1 deixou pronto para a Camada 2** (pontos de extensão, todos dentro da transação da ação):
 - `AgendamentoService.aoLiberarVaga(manager, slot, agora)`: chamado por cancelar e remarcar. É onde nasce a oferta de adiantamento (RN-30 a RN-35). O cancelamento automático (RN-26) também deve passar por ele.
@@ -564,6 +563,9 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | RN-06: categoria do profissional | `SlotService.criarEmLote` recusa profissional de outra categoria | `tests/medicoPorRua.test.ts` ("lote de horários recusa") |
 | RN-06: endereço e médico de referência | `PacienteService.cadastrar` (exige rua) e `atualizarEndereco`; `PacienteMapper` devolve `rua` e `medicoReferencia`; `CatalogoService.listarRuas` | `tests/medicoPorRua.test.ts` |
 | RN-80: canais no Perfil | `PacienteService.atualizarCanais`; `Despachante.escolherCanal` ignora canal recusado | `tests/medicoPorRua.test.ts` ("canais de aviso no Perfil") |
+| RN-10 a RN-12 no app: linha do tempo dos avisos | `AvisoService.doAgendamento` em `src/services/AvisoService.ts` (lê as `Notificacao` do agendamento); rotas `GET /agendamentos/:id/avisos` e `GET /equipe/agendamentos/:id/avisos` | `tests/avisos.test.ts` |
+| UBS na sessão (cabeçalho do app) | `AuthService.ubsDa` + `UbsMapper`; campo `ubs` no login e em `/auth/eu` | `tests/avisos.test.ts` ("o login e /auth/eu trazem a UBS") |
+| RN-90: destinatário na caixa de saída | `MensagemSaida.destinatarioNome` preenchido em `src/jobs/lembretesJob.ts` | `tests/avisos.test.ts` ("caixa de saída de dev") |
 
 ## 13. Como rodar
 
@@ -621,10 +623,12 @@ Base: `http://localhost:3333` em dev. JSON em tudo, exceto a página do link (HT
 
 | Método e rota | Quem | Corpo | Resposta |
 |---|---|---|---|
-| `POST /auth/equipe/entrar` | público | `{ email, senha }` | `{ token, usuario: { id, ubsId, nome, email, perfil } }` |
-| `POST /auth/paciente/entrar` | público | `{ cpf, senha }` (CPF com ou sem máscara) | `{ token, deveTrocarSenha, paciente }` |
-| `POST /auth/paciente/trocar-senha` | paciente (mesmo com senha provisória) | `{ senhaAtual, novaSenha }` | `{ token, deveTrocarSenha: false, paciente }` (use o token novo) |
-| `GET /auth/eu` | qualquer logado | — | `{ tipo: "EQUIPE", usuario }` ou `{ tipo: "PACIENTE", paciente }` |
+| `POST /auth/equipe/entrar` | público | `{ email, senha }` | `{ token, usuario: { id, ubsId, nome, email, perfil }, ubs }` |
+| `POST /auth/paciente/entrar` | público | `{ cpf, senha }` (CPF com ou sem máscara) | `{ token, deveTrocarSenha, paciente, ubs }` |
+| `POST /auth/paciente/trocar-senha` | paciente (mesmo com senha provisória) | `{ senhaAtual, novaSenha }` | `{ token, deveTrocarSenha: false, paciente, ubs }` (use o token novo) |
+| `GET /auth/eu` | qualquer logado | — | `{ tipo: "EQUIPE", usuario, ubs }` ou `{ tipo: "PACIENTE", paciente, ubs }` |
+
+`ubs` é `{ id, nome, endereco, telefone }` (nome no cabeçalho do app).
 | `PATCH /auth/paciente/canais` | paciente | `{ canais: ["PUSH", "WHATSAPP", "SMS", "EMAIL"] }` (os ligados) | paciente; os canais fora da lista ficam `{ aceito: false, em }` (RN-80) |
 
 O paciente (para ele mesmo e para a equipe) traz também `rua: { id, nome } | null`, `numero` e `medicoReferencia: { id, nome } | null`, usado em "Seu médico: Dra. Helena (pela sua rua)".
@@ -650,6 +654,9 @@ Enquanto `deveTrocarSenha` for `true`, o paciente só consegue usar `trocar-senh
 | `POST /agendamentos/:id/confirmar` | — | agendamento (idempotente) |
 | `POST /agendamentos/:id/cancelar` | — | agendamento (idempotente) |
 | `POST /agendamentos/:id/remarcar` | `{ slotId }` | o agendamento **novo** (idempotente para o mesmo slot) |
+| `GET /agendamentos/:id/avisos` | — | `{ avisos: [{ etapa, data, estado, canais }], prazoResposta, canceladoAutomaticamenteEm }` |
+
+Avisos (RN-10 a RN-12): `etapa` é `D14`, `D7`, `D3` ou `D0`; `estado` é `agendado` (ainda vai sair), `enviado` (saiu e pede resposta), `respondido`, `lembrete` (saiu só para lembrar: D-0 ou já confirmado) ou `semResposta` (RN-26). Etapas puladas (RN-11) ou canceladas não aparecem. `prazoResposta` fica `null` até a RN-26 existir.
 
 Formato do agendamento para o paciente:
 
@@ -682,6 +689,7 @@ Erros de RN-06: 400 "Cadastre a rua do paciente na recepção para agendar consu
 | `GET /equipe/agenda` | equipe | `data` (AAAA-MM-DD), `profissionalId?`, `categoria?` (`CONSULTA` = Médico, `PROCEDIMENTO` = Enfermagem) | `[agendamento da equipe]` do dia |
 | `POST /equipe/agendamentos/:id/confirmar` · `/cancelar` · `/remarcar` | recepção, gestor | remarcar: `{ slotId }` | agendamento da equipe |
 | `POST /equipe/agendamentos/:id/presenca` | recepção, gestor | `{ resultado: "COMPARECEU" \| "FALTOU" }` | agendamento da equipe |
+| `GET /equipe/agendamentos/:id/avisos` | equipe (inclui ACS) | — | mesma resposta de `GET /agendamentos/:id/avisos` |
 
 O agendamento da equipe é o do paciente mais `slotId`, `criadoPorTipo`, `canceladoPorTipo`, `presencaRegistradaEm` e `paciente: { id, nome, cpf, telefone, vulneravel }` (RN-52: o selo só aparece aqui).
 
@@ -703,4 +711,4 @@ O agendamento da equipe é o do paciente mais `slotId`, `criadoPorTipo`, `cancel
 | `POST /dev/relogio/definir` | `{ para: "2026-11-20T07:00:00-03:00" }` |
 | `POST /dev/relogio/zerar` | volta ao relógio real |
 | `POST /dev/jobs/rodar` | roda os jobs uma vez agora |
-| `GET /dev/envios?limite=` · `DELETE /dev/envios` | caixa de saída do mock (texto, canal, link de cada envio) |
+| `GET /dev/envios?limite=` · `DELETE /dev/envios` | caixa de saída do mock (texto, canal, link, `destinatarioNome` e `enviadaEm` de cada envio) |

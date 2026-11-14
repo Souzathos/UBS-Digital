@@ -58,6 +58,7 @@ export function criarLembretesJob(canais: Despachante = despachante): Job {
                         canal,
                         destinatarioTipo: TipoAutor.PACIENTE,
                         destinatarioId: paciente.id,
+                        destinatarioNome: paciente.nome,
                         destino,
                         etapa: notificacao.etapa,
                         texto: textoLembrete({

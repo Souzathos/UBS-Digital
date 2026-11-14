@@ -12,6 +12,7 @@ agendamentoRoutes.use(authPaciente())
 
 agendamentoRoutes.post('/', validateBody(CriarAgendamentoDTO), agendamento.criar.bind(agendamento))
 agendamentoRoutes.get('/meus', agendamento.meus.bind(agendamento))
+agendamentoRoutes.get('/:id/avisos', validateIds('id'), agendamento.avisosDoAgendamento.bind(agendamento))
 agendamentoRoutes.post('/:id/confirmar', validateIds('id'), agendamento.confirmar.bind(agendamento))
 agendamentoRoutes.post('/:id/cancelar', validateIds('id'), agendamento.cancelar.bind(agendamento))
 agendamentoRoutes.post('/:id/remarcar', validateIds('id'), validateBody(RemarcarDTO), agendamento.remarcar.bind(agendamento))
