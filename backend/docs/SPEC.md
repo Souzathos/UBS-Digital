@@ -221,7 +221,7 @@ O modelo tem 16 entidades e serve para qualquer banco relacional. Os nomes estã
 
 ## 6. Telas
 
-São 3 superfícies: o app (paciente e contato vinculado no mesmo app), a página do link e o painel da UBS. **Nesta fase só a página do link é implementada (é servida pelo backend). O app e o painel ficam para depois.**
+São 3 superfícies: o app (paciente e contato vinculado no mesmo app), a página do link e o painel da UBS. A página do link é servida pelo backend. O app (paciente e painel da equipe) está em construção em `frontend/`; o estado de cada parte está em "Estado do front", no fim desta seção.
 
 ### App React Native: paciente
 
@@ -266,6 +266,37 @@ A pontuação não aparece como número. Quando estiver abaixo de 50, o app most
 - **13/11:** o app vai usar **`useTheme`** para cores e tema.
 - **14/11:** ThemeProvider próprio + `useTheme` + `StyleSheet`, sem biblioteca de UI. Expo Router com rotas em `src/app/` (pedido pelo `frontend/AGENTS.md`). As telas que dependem da Camada 2 são construídas com dados falsos atrás da mesma interface de serviço e ligadas à API depois. As telas desenhadas no Claude Design ficam exportadas em `frontend/design/`. O handoff completo está em [`HANDOFF-FRONTEND.md`](../../HANDOFF-FRONTEND.md).
 - **Textos:** no tipo Médico, fale em "consulta"; no tipo Enfermagem, em "procedimento"; para os dois, "atendimento". Toda consulta e procedimento leva a etiqueta "Médico" ou "Enfermagem".
+- **14/11, arquitetura do app aprovada:** TanStack Query para buscar dados e invalidar listas depois de cada ação; testes unitários das peças-chave (`jest-expo`); etiqueta "Exemplo" nas telas com dados falsos, só em desenvolvimento; trabalho na branch `feat/camada-1`. Datas no fuso de São Paulo por subtração fixa de 3h (sem horário de verão desde 2019), sem depender do Intl do Hermes. Ícones com `react-native-svg`, copiando os caminhos SVG das telas.
+
+### Estado do front (app Expo)
+
+Atualizado ao fim de cada parte. ☑ = feito e verificado, ☐ = pendente.
+
+| Parte | Conteúdo | RN | Estado | Commit |
+|---|---|---|---|---|
+| 0 | Fundação: Expo Router, fontes, tokens e 3 paletas, ThemeProvider + `useTheme` + `criarEstilos`, componentes base, preferências e menu de acessibilidade, datas e rótulos, vitrine de desenvolvimento | seção 6 | ☑ | — |
+| 1 | Cliente da API, tipos, sessão, guardas de rota, Entrar (paciente e equipe), Crie sua senha | senha provisória | ☐ | |
+| 2 | Paciente: Meus atendimentos, detalhe, Confirmar, Cancelar | RN-12, RN-20, RN-21 | ☐ | |
+| 3 | Paciente: Agendar 1 a 4, erros, Remarcar | RN-01, RN-04, RN-06, RN-22 | ☐ | |
+| 4 | Paciente: Perfil e ouvir esta tela | RN-06, RN-80 | ☐ | |
+| 5 | Equipe: Agenda de hoje e presença | fluxo C, RN-82 | ☐ | |
+| 6 | Equipe: Pacientes, cadastro, senha gerada, ficha, agendar pela recepção | RN-06, RN-52 | ☐ | |
+| 7 | Equipe: Relógio de desenvolvimento | RN-90 | ☐ | |
+| 8 | Camada 2 com dados falsos | RN-26, 27, 30–36, 40, 50, 55 | ☐ | |
+| 9 | Fechamento: rotas que faltam no backend, roteiro de demonstração | — | ☐ | |
+
+**Onde está cada peça do app** (`frontend/src/`):
+
+| Peça | Arquivo |
+|---|---|
+| Paletas clara (paciente), escura (equipe) e alto contraste | `tema/paletas.ts` |
+| Espaços, raios, fontes, escala tipográfica e escala da letra (1 · 1,2 · 1,4) | `tema/tokens.ts`, `tema/fontes.ts` |
+| Tema = variante do grupo de rotas + preferências; `useTheme`, `criarEstilos` | `tema/ThemeProvider.tsx`, `tema/criarEstilos.ts` |
+| Preferências de acessibilidade salvas no aparelho | `acessibilidade/PreferenciasProvider.tsx` |
+| Menu de acessibilidade e "Ouvir esta tela" | `acessibilidade/MenuAcessibilidade.tsx`, `acessibilidade/leitura.ts` |
+| Moldura de toda tela (cabeçalho, botão de acessibilidade, rolagem, rodapé) | `componentes/Tela.tsx` |
+| RN-06 "Médico"/"Enfermagem" e status sempre escrito | `utils/rotulos.ts`, `componentes/Etiqueta.tsx` |
+| Datas "Qui, 10/12 · 9h" e por extenso, no fuso de São Paulo | `utils/datas.ts` |
 
 ## 7. Configurações
 

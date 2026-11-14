@@ -4,7 +4,7 @@
 
 ## O que é
 
-Backend Node + TypeScript + Express que lembra o paciente de consultas e exames da UBS em várias etapas (D-14, D-7, D-3, D-0), deixa confirmar, cancelar ou remarcar pelo app ou por um link sem instalação, e reaproveita cada vaga liberada. O app React Native (Expo) para paciente, contato vinculado e equipe da UBS **ainda não começou**. O trabalho do front começa por um novo chat a partir de [`HANDOFF-FRONTEND.md`](HANDOFF-FRONTEND.md); as telas desenhadas ficam em `frontend/design/`.
+Backend Node + TypeScript + Express que lembra o paciente de consultas e exames da UBS em várias etapas (D-14, D-7, D-3, D-0), deixa confirmar, cancelar ou remarcar pelo app ou por um link sem instalação, e reaproveita cada vaga liberada. O app React Native (Expo) para paciente e equipe da UBS **está em construção** em `frontend/`, a partir de [`HANDOFF-FRONTEND.md`](HANDOFF-FRONTEND.md); as telas desenhadas ficam em `frontend/design/`.
 
 ## Stack
 
@@ -13,7 +13,7 @@ Backend Node + TypeScript + Express que lembra o paciente de consultas e exames 
 | Backend | Node 24 · TypeScript · Express 5 · TypeORM (migrations, nunca `synchronize`) · PostgreSQL 17 · Zod · JWT + bcryptjs |
 | Testes | `node:test` + supertest, banco descartável em Docker (`backend/docker-compose.test.yml`, porta 5434) |
 | Infra dev | `docker-compose.yml` na raiz: Postgres na porta **5433** (a 5432 é de outro projeto nesta máquina) |
-| App (a começar) | Expo 58 / React Native com Expo Router (`frontend/AGENTS.md`); ThemeProvider próprio + `useTheme` + StyleSheet; telas em `frontend/design/`; ver `HANDOFF-FRONTEND.md` |
+| App | Expo 58 / React Native 0.88 com Expo Router (`frontend/AGENTS.md`) · ThemeProvider próprio + `useTheme` + `criarEstilos` (StyleSheet) · TanStack Query · `jest-expo` · telas de referência em `frontend/design/` |
 
 ## Estrutura do backend
 
@@ -41,6 +41,26 @@ backend/
 │   └── utils/          jwt, hash, cpf, datas, token
 └── tests/              *.test.ts; os nomes dos testes citam o RN-xx
 ```
+
+## Estrutura do app
+
+```
+frontend/
+├── AGENTS.md           regras do Expo: leia a doc da v58 antes de usar uma API; instale com npx expo install
+├── design/             telas do Claude Design (referência visual, não código) + INDEX.md
+└── src/
+    ├── app/            só rotas (Expo Router); _layout.tsx carrega fontes, preferências e tema
+    ├── api/            cliente HTTP e tipos do contrato (SPEC, seção 14)
+    ├── servicos/       interfaces de serviço: API real ou dados falsos (Camada 2), trocadas em um arquivo
+    ├── sessao/         token no SecureStore e estado da sessão
+    ├── tema/           tokens, paletas (claro, escuro, alto contraste), ThemeProvider, criarEstilos
+    ├── acessibilidade/ preferências salvas no aparelho, menu e "Ouvir esta tela"
+    ├── componentes/    Tela, Texto, Botao, Etiqueta, Campo, Aviso, estados
+    ├── hooks/          um hook de dados por tela
+    └── utils/          datas (fuso de São Paulo), rótulos (RN-06, status), CPF
+```
+
+No app: estilo só por `criarEstilos`/`useTheme` (nada de hexadecimal na tela), texto só por `Texto`, toda tela dentro de `Tela`, regra de negócio nunca (a tela mostra o que a API devolve).
 
 ## Regras de desenvolvimento (obrigatórias)
 
@@ -72,13 +92,21 @@ npm run migration:generate -- src/migrations/NomeDaMigration
 
 Nunca rode `npm test` apontando para o banco de desenvolvimento: o harness recusa bancos cujo nome não termina em `_test`.
 
+```bash
+cd frontend
+cp .env.example .env                 # EXPO_PUBLIC_API_URL (no celular, o IP da máquina)
+npm install
+npx expo start                       # app (i = iOS, a = Android, w = web)
+npm run typecheck && npm run lint && npm test
+```
+
 ## Estado
 
 **Camada 1 concluída em 13/11/2026 e ajustada às telas em 14/11** (branch `feat/camada-1`, 97 testes). O que existe, onde está cada regra e o contrato da API para o app estão no SPEC.md (seções 11, 12 e 14).
 
 - **Modelo de atendimento (RN-06):** Médico faz **consultas** (`CONSULTA`), sempre com o médico de referência da rua do paciente. Enfermagem faz **procedimentos** (`PROCEDIMENTO`), que não dependem da rua.
 - **Próximo passo do backend:** a Camada 2, que começa pelos pontos de extensão `AgendamentoService.aoLiberarVaga` e `PresencaService.aoRegistrarPresenca`. Falta decidir a RN-56.
-- **Próximo passo do front:** `HANDOFF-FRONTEND.md`.
+- **Front:** arquitetura aprovada em 14/11 (plano em partes 0 a 9, estado em "Estado do front" na seção 6 do SPEC). Parte 0 (fundação: tema, acessibilidade, componentes base) concluída; próxima: Parte 1 (API, sessão, login).
 
 ## Git
 
