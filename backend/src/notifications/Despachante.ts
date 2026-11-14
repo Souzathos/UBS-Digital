@@ -1,5 +1,7 @@
 import { Canal, Paciente } from "../models";
 import { CanalAdapter, MensagemSaida, ResultadoEnvio } from "./CanalAdapter";
+import { env } from "../config/env";
+import { ExpoPushAdapter } from "./adapters/ExpoPushAdapter";
 import { MockAdapter } from "./adapters/MockAdapter";
 
 export type CanalDeEnvio = Exclude<Canal, Canal.EMAIL>
@@ -25,7 +27,11 @@ export class Despachante {
     private adaptadores: Map<Canal, CanalAdapter>
 
     constructor(adaptadores?: CanalAdapter[]) {
-        const lista = adaptadores ?? [Canal.PUSH, Canal.WHATSAPP, Canal.SMS, Canal.EMAIL].map(c => new MockAdapter(c))
+        // Push real só com PUSH_EXPO=true; os outros canais seguem no mock até a Camada 3.
+        const lista = adaptadores ?? [
+            env.PUSH_EXPO ? new ExpoPushAdapter() : new MockAdapter(Canal.PUSH),
+            ...[Canal.WHATSAPP, Canal.SMS, Canal.EMAIL].map(c => new MockAdapter(c))
+        ]
         this.adaptadores = new Map(lista.map(a => [a.canal, a]))
     }
 

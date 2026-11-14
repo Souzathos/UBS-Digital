@@ -4,7 +4,7 @@ import { AppDataSource } from "../config/dataSource";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { Canal, Paciente, Rua } from "../models";
 import { ConsentimentoCanais } from "../models/Paciente";
-import { AtualizarCanaisInput, AtualizarEnderecoInput, BuscarPacientesInput, CadastrarPacienteInput } from "../dtos/paciente";
+import { AtualizarCanaisInput, AtualizarEnderecoInput, BuscarPacientesInput, CadastrarPacienteInput, AtualizarPushTokenInput } from "../dtos/paciente";
 import { gerarHash } from "../utils/hash";
 import { SessaoEquipe, SessaoPaciente } from "../utils/jwt";
 import { gerarSenhaProvisoria } from "../utils/token";
@@ -95,6 +95,14 @@ export class PacienteService {
 
     // RN-80: o paciente liga e desliga cada canal no Perfil. Mantém a data de quem já tinha aceitado e
     // registra a data da recusa de quem desligou.
+    // RN-60: guarda o token de push do aparelho. O push só é usado se o canal não estiver desligado no
+    // Perfil (RN-80, ver Despachante). Um token só fica com um paciente: no mesmo celular, quem entra
+    // por último recebe.
+    async atualizarPushToken(sessao: SessaoPaciente, { token }: AtualizarPushTokenInput) {
+        if(token) await this.repo.update({ pushToken: token }, { pushToken: null })
+        await this.repo.update({ id: sessao.id }, { pushToken: token })
+    }
+
     async atualizarCanais(sessao: SessaoPaciente, { canais }: AtualizarCanaisInput) {
         const paciente = await this.carregar(sessao.id)
         const agora = this.clock.now().toISOString()

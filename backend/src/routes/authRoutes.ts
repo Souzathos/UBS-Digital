@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/AuthController";
 import { PacienteController } from "../controllers/PacienteController";
-import { AtualizarCanaisDTO } from "../dtos/paciente";
+import { AtualizarCanaisDTO, AtualizarPushTokenDTO } from "../dtos/paciente";
 import { EntrarEquipeDTO, EntrarPacienteDTO, TrocarSenhaDTO } from "../dtos/auth";
 import { authPaciente, authQualquer } from "../middlewares/auth";
 import { validateBody } from "../middlewares/validateBody";
@@ -16,5 +16,6 @@ authRoutes.post('/paciente/trocar-senha', authPaciente({ permitirSenhaProvisoria
 authRoutes.get('/eu', authQualquer, auth.eu.bind(auth))
 // Perfil do paciente: canais de aviso autorizados (RN-80)
 authRoutes.patch('/paciente/canais', authPaciente(), validateBody(AtualizarCanaisDTO), paciente.atualizarCanais.bind(paciente))
+authRoutes.patch('/paciente/push-token', authPaciente(), validateBody(AtualizarPushTokenDTO), paciente.atualizarPushToken.bind(paciente))
 
 export default authRoutes

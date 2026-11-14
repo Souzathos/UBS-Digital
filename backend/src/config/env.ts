@@ -22,7 +22,10 @@ const envSchema = z.object({
     // Base dos links de ação (RN-73: domínio reconhecível para não parecer golpe)
     LINK_BASE_URL: z.string().min(1).default('http://localhost:3333'),
     // Tick dos jobs em desenvolvimento; 0 desliga (testes e endpoint /dev disparam à mão)
-    JOBS_INTERVALO_MS: z.coerce.number().int().min(0).default(60000)
+    JOBS_INTERVALO_MS: z.coerce.number().int().min(0).default(60000),
+    // Push de verdade pelo serviço do Expo (RN-60, Camada 3). Desligado, o push vai para o mock como
+    // os outros canais (testes e quem não quer mandar nada para fora).
+    PUSH_EXPO: z.enum(['true', 'false']).default('false').transform(v => v === 'true')
 })
 
 const parsed = envSchema.safeParse(process.env)

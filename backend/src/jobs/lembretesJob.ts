@@ -2,7 +2,7 @@ import { In, LessThanOrEqual } from "typeorm";
 import { AppDataSource } from "../config/dataSource";
 import { Agendamento, Notificacao, STATUS_AGENDAMENTO_ATIVOS, StatusAgendamento, StatusNotificacao, TipoAutor } from "../models";
 import { despachante, Despachante } from "../notifications/Despachante";
-import { exigeResposta, textoLembrete } from "../notifications/mensagens";
+import { exigeResposta, textoLembrete, textoPush } from "../notifications/mensagens";
 import { ConfiguracaoService } from "../services/ConfiguracaoService";
 import { ETAPAS_DE_LEMBRETE } from "../services/LembreteService";
 import { LinkTokenService } from "../services/LinkTokenService";
@@ -53,6 +53,17 @@ export function criarLembretesJob(canais: Despachante = despachante): Job {
                         expiraEm: slot.inicio
                     })
 
+                    const dadosTexto = {
+                        etapa: notificacao.etapa,
+                        status: agendamento.status,
+                        ubsNome: paciente.ubs.nome,
+                        pacienteNome: paciente.nome,
+                        tipoNome: slot.tipoAtendimento.nome,
+                        profissionalNome: slot.profissional.nome,
+                        inicio: slot.inicio,
+                        instrucoesPreparo: slot.tipoAtendimento.instrucoesPreparo,
+                        link: url
+                    }
                     const resultado = await canais.enviar({
                         notificacaoId: notificacao.id,
                         canal,
@@ -61,17 +72,10 @@ export function criarLembretesJob(canais: Despachante = despachante): Job {
                         destinatarioNome: paciente.nome,
                         destino,
                         etapa: notificacao.etapa,
-                        texto: textoLembrete({
-                            etapa: notificacao.etapa,
-                            status: agendamento.status,
-                            ubsNome: paciente.ubs.nome,
-                            pacienteNome: paciente.nome,
-                            tipoNome: slot.tipoAtendimento.nome,
-                            profissionalNome: slot.profissional.nome,
-                            inicio: slot.inicio,
-                            instrucoesPreparo: slot.tipoAtendimento.instrucoesPreparo,
-                            link: url
-                        }),
+                        texto: textoLembrete(dadosTexto),
+                        titulo: paciente.ubs.nome,
+                        textoCurto: textoPush(dadosTexto),
+                        agendamentoId: agendamento.id,
                         link: url,
                         exigeResposta: exigeResposta(notificacao.etapa, agendamento.status),
                         enviadaEm: agora

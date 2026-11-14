@@ -32,6 +32,11 @@ export class PacienteController {
         return res.status(200).json(PacienteMapper.paraPaciente(paciente))
     }
 
+    async atualizarPushToken(req: Request, res: Response) {
+        await this.service.atualizarPushToken(sessaoPaciente(req), req.body)
+        return res.status(204).send()
+    }
+
     async redefinirSenha(req: Request, res: Response) {
         const { paciente, senhaProvisoria } = await this.service.redefinirSenha(Number(req.params.id), sessaoEquipe(req))
         return res.status(200).json({ paciente: PacienteMapper.paraEquipe(paciente), senhaProvisoria })

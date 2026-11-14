@@ -37,3 +37,9 @@ export const AtualizarCanaisDTO = z.object({
     canais: z.array(z.enum(Canal)).max(4)
 })
 export type AtualizarCanaisInput = z.infer<typeof AtualizarCanaisDTO>
+
+// Token do Expo do aparelho (push, RN-60). null apaga (ao sair da conta no aparelho).
+export const AtualizarPushTokenDTO = z.object({
+    token: z.string().regex(/^Expo(nent)?PushToken\[[^\]]+\]$/, 'Token de push inválido').nullable()
+})
+export type AtualizarPushTokenInput = z.infer<typeof AtualizarPushTokenDTO>

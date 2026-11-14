@@ -12,6 +12,10 @@ export interface MensagemSaida {
     destino: string | null
     etapa: EtapaNotificacao
     texto: string
+    // Push: título (nome da UBS, RN-73) e texto curto sem o link (tocar abre o app)
+    titulo?: string
+    textoCurto?: string
+    agendamentoId?: number
     link: string
     // RN-12: lembrete com ação (PENDENTE em D-14/D-7/D-3) ou só informativo
     exigeResposta: boolean
