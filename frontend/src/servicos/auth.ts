@@ -1,5 +1,5 @@
 import { requisitar } from '@/api/cliente'
-import type { RespostaEntrarEquipe, RespostaEntrarPaciente, RespostaEu } from '@/api/tipos'
+import type { Canal, PacienteProprio, RespostaEntrarEquipe, RespostaEntrarPaciente, RespostaEu } from '@/api/tipos'
 
 // Autenticação (SPEC, seção 14, "Autenticação").
 export interface AuthServico {
@@ -8,6 +8,8 @@ export interface AuthServico {
     // Usa o token da senha provisória e devolve um token novo, já liberado.
     trocarSenha(token: string, senhaAtual: string, novaSenha: string): Promise<RespostaEntrarPaciente>
     eu(token: string): Promise<RespostaEu>
+    // RN-80: a lista dos canais ligados; os de fora ficam recusados.
+    atualizarCanais(canais: Canal[]): Promise<PacienteProprio>
 }
 
 export const authApi: AuthServico = {
@@ -15,5 +17,6 @@ export const authApi: AuthServico = {
     entrarEquipe: (email, senha) => requisitar('POST', '/auth/equipe/entrar', { corpo: { email, senha }, token: null }),
     trocarSenha: (token, senhaAtual, novaSenha) =>
         requisitar('POST', '/auth/paciente/trocar-senha', { corpo: { senhaAtual, novaSenha }, token, encerraSessaoEm401: false }),
-    eu: token => requisitar('GET', '/auth/eu', { token })
+    eu: token => requisitar('GET', '/auth/eu', { token }),
+    atualizarCanais: canais => requisitar('PATCH', '/auth/paciente/canais', { corpo: { canais } })
 }
