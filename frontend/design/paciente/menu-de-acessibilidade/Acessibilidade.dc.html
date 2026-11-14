@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Menu de acessibilidade</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#0A5FB4;text-decoration:none}a:hover{color:#083F82}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: {{fundoTela}}; color: {{fg}}; font-family: 'Public Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.35">
+<div style="height: 844px; overflow-y: auto">
+<div style="zoom: {{zoom}}; padding: 56px 20px 24px; display: flex; flex-direction: column; gap: 14px">
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px">
+<span style="display: flex; align-items: center; gap: 8px">
+<span style="flex: none; padding: 3px 5px; border-radius: 8px; background: #FFFFFF; display: flex"><img src="./assets/eb5bdd90ce37549e80ce27aaf805f342.png" alt="" width="49" height="36" style="display: block; width: 42px; height: 31px"></span>
+<span style="font-size: 18px; font-weight: 600">UBS Feitoria</span>
+</span>
+<button onClick="{{abrir}}" aria-expanded="{{aberto}}" style="flex: none; min-height: 48px; padding: 0 12px; border: 1.5px solid {{fg}}; border-radius: 24px; background: {{bg}}; color: {{fg}}; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5a1.6 1.6 0 110 3.2 1.6 1.6 0 010-3.2zM5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5L9 21M12 14.5l3 6.5"></path></svg>
+Acessibilidade
+</button>
+</header>
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Meus atendimentos</h1>
+<div style="background: {{bg}}; border: 2px solid {{fg}}; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<span style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; border: 2px solid {{chipFundo}}; background: {{chipFundo}}; color: {{chipTinta}}; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v5a4 4 0 008 0V3M10 12v3a5 5 0 0010 0v-2M20 13a1.8 1.8 0 100-3.6 1.8 1.8 0 000 3.6z"></path></svg>Médico</span>
+<span style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; border: 2px solid {{avisoFundo}}; background: {{avisoFundo}}; color: {{avisoTinta}}; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Falta confirmar</span>
+</div>
+<span style="font-size: 18px; font-weight: 600">Consulta clínica geral</span>
+<span style="font-size: 28px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums">Qui, 10/12 · 9h</span>
+<span style="font-size: 15px; color: {{mute}}">Dra. Helena · UBS Feitoria</span>
+<div style="padding-top: 6px; display: flex; flex-wrap: wrap; gap: 8px">
+<button style="flex: 1 1 100%; min-height: 60px; padding: 8px 12px; border-radius: 10px; border: 2px solid {{okFundo}}; background: {{okFundo}}; color: {{okTinta}}; font-size: 20px; font-weight: 700">Confirmar presença</button>
+<button style="flex: 1 1 130px; min-height: 52px; padding: 8px 12px; border-radius: 10px; border: 1.5px solid {{fg}}; background: {{bg}}; color: {{fg}}; font-size: 17px; font-weight: 600">Remarcar</button>
+<button style="flex: 1 1 130px; min-height: 52px; padding: 8px 12px; border-radius: 10px; border: 1.5px solid {{perigo}}; background: {{bg}}; color: {{perigo}}; font-size: 17px; font-weight: 600">Cancelar</button>
+</div>
+</div>
+</div>
+</div>
+
+<sc-if value="{{aberto}}" hint-placeholder-val="{{true}}">
+<div style="position: absolute; inset: 0; background: rgba(6, 26, 61, 0.55); display: flex; flex-direction: column; justify-content: flex-end">
+<div role="dialog" aria-modal="true" aria-labelledby="tituloA11y" style="padding: 18px 20px 30px; border-radius: 22px 22px 0 0; border-top: 2px solid {{fg}}; background: {{bg}}; color: {{fg}}; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<h2 id="tituloA11y" style="margin: 0; font-size: 24px; font-weight: 700">Acessibilidade</h2>
+<button onClick="{{fechar}}" style="flex: none; min-height: 48px; padding: 0 14px; border: 1.5px solid {{fg}}; border-radius: 24px; background: {{bg}}; color: {{fg}}; font-size: 16px; font-weight: 600">Fechar</button>
+</div>
+<div role="group" aria-labelledby="rotLetra" style="display: flex; flex-direction: column; gap: 6px">
+<span id="rotLetra" style="font-size: 17px; font-weight: 600">Tamanho da letra</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{tamanhos}}" as="o" hint-placeholder-count="3">
+<button onClick="{{o.escolher}}" aria-pressed="{{o.sel}}" aria-label="{{o.nome}}" style="min-height: 84px; padding: 6px 4px; border: 1.5px solid {{fg}}; border-radius: 10px; background: {{o.fundo}}; color: {{o.tinta}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+<span aria-hidden="true" style="font-size: {{o.amostra}}px; line-height: 1; font-weight: 700">A</span>
+<span style="display: flex; align-items: center; gap: 3px; font-size: 14px; font-weight: 600">
+<sc-if value="{{o.sel}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4.5 4.5L19 7"></path></svg></sc-if>
+{{o.nome}}
+</span>
+</button>
+</sc-for>
+</div>
+</div>
+<button onClick="{{alternarContraste}}" aria-pressed="{{alto}}" style="min-height: 64px; padding: 8px 12px; border: 1.5px solid {{fg}}; border-radius: 10px; background: {{bg}}; color: {{fg}}; display: flex; align-items: center; gap: 12px; text-align: left">
+<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M12 3a9 9 0 100 18V3zM21 12a9 9 0 01-9 9"></path><path d="M12 3a9 9 0 019 9"></path></svg>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<span style="font-size: 17px; font-weight: 600">Alto contraste</span>
+<span style="font-size: 14px; color: {{mute}}">Fundo preto e letras brancas</span>
+</span>
+<span style="flex: none; min-width: 92px; padding: 6px 10px; border-radius: 16px; border: 2px solid {{fg}}; background: {{chave}}; color: {{chaveTinta}}; font-size: 14px; font-weight: 700; text-align: center">{{contrasteTexto}}</span>
+</button>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<button onClick="{{alternarVoz}}" aria-pressed="{{lendo}}" style="min-height: 60px; padding: 8px 12px; border-radius: 10px; border: 1.5px solid {{fg}}; background: {{fg}}; color: {{bg}}; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 18px; font-weight: 700">
+<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="{{vozIcone}}"></path></svg>
+{{vozTexto}}
+</button>
+<sc-if value="{{lendo}}" hint-placeholder-val="{{false}}">
+<p role="status" style="margin: 0; padding: 10px 12px; border-radius: 10px; border: 2px dashed {{fg}}; font-size: 15px">Lendo: “Médico. Consulta clínica geral. Quinta, 10 de dezembro, às 9 horas. UBS Feitoria. Falta confirmar.”</p>
+</sc-if>
+</div>
+<p style="margin: 0; font-size: 14px; color: {{mute}}">Suas escolhas ficam salvas neste celular.</p>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"letra":{"editor":"enum","options":["normal","grande","muito grande"],"default":"normal"},"altoContraste":{"editor":"boolean","default":false},"menuAberto":{"editor":"boolean","default":true},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+componentWillUnmount() {
+try { window.speechSynthesis.cancel(); } catch (e) {}
+}
+renderVals() {
+const s = this.state || {};
+const letra = s.letra || (this.props.letra ?? 'normal');
+const alto = s.alto === undefined ? !!(this.props.altoContraste ?? false) : s.alto;
+const aberto = s.aberto === undefined ? !!(this.props.menuAberto ?? true) : s.aberto;
+const lendo = !!s.lendo;
+const ZOOM = { normal: 1, grande: 1.2, 'muito grande': 1.4 };
+const T = alto
+? { bg: '#000000', fundoTela: '#000000', fg: '#FFFFFF', mute: '#FFFFFF', chipFundo: '#FFFFFF', chipTinta: '#000000', avisoFundo: '#FFE14D', avisoTinta: '#000000', okFundo: '#FFE14D', okTinta: '#000000', perigo: '#FFFFFF' }
+: { bg: '#FFFFFF', fundoTela: '#F1F5FA', fg: '#082C63', mute: '#41536F', chipFundo: '#082C63', chipTinta: '#FFFFFF', avisoFundo: '#FEC301', avisoTinta: '#082C63', okFundo: '#167A3E', okTinta: '#FFFFFF', perigo: '#B31400' };
+const TEXTO = 'Próximo atendimento. Médico. Consulta clínica geral. Quinta-feira, 10 de dezembro, às 9 horas. Doutora Helena, UBS Feitoria. Falta confirmar. Você pode confirmar presença, remarcar ou cancelar.';
+const parar = () => { try { window.speechSynthesis.cancel(); } catch (e) {} };
+const falar = () => {
+try {
+const u = new SpeechSynthesisUtterance(TEXTO);
+u.lang = 'pt-BR';
+u.rate = 0.9;
+u.onend = () => this.setState({ lendo: false });
+window.speechSynthesis.cancel();
+window.speechSynthesis.speak(u);
+} catch (e) {}
+};
+const AMOSTRA = { normal: 18, grande: 24, 'muito grande': 30 };
+return Object.assign({}, T, {
+zoom: ZOOM[letra] || 1,
+aberto,
+abrir: () => this.setState({ aberto: true }),
+fechar: () => { parar(); this.setState({ aberto: false, lendo: false }); },
+tamanhos: ['normal', 'grande', 'muito grande'].map((n) => {
+const sel = n === letra;
+return { nome: n === 'normal' ? 'Normal' : n === 'grande' ? 'Grande' : 'Muito grande', sel, amostra: AMOSTRA[n], fundo: sel ? T.fg : T.bg, tinta: sel ? T.bg : T.fg, escolher: () => this.setState({ letra: n }) };
+}),
+alto,
+alternarContraste: () => this.setState({ alto: !alto }),
+contrasteTexto: alto ? 'Ligado' : 'Desligado',
+chave: alto ? T.fg : T.bg,
+chaveTinta: alto ? T.bg : T.fg,
+lendo,
+vozTexto: lendo ? 'Parar de ouvir' : 'Ouvir esta tela',
+vozIcone: lendo ? 'M7 7h10v10H7z' : 'M4 9v6h4l5 4V5L8 9H4zM16 9a3.5 3.5 0 010 6M18.5 6.5a7 7 0 010 11',
+alternarVoz: () => { if (lendo) { parar(); this.setState({ lendo: false }); } else { falar(); this.setState({ lendo: true }); } }
+});
+}
+}
+</script>
+</body>
+</html>

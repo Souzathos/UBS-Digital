@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Equipe: agendar pela recepção</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#7CC4F5;text-decoration:none}a:hover{color:#CDE6FB}
+input::placeholder{color:#9FB3D1}
+</style>
+</helmet>
+<div style="width: 390px; height: 1160px; display: flex; flex-direction: column; overflow: hidden; background: #061A3D; color: #F2F7FD; font-family: 'Public Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.35">
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 56px 20px 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span style="font-size: 14px; font-weight: 600; color: #B5C8E2">UBS Feitoria · Recepção</span>
+<a href="Acessibilidade.dc.html" style="flex: none; min-height: 48px; padding: 0 12px; border: 1px solid #2F5287; border-radius: 10px; color: #F2F7FD; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5a1.6 1.6 0 110 3.2 1.6 1.6 0 010-3.2zM5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5L9 21M12 14.5l3 6.5"></path></svg>
+Acessibilidade
+</a>
+</div>
+<h1 style="flex: none; margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Agendar pela recepção</h1>
+
+<section aria-labelledby="secPaciente" style="flex: none; display: flex; flex-direction: column; gap: 8px">
+<h2 id="secPaciente" style="margin: 0; font-size: 14px; font-weight: 600; color: #7CC4F5">1. Paciente</h2>
+<div style="position: relative; display: flex">
+<label for="buscaPac" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar paciente por nome ou CPF</label>
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5C8E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 14px"><path d="M11 18a7 7 0 100-14 7 7 0 000 14zM20 20l-4-4"></path></svg>
+<input id="buscaPac" type="search" defaultValue="Osvaldo" placeholder="Nome ou CPF" style="flex: 1; min-width: 0; height: 48px; padding: 0 14px 0 44px; border: 1.5px solid #4D6FA3; border-radius: 10px; background: #0C2A5A; font-size: 16px">
+</div>
+<div style="padding: 12px 14px; border: 1.5px solid #7CC4F5; border-radius: 10px; background: #0C2A5A; display: flex; flex-direction: column; gap: 4px">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 600">
+Osvaldo Menezes
+<svg role="img" aria-label="Selo de vulnerável" width="16" height="16" viewBox="0 0 24 24" fill="#7CC4F5" style="flex: none"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path></svg>
+</span>
+<span style="font-size: 13px; color: #B5C8E2">74 anos · CPF ***.456.789-**</span>
+<span style="font-size: 14px">Rua das Flores, 210 · Feitoria</span>
+<span style="font-size: 14px; font-weight: 600; color: #CDE6FB">Médico de referência: Dra. Helena</span>
+</div>
+</section>
+
+<section aria-labelledby="secTipo" style="flex: none; display: flex; flex-direction: column; gap: 8px">
+<h2 id="secTipo" style="margin: 0; font-size: 14px; font-weight: 600; color: #7CC4F5">2. Tipo</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{tipos}}" as="t" hint-placeholder-count="2">
+<button onClick="{{t.escolher}}" aria-pressed="{{t.sel}}" style="min-height: 52px; border-radius: 10px; border: 1.5px solid {{t.borda}}; background: {{t.fundo}}; color: {{t.tinta}}; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.icone}}"></path></svg>
+{{t.nome}}
+</button>
+</sc-for>
+</div>
+</section>
+
+<section aria-labelledby="secItem" style="flex: none; display: flex; flex-direction: column; gap: 8px">
+<h2 id="secItem" style="margin: 0; font-size: 14px; font-weight: 600; color: #7CC4F5">3. {{rotuloItem}}</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{itens}}" as="it" hint-placeholder-count="6">
+<button onClick="{{it.escolher}}" aria-pressed="{{it.sel}}" style="min-height: 52px; padding: 4px 10px; border-radius: 10px; border: 1.5px solid {{it.borda}}; background: {{it.fundo}}; color: {{it.tinta}}; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; text-align: center">
+<sc-if value="{{it.sel}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg></sc-if>
+{{it.curto}}
+</button>
+</sc-for>
+</div>
+<sc-if value="{{duplicado}}" hint-placeholder-val="{{false}}">
+<div role="alert" style="padding: 10px 12px; border-radius: 10px; background: #FEC301; color: #061A3D; display: flex; align-items: flex-start; gap: 8px">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M12 4l9 16H3zM12 10v4M12 17v.5"></path></svg>
+<span style="font-size: 14px; font-weight: 600">Osvaldo já tem Consulta clínica geral em qui, 10/12, às 9h. Remarque a que existe em vez de marcar outra.</span>
+</div>
+</sc-if>
+</section>
+
+<section aria-labelledby="secHora" style="flex: none; display: flex; flex-direction: column; gap: 10px">
+<h2 id="secHora" style="margin: 0; font-size: 14px; font-weight: 600; color: #7CC4F5">4. Horário · todos os horários</h2>
+<sc-for list="{{dias}}" as="d" hint-placeholder-count="3">
+<div role="group" aria-label="{{d.dia}}, {{d.quem}}" style="display: flex; flex-direction: column; gap: 6px">
+<span style="display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px"><span style="font-size: 16px; font-weight: 600">{{d.dia}}</span><span style="font-size: 13px; color: #B5C8E2">{{d.quem}}</span></span>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{d.horas}}" as="h" hint-placeholder-count="4">
+<button onClick="{{h.escolher}}" aria-pressed="{{h.sel}}" style="min-height: 56px; padding: 4px 2px; border-radius: 10px; border: 1.5px {{h.estiloBorda}} {{h.borda}}; background: {{h.fundo}}; color: {{h.tinta}}; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1">
+<span style="display: flex; align-items: center; gap: 3px; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">
+<sc-if value="{{h.sel}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4.5 4.5L19 7"></path></svg></sc-if>
+{{h.hora}}
+</span>
+<sc-if value="{{h.reservado}}" hint-placeholder-val="{{false}}"><span style="margin-top: 2px; font-size: 11px; font-weight: 600; color: {{h.tagTinta}}">Só recepção</span></sc-if>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<p style="margin: 0; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #B5C8E2">
+<span aria-hidden="true" style="flex: none; margin-top: 2px; width: 14px; height: 14px; border: 1.5px dashed #FEC301; border-radius: 3px"></span>
+<span>Só recepção: horário guardado para quem marca no balcão ou não usa o app. Não aparece para o paciente.</span>
+</p>
+</section>
+
+<sc-if value="{{agendado}}" hint-placeholder-val="{{false}}">
+<div role="status" style="flex: none; padding: 12px 14px; border-radius: 10px; background: #82CBF6; color: #061A3D; display: flex; align-items: flex-start; gap: 10px">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+<span style="display: flex; flex-direction: column">
+<span style="font-size: 16px; font-weight: 700">Agendado para {{resumo}}</span>
+<span style="font-size: 14px">O aviso sai pelos canais autorizados do Osvaldo e da Lúcia.</span>
+</span>
+</div>
+</sc-if>
+<sc-if value="{{podeAgendar}}" hint-placeholder-val="{{true}}">
+<button onClick="{{agendar}}" disabled="{{bloqueado}}" style="flex: none; min-height: 56px; padding: 6px 12px; border-radius: 10px; border: 0; background: #F2F7FD; color: #061A3D; opacity: {{opacidade}}; font-size: 16px; font-weight: 700">{{botaoTexto}}</button>
+</sc-if>
+</div>
+<div style="flex: none; height: 84px"><dc-import name="NavEquipe" active="agenda" hint-size="390px,84px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1160}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = this.state || {};
+const tipo = s.tipo || 'medico';
+const med = tipo === 'medico';
+const ITENS = {
+medico: [['Clínica geral', 'Consulta clínica geral'], ['Pré-natal', 'Consulta de pré-natal'], ['Puericultura', 'Consulta de puericultura'], ['Retorno', 'Consulta de retorno'], ['Renovação de receita', 'Renovação de receita'], ['Hiperdia', 'Consulta de hiperdia']],
+enf: [['Curativo', 'Curativo'], ['Vacinação', 'Vacinação'], ['Coleta de exames', 'Coleta de exames'], ['Aferição de pressão', 'Aferição de pressão'], ['Preventivo', 'Preventivo'], ['Retirada de pontos', 'Retirada de pontos']]
+};
+const DIAS = {
+medico: [
+['Ter, 15/12', 'Dra. Helena', [['7h40', true], ['8h20'], ['9h'], ['10h20']]],
+['Qua, 16/12', 'Dra. Helena', [['13h30', true], ['14h10'], ['15h50']]],
+['Sex, 18/12', 'Dra. Helena', [['8h'], ['9h40'], ['11h', true], ['13h30']]]
+],
+enf: [
+['Seg, 14/12', 'Enfermeira Rosana', [['7h', true], ['7h30'], ['8h'], ['8h30']]],
+['Ter, 15/12', 'Enfermeiro Paulo', [['13h'], ['14h'], ['15h', true]]],
+['Qua, 16/12', 'Enfermeira Rosana', [['7h30'], ['9h']]]
+]
+};
+const item = typeof s.item === 'number' ? s.item : 3;
+const slot = s.slot || '';
+const ICONES = { medico: 'M6 3v5a4 4 0 008 0V3M10 12v3a5 5 0 0010 0v-2M20 13a1.8 1.8 0 100-3.6 1.8 1.8 0 000 3.6z', enf: 'M9 4h6v5h5v6h-5v5H9v-5H4V9h5z' };
+let resumo = '';
+const dias = DIAS[tipo].map((d, di) => ({
+dia: d[0],
+quem: 'com ' + d[1],
+horas: d[2].map((h, hi) => {
+const id = di + '-' + hi;
+const sel = id === slot;
+const res = !!h[1];
+if (sel) resumo = d[0].toLowerCase() + ', às ' + h[0] + ' (' + d[1] + ')';
+return { hora: h[0], sel, reservado: res,
+fundo: sel ? '#F2F7FD' : '#0C2A5A',
+tinta: sel ? '#061A3D' : '#F2F7FD',
+borda: sel ? '#F2F7FD' : res ? '#FEC301' : '#4D6FA3',
+estiloBorda: res && !sel ? 'dashed' : 'solid',
+tagTinta: sel ? '#061A3D' : '#FEC301',
+escolher: () => this.setState({ slot: id, feito: false }) };
+})
+}));
+const duplicado = med && item === 0;
+const pronto = !!resumo && !duplicado;
+return {
+tipos: ['medico', 'enf'].map((id) => {
+const sel = id === tipo;
+return { nome: id === 'medico' ? 'Médico' : 'Enfermagem', icone: ICONES[id], sel, fundo: sel ? '#F2F7FD' : 'transparent', tinta: sel ? '#061A3D' : '#F2F7FD', borda: sel ? '#F2F7FD' : '#4D6FA3', escolher: () => this.setState({ tipo: id, item: 0, slot: '', feito: false }) };
+}),
+rotuloItem: med ? 'Consulta' : 'Procedimento',
+itens: ITENS[tipo].map((it, i) => {
+const sel = i === item;
+return { curto: it[0], sel, fundo: sel ? '#F2F7FD' : '#0C2A5A', tinta: sel ? '#061A3D' : '#F2F7FD', borda: sel ? '#F2F7FD' : '#4D6FA3', escolher: () => this.setState({ item: i, feito: false }) };
+}),
+duplicado,
+dias,
+resumo: (ITENS[tipo][item] || ITENS[tipo][0])[1] + ', ' + resumo,
+agendado: !!s.feito,
+podeAgendar: !s.feito,
+bloqueado: !pronto,
+opacidade: pronto ? 1 : 0.45,
+botaoTexto: duplicado ? 'Já existe uma marcada' : resumo ? 'Agendar ' + resumo : 'Escolha um horário',
+agendar: () => { if (pronto) this.setState({ feito: true }); }
+};
+}
+}
+</script>
+</body>
+</html>

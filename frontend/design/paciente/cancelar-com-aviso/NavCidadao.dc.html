@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Navegação do paciente</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Atkinson+Hyperlegible+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<nav aria-label="Seções do app" style="position: relative; width: 390px; height: 84px; box-sizing: border-box; font-family: 'Public Sans', system-ui, sans-serif">
+<div style="position: absolute; left: 0; right: 0; top: 18px; bottom: 0; background: #FFFFFF; border-top: 1px solid #DCE5F0"></div>
+<div style="position: absolute; inset: 0; padding: 0 8px; display: flex; align-items: flex-start">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+<a href="{{t.href}}" aria-current="{{t.atual}}" style="flex: 1; height: 84px; padding-top: {{t.topo}}px; display: flex; flex-direction: column; align-items: center; text-decoration: none; color: {{t.fg}}; font-size: 13px; line-height: 16px; font-weight: {{t.w}}">
+<span style="width: {{t.box}}px; height: {{t.box}}px; border-radius: 50%; background: {{t.bg}}; box-shadow: {{t.anel}}; color: {{t.cor}}; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="{{t.ico}}" height="{{t.ico}}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{t.sw}}" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.d}}"></path></svg>
+</span>
+{{t.label}}
+</a>
+</sc-for>
+</div>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["atendimentos","agendar","perfil"],"default":"atendimentos"},"$preview":{"width":390,"height":84}}'>
+class Component extends DCLogic {
+renderVals() {
+const raw = this.props.active ?? 'atendimentos';
+const antigo = { inicio: 'atendimentos', atender: 'atendimentos', prontuario: 'perfil' };
+const active = antigo[raw] || raw;
+const tabs = [
+{ id: 'atendimentos', label: 'Atendimentos', href: 'MeusAtendimentos.dc.html', d: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M9 15l2 2 4-4' },
+{ id: 'agendar', label: 'Agendar', href: 'Agendar.dc.html', d: 'M12 5v14M5 12h14' },
+{ id: 'perfil', label: 'Perfil', href: 'Perfil.dc.html', d: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0' }
+];
+return { tabs: tabs.map((t) => {
+const on = t.id === active;
+if (t.id === 'agendar') return { ...t, atual: on ? 'page' : 'false', topo: 0, box: 56, ico: 28, sw: 2.6, cor: '#FFFFFF', fg: '#082C63', w: 700, bg: '#082C63', anel: (on ? '0 0 0 5px #82CBF6' : '0 0 0 5px #BFE3FA') + ', 0 6px 14px rgba(8, 44, 99, 0.28)' };
+return { ...t, atual: on ? 'page' : 'false', topo: 26, box: 30, ico: 24, sw: on ? 2.4 : 1.8, cor: on ? '#082C63' : '#4F5F78', fg: on ? '#082C63' : '#4F5F78', w: on ? 700 : 500, bg: 'transparent', anel: 'none' };
+}) };
+}
+}
+</script>
+</body>
+</html>

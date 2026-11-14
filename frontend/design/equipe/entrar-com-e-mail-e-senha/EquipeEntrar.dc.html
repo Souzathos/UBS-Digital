@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Equipe: entrar</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#7CC4F5;text-decoration:none}a:hover{color:#CDE6FB}
+input::placeholder{color:#9FB3D1}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; padding: 56px 20px 32px; display: flex; flex-direction: column; gap: 18px; overflow: hidden; background: #061A3D; color: #F2F7FD; font-family: 'Public Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.35">
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span style="display: flex; align-items: center; gap: 8px">
+<span style="flex: none; padding: 3px 5px; border-radius: 8px; background: #FFFFFF; display: flex"><img src="./assets/eb5bdd90ce37549e80ce27aaf805f342.png" alt="" width="49" height="36" style="display: block; width: 42px; height: 31px"></span>
+<span style="display: flex; flex-direction: column; line-height: 1.15">
+<span style="font-size: 17px; font-weight: 600">UBS Feitoria</span>
+<span style="font-size: 12px; color: #B5C8E2">Painel da equipe</span>
+</span>
+</span>
+<a href="Acessibilidade.dc.html" style="flex: none; min-height: 48px; padding: 0 12px; border: 1px solid #2F5287; border-radius: 10px; color: #F2F7FD; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5a1.6 1.6 0 110 3.2 1.6 1.6 0 010-3.2zM5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5L9 21M12 14.5l3 6.5"></path></svg>
+Acessibilidade
+</a>
+</header>
+<div style="display: flex; flex-direction: column; gap: 6px; padding-top: 10px">
+<h1 style="margin: 0; font-size: 30px; line-height: 1.1; font-weight: 600">Entrar na equipe</h1>
+<p style="margin: 0; font-size: 16px; color: #B5C8E2">Recepção, enfermagem, médicos e ACS. Use seu e-mail da UBS.</p>
+</div>
+<sc-if value="{{erro}}" hint-placeholder-val="{{false}}">
+<div role="alert" style="padding: 12px 14px; border-radius: 10px; background: #FEC301; color: #061A3D; display: flex; align-items: flex-start; gap: 10px">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M12 7v6M12 16.5v.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+<span style="display: flex; flex-direction: column">
+<span style="font-size: 17px; font-weight: 600">E-mail ou senha inválidos</span>
+<span style="font-size: 14px">Confira e tente de novo.</span>
+</span>
+</div>
+</sc-if>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="email" style="font-size: 16px; font-weight: 600">E-mail</label>
+<input id="email" type="email" autocomplete="username" placeholder="nome@ubsfeitoria.gov.br" defaultValue="ana.recepcao@ubsfeitoria.gov.br" style="height: 56px; padding: 0 14px; border: 1.5px solid {{bordaCampo}}; border-radius: 10px; background: #0C2A5A; font-size: 17px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="senhaEquipe" style="font-size: 16px; font-weight: 600">Senha</label>
+<div style="display: flex; gap: 8px">
+<input id="senhaEquipe" type="{{tipoSenha}}" autocomplete="current-password" defaultValue="feitoria-2026" style="flex: 1; min-width: 0; height: 56px; padding: 0 14px; border: 1.5px solid {{bordaCampo}}; border-radius: 10px; background: #0C2A5A; font-size: 17px">
+<button onClick="{{alternarSenha}}" aria-pressed="{{mostrando}}" aria-controls="senhaEquipe" style="flex: none; min-width: 96px; height: 56px; padding: 0 12px; border: 1.5px solid #B5C8E2; border-radius: 10px; background: transparent; font-size: 15px; font-weight: 600">{{rotuloSenha}}</button>
+</div>
+</div>
+</div>
+<a href="EquipeAgenda.dc.html" style="min-height: 56px; border-radius: 10px; background: #F2F7FD; color: #061A3D; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center">Entrar</a>
+<p style="margin: 0; font-size: 14px; color: #B5C8E2">Esqueceu a senha? Fale com a coordenação da UBS.</p>
+<div style="flex: 1"></div>
+<a href="Entrar.dc.html" style="align-self: center; min-height: 48px; padding: 0 12px; display: flex; align-items: center; font-size: 15px; font-weight: 600; text-decoration: underline">Sou paciente: entrar com CPF</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"erro":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = this.state || {};
+const erro = !!(this.props.erro ?? false);
+const mostrando = !!s.mostrar;
+return {
+erro,
+bordaCampo: erro ? '#FEC301' : '#4D6FA3',
+tipoSenha: mostrando ? 'text' : 'password',
+mostrando,
+rotuloSenha: mostrando ? 'Esconder' : 'Mostrar',
+alternarSenha: () => this.setState({ mostrar: !mostrando })
+};
+}
+}
+</script>
+</body>
+</html>

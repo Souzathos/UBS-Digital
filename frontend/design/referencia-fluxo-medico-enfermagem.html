@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UBS Smart - Sistema de Agendamento Inteligente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --success: #34a853;
+            --warning: #fbbc04;
+            --danger: #ea4335;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --enfermagem: #7c4dff;
+            --medico: #1a73e8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        /* TABS */
+        .tabs {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            background: white;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 14px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            background: #f8f9fa;
+            color: var(--primary);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab .badge {
+            background: var(--danger);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+        }
+
+        /* MAIN */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* FLUXOGRAMA */
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            padding: 20px 0;
+        }
+
+        .flow-step {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            text-align: center;
+            max-width: 320px;
+            width: 100%;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .flow-step:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .flow-step.start {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            border-radius: 30px;
+        }
+
+        .flow-step.decision {
+            background: var(--warning);
+            color: #333;
+            border-color: #f0a000;
+            transform: rotate(0deg);
+            border-radius: 8px;
+            border-left: 5px solid #f0a000;
+        }
+
+        .flow-step.process-med {
+            border-left: 5px solid var(--medico);
+            background: #e8f0fe;
+        }
+
+        .flow-step.process-enf {
+            border-left: 5px solid var(--enfermagem);
+            background: #f3e8ff;
+        }
+
+        .flow-step.success {
+            background: #e6f4ea;
+            border-color: var(--success);
+            border-left: 5px solid var(--success);
+        }
+
+        .flow-step.danger {
+            background: #fce8e6;
+            border-color: var(--danger);
+            border-left: 5px solid var(--danger);
+        }
+
+        .flow-step.redirect {
+            background: #fff3e0;
+            border-left: 5px solid #ff9800;
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            padding: 5px 0;
+        }
+
+        .flow-arrow.split {
+            display: flex;
+            justify-content: center;
+            gap: 120px;
+            width: 100%;
+            position: relative;
+        }
+
+        .flow-split {
+            display: flex;
+            gap: 30px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .flow-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            flex: 1;
+            max-width: 280px;
+        }
+
+        .flow-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .flow-step-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .flow-step-desc {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* FORMULÁRIO AGENDAMENTO */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2d9249;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d33426;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #333;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+
+        /* AGENDA GRID */
+        .agenda-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .agenda-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .filter-chip:hover,
+        .filter-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-chip.enf.active {
+            background: var(--enfermagem);
+            border-color: var(--enfermagem);
+        }
+
+        .agenda-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .agenda-table th {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .agenda-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .agenda-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-agendado {
+            background: #e8f0fe;
+            color: var(--primary);
+        }
+
+        .status-confirmado {
+            background: #e6f4ea;
+            color: var(--success);
+        }
+
+        .status-faltou {
+            background: #fce8e6;
+            color: var(--danger);
+        }
+
+        .status-remanejado {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-espera {
+            background: #f3e8ff;
+            color: var(--enfermagem);
+        }
+
+        .tipo-badge {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tipo-medico {
+            background: #e8f0fe;
+            color: var(--medico);
+        }
+
+        .tipo-enfermagem {
+            background: #f3e8ff;
+            color: var(--enfermagem);
+        }
+
+        /* FILA DE ESPERA */
+        .queue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .queue-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .queue-item.match {
+            border-left-color: var(--success);
+            background: #e6f4ea;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(52, 168, 83, 0.3); }
+            50% { box-shadow: 0 0 0 8px rgba(52, 168, 83, 0); }
+        }
+
+        .queue-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .queue-name {
+            font-weight: 600;
+        }
+
+        .queue-details {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .queue-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px;
+        }
+
+        /* NOTIFICAÇÕES */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 300;
+            transform: translateX(400px);
+            transition: transform 0.4s ease;
+            max-width: 380px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.warning {
+            background: #ff9800;
+        }
+
+        .notification.info {
+            background: var(--primary);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        /* TOPIC ROUTER VISUAL */
+        .topic-router {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            align-items: start;
+            margin: 20px 0;
+        }
+
+        .topic-input-box, .topic-output-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .topic-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .topic-item:hover {
+            transform: translateX(5px);
+        }
+
+        .topic-item.med { background: #e8f0fe; border-left: 4px solid var(--medico); }
+        .topic-item.enf { background: #f3e8ff; border-left: 4px solid var(--enfermagem); }
+
+        .topic-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .topic-engine {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--enfermagem));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            animation: spin 4s linear infinite;
+            box-shadow: 0 4px 20px rgba(26,115,232,0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .stat-card.danger .stat-number { color: var(--danger); }
+        .stat-card.success .stat-number { color: var(--success); }
+        .stat-card.warning .stat-number { color: #ff9800; }
+
+        /* MATCH RESULT */
+        .match-result {
+            background: linear-gradient(135deg, #e6f4ea, #fff3e0);
+            border: 2px solid var(--success);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .match-result h4 {
+            color: var(--success);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .match-arrow-big {
+            font-size: 2rem;
+            margin: 10px 0;
+        }
+
+        .match-patients {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .match-patient-card {
+            background: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 180px;
+        }
+
+        /* LOG */
+        .log-container {
+            background: #1a1a2e;
+            border-radius: 10px;
+            padding: 16px;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .log-time { color: #666; }
+        .log-topic { color: #4fc3f7; }
+        .log-action { color: #ffd54f; }
+        .log-success { color: #69f0ae; }
+        .log-error { color: #ff5252; }
+
+        /* PROCEDIMENTOS INFO */
+        .proc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .proc-column h4 {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .proc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .proc-list li {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .proc-list.med li {
+            background: #e8f0fe;
+        }
+
+        .proc-list.enf li {
+            background: #f3e8ff;
+        }
+
+        /* RUAS */
+        .ruas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .rua-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 14px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .rua-card h5 {
+            margin-bottom: 6px;
+        }
+
+        .rua-card p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .proc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-split {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .topic-router {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .agenda-table {
+                font-size: 0.8rem;
+            }
+
+            .agenda-table th,
+            .agenda-table td {
+                padding: 8px;
+            }
+
+            .match-patients {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-content">
+            <h1>
+                🏥 UBS Smart
+                <span class="header-badge">v1.0</span>
+            </h1>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <span style="font-size:0.85rem;">📅 <span id="dataAtual"></span></span>
+                <span style="font-size:0.85rem;">👤 Admin</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('fluxo')">📊 Fluxograma</div>
+        <div class="tab" onclick="switchTab('agendar')">📝 Agendar</div>
+        <div class="tab" onclick="switchTab('agenda')">📅 Agenda do Dia</div>
+        <div class="tab" onclick="switchTab('faltas')">
+            ❌ Faltas/Remanejamento
+            <span class="badge" id="faltasBadge">0</span>
+        </div>
+        <div class="tab" onclick="switchTab('fila')">
+            ⏳ Fila de Espera
+            <span class="badge" id="filaBadge">0</span>
+        </div>
+        <div class="tab" onclick="switchTab('topicos')">🔀 Motor de Tópicos</div>
+        <div class="tab" onclick="switchTab('log')">📋 Log do Sistema</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- ===== ABA FLUXOGRAMA ===== -->
+        <div class="tab-content active" id="tab-fluxo">
+            <div class="card">
+                <div class="card-title">📊 Fluxo de Atendimento da UBS</div>
+
+                <!-- Procedimentos e Ruas -->
+                <div class="proc-grid" style="margin-bottom:30px;">
+                    <div class="proc-column">
+                        <h4><span class="tipo-badge tipo-medico">MÉDICO</span> Procedimentos por Rua</h4>
+                        <ul class="proc-list med">
+                            <li>🩺 Consulta Clínica Geral</li>
+                            <li>👶 Puericultura (consulta médica)</li>
+                            <li>🤰 Pré-Natal (consulta médica)</li>
+                            <li>🏥 Retorno / Acompanhamento</li>
+                            <li>📋 Renovação de Receita (com avaliação)</li>
+                            <li>🫀 Hiperdia (consulta médica)</li>
+                        </ul>
+                    </div>
+                    <div class="proc-column">
+                        <h4><span class="tipo-badge tipo-enfermagem">ENFERMAGEM</span> Procedimentos</h4>
+                        <ul class="proc-list enf">
+                            <li>💉 Curativo</li>
+                            <li>💊 Administração de Medicação</li>
+                            <li>📊 Aferição de PA / Glicemia</li>
+                            <li>🩸 Coleta de Exames</li>
+                            <li>💉 Vacinação</li>
+                            <li>🤰 Pré-Natal (consulta enfermagem)</li>
+                            <li>👶 Puericultura (consulta enfermagem)</li>
+                            <li>📋 Preventivo</li>
+                            <li>🩹 Retirada de Pontos</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Distribuição por Ruas -->
+                <div class="card-title">🗺️ Distribuição por Ruas (Médicos)</div>
+                <div class="ruas-grid" style="margin-bottom:30px;">
+                    <div class="rua-card">
+                        <h5>👨‍⚕️ Dr. Silva</h5>
+                        <p>Rua das Flores, Rua Boa Vista, Av. Central (pares)</p>
+                    </div>
+                    <div class="rua-card">
+                        <h5>👩‍⚕️ Dra. Santos</h5>
+                        <p>Rua São José, Rua Nova, Av. Central (ímpares)</p>
+                    </div>
+                    <div class="rua-card">
+                        <h5>👨‍⚕️ Dr. Oliveira</h5>
+                        <p>Rua do Comércio, Rua Esperança, Rua Liberdade</p>
+                    </div>
+                </div>
+
+                <!-- FLUXOGRAMA VISUAL -->
+                <div class="card-title">🔄 Fluxo de Agendamento + Remanejamento por Falta</div>
+                <div class="flow-container">
+                    <div class="flow-step start">
+                        <div class="flow-step-title">📱 Paciente solicita agendamento</div>
+                        <div class="flow-step-desc">Via App / Recepção</div>
+                    </div>
+                    <div class="flow-arrow">⬇️</div>
+
+                    <div class="flow-step decision">
+                        <div class="flow-step-title">🔀 TÓPICO ROUTER</div>
+                        <div class="flow-step-desc">Analisa tipo de procedimento solicitado</div>
+                    </div>
+                    <div class="flow-arrow">⬇️</div>
+
+                    <div class="flow-split">
+                        <div class="flow-branch">
+                            <div class="flow-label">Procedimento Médico</div>
+                            <div class="flow-step process-med">
+                                <div class="flow-step-title">🩺 Fila Médica</div>
+                                <div class="flow-step-desc">Filtro por RUA → Médico responsável</div>
+                            </div>
+                            <div class="flow-arrow">⬇️</div>
+                            <div class="flow-step process-med">
+                                <div class="flow-step-title">📅 Agenda do Médico</div>
+                                <div class="flow-step-desc">Verifica horários disponíveis</div>
+                            </div>
+                        </div>
+                        <div class="flow-branch">
+                            <div class="flow-label">Procedimento Enfermagem</div>
+                            <div class="flow-step process-enf">
+                                <div class="flow-step-title">💉 Fila Enfermagem</div>
+                                <div class="flow-step-desc">Filtro por TIPO de procedimento</div>
+                            </div>
+                            <div class="flow-arrow">⬇️</div>
+                            <div class="flow-step process-enf">
+                                <div class="flow-step-title">📅 Agenda Enfermagem</div>
+                                <div class="flow-step-desc">Verifica horários disponíveis</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flow-arrow">⬇️</div>
+                    <div class="flow-step success">
+                        <div class="flow-step-title">✅ Consulta Agendada</div>
+                        <div class="flow-step-desc">Paciente recebe confirmação</div>
+                    </div>
+
+                    <div class="flow-arrow">⬇️</div>
+                    <div class="flow-step decision">
+                        <div class="flow-step-title">📋 Dia da Consulta</div>
+                        <div class="flow-step-desc">Paciente compareceu?</div>
+                    </div>
+                    <div class="flow-arrow">⬇️</div>
+
+                    <div class="flow-split">
+                        <div class="flow-branch">
+                            <div class="flow-label">✅ SIM</div>
+                            <div class="flow-step success">
+                                <div class="flow-step-title">Atendimento Normal</div>
+                                <div class="flow-step-desc">Segue fluxo padrão</div>
+                            </div>
+                        </div>
+                        <div class="flow-branch">
+                            <div class="flow-label">❌ NÃO (FALTOU)</div>
+                            <div class="flow-step danger">
+                                <div class="flow-step-title">⚠️ Falta Detectada</div>
+                                <div class="flow-step-desc">Sistema ativa remanejamento</div>
+                            </div>
+                            <div class="flow-arrow">⬇️</div>
+                            <div class="flow-step redirect">
+                                <div class="flow-step-title">🔄 Busca Match na Fila</div>
+                                <div class="flow-step-desc">Mesmo procedimento + mesma rua (se médico)</div>
+                            </div>
+                            <div class="flow-arrow">⬇️</div>
+                            <div class="flow-step success">
+                                <div class="flow-step-title">📲 Notifica paciente da fila</div>
+                                <div class="flow-step-desc">Oferece a vaga liberada</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ABA AGENDAR ===== -->
+        <div class="tab-content" id="tab-agendar">
+            <div class="card">
+                <div class="card-title">📝 Novo Agendamento</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome do Paciente</label>
+                        <input type="text" id="nomePaciente" placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" id="cpfPaciente" placeholder="000.000.000-00" maxlength="14">
+                    </div>
+                    <div class="form-group">
+                        <label>Rua do Paciente</label>
+                        <select id="ruaPaciente">
+                            <option value="">Selecione a rua...</option>
+                            <option value="rua_flores">Rua das Flores</option>
+                            <option value="rua_boa_vista">Rua Boa Vista</option>
+                            <option value="av_central_par">Av. Central (par)</option>
+                            <option value="rua_sao_jose">Rua São José</option>
+                            <option value="rua_nova">Rua Nova</option>
+                            <option value="av_central_impar">Av. Central (ímpar)</option>
+                            <option value="rua_comercio">Rua do Comércio</option>
+                            <option value="rua_esperanca">Rua Esperança</option>
+                            <option value="rua_liberdade">Rua Liberdade</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Procedimento</label>
+                        <select id="tipoProcedimento" onchange="filtrarProcedimentos()">
+                            <option value="">Selecione...</option>
+                            <option value="medico">🩺 Médico</option>
+                            <option value="enfermagem">💉 Enfermagem</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Procedimento Específico</label>
+                        <select id="procedimento">
+                            <option value="">Selecione o tipo primeiro...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Desejada</label>
+                        <input type="date" id="dataConsulta">
+                    </div>
+                    <div class="form-group">
+                        <label>Horário</label>
+                        <select id="horarioConsulta">
+                            <option value="">Selecione...</option>
+                            <option>07:00</option>
+                            <option>07:30</option>
+                            <option>08:00</option>
+                            <option>08:30</option>
+                            <option>09:00</option>
+                            <option>09:30</option>
+                            <option>10:00</option>
+                            <option>10:30</option>
+                            <option>11:00</option>
+                            <option>13:00</option>
+                            <option>13:30</option>
+                            <option>14:00</option>
+                            <option>14:30</option>
+                            <option>15:00</option>
+                            <option>15:30</option>
+                            <option>16:00</option>
+                        </select>
+                    </div>
+                    <div class="form-group full" id="medicoAutoContainer" style="display:none;">
+                        <label>Médico Direcionado (automático pela rua)</label>
+                        <input type="text" id="medicoAuto" readonly style="background:#e8f0fe; font-weight:600;">
+                    </div>
+                    <div class="form-group full" style="padding-top:10px;">
+                        <button class="btn btn-primary" onclick="agendarConsulta()">
+                            📅 Agendar Consulta
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMO FUNCIONA O TÓPICO -->
+            <div class="card">
+                <div class="card-title">💡 Como o Sistema Direciona</div>
+                <div id="direcionamentoInfo" style="padding:10px; color:var(--text-secondary); font-size:0.9rem;">
+                    Selecione o tipo de procedimento e a rua para ver o direcionamento automático.
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ABA AGENDA DO DIA ===== -->
+        <div class="tab-content" id="tab-agenda">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statTotal">0</div>
+                    <div class="stat-label">Total Agendados</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-number" id="statConfirmados">0</div>
+                    <div class="stat-label">Confirmados</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-number" id="statFaltas">0</div>
+                    <div class="stat-label">Faltas</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-number" id="statRemanejados">0</div>
+                    <div class="stat-label">Remanejados</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="agenda-header">
+                    <div class="card-title" style="margin:0;">📅 Agenda de Hoje</div>
+                    <div class="agenda-filters">
+                        <span class="filter-chip active" onclick="filtrarAgenda('todos', this)">Todos</span>
+                        <span class="filter-chip" onclick="filtrarAgenda('medico', this)">🩺 Médico</span>
+                        <span class="filter-chip" onclick="filtrarAgenda('enfermagem', this)">💉 Enfermagem</span>
+                        <span class="filter-chip" onclick="filtrarAgenda('faltou', this)">❌ Faltas</span>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="agenda-table">
+                        <thead>
+                            <tr>
+                                <th>Horário</th>
+                                <th>Paciente</th>
+                                <th>Tipo</th>
+                                <th>Procedimento</th>
+                                <th>Profissional</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agendaBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ABA FALTAS/REMANEJAMENTO ===== -->
+        <div class="tab-content" id="tab-faltas">
+            <div class="card">
+                <div class="card-title">❌ Registrar Falta e Remanejar Vaga</div>
+                <p style="color:var(--text-secondary); margin-bottom:20px; font-size:0.9rem;">
+                    Quando um paciente falta, o sistema busca automaticamente na fila de espera
+                    outro paciente que precisa do <strong>mesmo procedimento</strong> (e mesma rua, se for médico).
+                </p>
+
+                <div id="faltasList">
+                    <p style="text-align:center; color:var(--text-secondary); padding:20px;">
+                        Nenhuma falta registrada. Marque faltas na aba "Agenda do Dia".
+                    </p>
+                </div>
+            </div>
+
+            <div class="card" id="matchResultCard" style="display:none;">
+                <div class="card-title">🎯 Resultado do Match</div>
+                <div id="matchResult"></div>
+            </div>
+        </div>
+
+        <!-- ===== ABA FILA DE ESPERA ===== -->
+        <div class="tab-content" id="tab-fila">
+            <div class="card">
+                <div class="card-title">➕ Adicionar à Fila de Espera</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome do Paciente</label>
+                        <input type="text" id="filaName" placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" id="filaTel" placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="form-group">
+                        <label>Rua</label>
+                        <select id="filaRua">
+                            <option value="">Selecione a rua...</option>
+                            <option value="rua_flores">Rua das Flores</option>
+                            <option value="rua_boa_vista">Rua Boa Vista</option>
+                            <option value="av_central_par">Av. Central (par)</option>
+                            <option value="rua_sao_jose">Rua São José</option>
+                            <option value="rua_nova">Rua Nova</option>
+                            <option value="av_central_impar">Av. Central (ímpar)</option>
+                            <option value="rua_comercio">Rua do Comércio</option>
+                            <option value="rua_esperanca">Rua Esperança</option>
+                            <option value="rua_liberdade">Rua Liberdade</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Procedimento</label>
+                        <select id="filaTipo" onchange="filtrarProcedimentosFila()">
+                            <option value="">Selecione...</option>
+                            <option value="medico">🩺 Médico</option>
+                            <option value="enfermagem">💉 Enfermagem</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Procedimento</label>
+                        <select id="filaProc">
+                            <option value="">Selecione o tipo primeiro...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="justify-content:flex-end;">
+                        <button class="btn btn-primary" onclick="addFila()">
+                            ➕ Adicionar à Fila
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⏳ Pacientes na Fila de Espera</div>
+                <div id="filaContainer" class="queue-list">
+                    <p style="text-align:center; color:var(--text-secondary); padding:20px;">
+                        Nenhum paciente na fila de espera.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ABA MOTOR DE TÓPICOS ===== -->
+        <div class="tab-content" id="tab-topicos">
+            <div class="card">
+                <div class="card-title">🔀 Motor de Tópicos - Como funciona o roteamento</div>
+                <p style="color:var(--text-secondary); margin-bottom:20px; font-size:0.9rem;">
+                    O sistema usa <strong>tópicos</strong> para classificar e rotear cada solicitação.
+                    Quando um agendamento é criado, ele recebe um tópico que define para onde será direcionado.
+                </p>
+
+                <div class="topic-router">
+                    <div class="topic-input-box">
+                        <h4 style="margin-bottom:10px;">📥 Entrada (Solicitações)</h4>
+                        <div class="topic-item med">🩺 consulta/medico/clinica_geral</div>
+                        <div class="topic-item med">🩺 consulta/medico/prenatal</div>
+                        <div class="topic-item med">🩺 consulta/medico/hiperdia</div>
+                        <div class="topic-item med">🩺 consulta/medico/puericultura</div>
+                        <div class="topic-item enf">💉 procedimento/enfermagem/curativo</div>
+                        <div class="topic-item enf">💉 procedimento/enfermagem/vacinacao</div>
+                        <div class="topic-item enf">💉 procedimento/enfermagem/coleta</div>
+                        <div class="topic-item enf">💉 procedimento/enfermagem/preventivo</div>
+                    </div>
+
+                    <div class="topic-center">
+                        <div class="topic-engine">⚙️</div>
+                        <div style="margin-top:10px; font-weight:600; color:var(--text-secondary); font-size:0.8rem; text-align:center;">
+                            TOPIC<br>ROUTER
+                        </div>
+                    </div>
+
+                    <div class="topic-output-box">
+                        <h4 style="margin-bottom:10px;">📤 Saída (Destino)</h4>
+                        <div class="topic-item med">👨‍⚕️ Dr. Silva → Ruas Grupo A</div>
+                        <div class="topic-item med">👩‍⚕️ Dra. Santos → Ruas Grupo B</div>
+                        <div class="topic-item med">👨‍⚕️ Dr. Oliveira → Ruas Grupo C</div>
+                        <div class="topic-item enf">👩‍⚕️ Enf. Maria → Sala Procedimentos</div>
+                        <div class="topic-item enf">👩‍⚕️ Enf. Ana → Sala Vacinas</div>
+                        <div class="topic-item enf">👩‍⚕️ Enf. Paula → Coleta/Preventivo</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:20px; padding:16px; background:#f8f9fa; border-radius:8px;">
+                    <strong>Regra de Match para Remanejamento:</strong>
+                    <ul style="margin-top:8px; padding-left:20px; color:var(--text-secondary); font-size:0.9rem;">
+                        <li><strong>Médico:</strong> Mesmo procedimento + Mesma rua (mesmo médico)</li>
+                        <li><strong>Enfermagem:</strong> Mesmo procedimento (não depende de rua)</li>
+                        <li>Paciente da fila com maior tempo de espera tem prioridade</li>
+                        <li>Notificação automática ao paciente via app</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ABA LOG ===== -->
+        <div class="tab-content" id="tab-log">
+            <div class="card">
+                <div class="card-title">📋 Log do Sistema em Tempo Real</div>
+                <div class="log-container" id="logContainer">
+                    <div class="log-entry">
+                        <span class="log-time">[SISTEMA]</span>
+                        <span class="log-success">Sistema UBS Smart inicializado com sucesso</span>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <button class="btn btn-outline btn-sm" onclick="clearLog()">🗑️ Limpar Log</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Confirmação</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div id="modalBody"></div>
+            <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;" id="modalFooter">
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // ==========================================
+        // DADOS E ESTADO DO SISTEMA
+        // ==========================================
+
+        const PROCEDIMENTOS = {
+            medico: [
+                { id: 'clinica_geral', nome: 'Consulta Clínica Geral', topico: 'consulta/medico/clinica_geral' },
+                { id: 'puericultura_med', nome: 'Puericultura (médica)', topico: 'consulta/medico/puericultura' },
+                { id: 'prenatal_med', nome: 'Pré-Natal (médico)', topico: 'consulta/medico/prenatal' },
+                { id: 'retorno', nome: 'Retorno / Acompanhamento', topico: 'consulta/medico/retorno' },
+                { id: 'receita', nome: 'Renovação de Receita', topico: 'consulta/medico/receita' },
+                { id: 'hiperdia_med', nome: 'Hiperdia (médico)', topico: 'consulta/medico/hiperdia' }
+            ],
+            enfermagem: [
+                { id: 'curativo', nome: 'Curativo', topico: 'procedimento/enfermagem/curativo' },
+                { id: 'medicacao', nome: 'Administração de Medicação', topico: 'procedimento/enfermagem/medicacao' },
+                { id: 'afericao', nome: 'Aferição PA / Glicemia', topico: 'procedimento/enfermagem/afericao' },
+                { id: 'coleta', nome: 'Coleta de Exames', topico: 'procedimento/enfermagem/coleta' },
+                { id: 'vacinacao', nome: 'Vacinação', topico: 'procedimento/enfermagem/vacinacao' },
+                { id: 'prenatal_enf', nome: 'Pré-Natal (enfermagem)', topico: 'procedimento/enfermagem/prenatal' },
+                { id: 'puericultura_enf', nome: 'Puericultura (enfermagem)', topico: 'procedimento/enfermagem/puericultura' },
+                { id: 'preventivo', nome: 'Preventivo', topico: 'procedimento/enfermagem/preventivo' },
+                { id: 'retirada_pontos', nome: 'Retirada de Pontos', topico: 'procedimento/enfermagem/retirada_pontos' }
+            ]
+        };
+
+        const RUAS_MEDICOS = {
+            'rua_flores': { medico: 'Dr. Silva', grupo: 'A' },
+            'rua_boa_vista': { medico: 'Dr. Silva', grupo: 'A' },
+            'av_central_par': { medico: 'Dr. Silva', grupo: 'A' },
+            'rua_sao_jose': { medico: 'Dra. Santos', grupo: 'B' },
+            'rua_nova': { medico: 'Dra. Santos', grupo: 'B' },
+            'av_central_impar': { medico: 'Dra. Santos', grupo: 'B' },
+            'rua_comercio': { medico: 'Dr. Oliveira', grupo: 'C' },
+            'rua_esperanca': { medico: 'Dr. Oliveira', grupo: 'C' },
+            'rua_liberdade': { medico: 'Dr. Oliveira', grupo: 'C' }
+        };
+
+        const RUAS_NOMES = {
+            'rua_flores': 'Rua das Flores',
+            'rua_boa_vista': 'Rua Boa Vista',
+            'av_central_par': 'Av. Central (par)',
+            'rua_sao_jose': 'Rua São José',
+            'rua_nova': 'Rua Nova',
+            'av_central_impar': 'Av. Central (ímpar)',
+            'rua_comercio': 'Rua do Comércio',
+            'rua_esperanca': 'Rua Esperança',
+            'rua_liberdade': 'Rua Liberdade'
+        };
+
+        // Estado do app
+        let agenda = [];
+        let filaEspera = [];
+        let logEntries = [];
+        let nextId = 1;
+
+        // Dados de exemplo
+        function carregarDadosExemplo() {
+            agenda = [
+                { id: nextId++, horario: '07:00', paciente: 'Maria da Silva', tipo: 'medico', procedimento: 'clinica_geral', rua: 'rua_flores', profissional: 'Dr. Silva', status: 'agendado' },
+                { id: nextId++, horario: '07:30', paciente: 'João Souza', tipo: 'enfermagem', procedimento: 'curativo', rua: 'rua_sao_jose', profissional: 'Enf. Maria', status: 'agendado' },
+                { id: nextId++, horario: '08:00', paciente: 'Ana Santos', tipo: 'medico', procedimento: 'prenatal_med', rua: 'rua_nova', profissional: 'Dra. Santos', status: 'confirmado' },
+                { id: nextId++, horario: '08:30', paciente: 'Pedro Lima', tipo: 'enfermagem', procedimento: 'vacinacao', rua: 'rua_comercio', profissional: 'Enf. Ana', status: 'agendado' },
+                { id: nextId++, horario: '09:00', paciente: 'Carla Mendes', tipo: 'medico', procedimento: 'hiperdia_med', rua: 'rua_boa_vista', profissional: 'Dr. Silva', status: 'agendado' },
+                { id: nextId++, horario: '09:30', paciente: 'Roberto Alves', tipo: 'enfermagem', procedimento: 'coleta', rua: 'rua_liberdade', profissional: 'Enf. Paula', status: 'agendado' },
+                { id: nextId++, horario: '10:00', paciente: 'Lúcia Ferreira', tipo: 'medico', procedimento: 'retorno', rua: 'rua_esperanca', profissional: 'Dr. Oliveira', status: 'agendado' },
+                { id: nextId++, horario: '10:30', paciente: 'Fernando Costa', tipo: 'enfermagem', procedimento: 'afericao', rua: 'rua_flores', profissional: 'Enf. Maria', status: 'agendado' },
+            ];
+
+            filaEspera = [
+                { id: nextId++, nome: 'Teresa Oliveira', tel: '(11) 99999-1111', rua: 'rua_flores', tipo: 'medico', procedimento: 'clinica_geral', dataEntrada: new Date(Date.now() - 86400000 * 3) },
+                { id: nextId++, nome: 'Ricardo Nunes', tel: '(11) 99999-2222', rua: 'rua_sao_jose', tipo: 'enfermagem', procedimento: 'curativo', dataEntrada: new Date(Date.now() - 86400000 * 2) },
+                { id: nextId++, nome: 'Sandra Vieira', tel: '(11) 99999-3333', rua: 'rua_boa_vista', tipo: 'medico', procedimento: 'hiperdia_med', dataEntrada: new Date(Date.now() - 86400000 * 1) },
+                { id: nextId++, nome: 'Marcos Paulo', tel: '(11) 99999-4444', rua: 'rua_comercio', tipo: 'enfermagem', procedimento: 'vacinacao', dataEntrada: new Date(Date.now() - 86400000 * 5) },
+                { id: nextId++, nome: 'Juliana Reis', tel: '(11) 99999-5555', rua: 'rua_esperanca', tipo: 'medico', procedimento: 'retorno', dataEntrada: new Date(Date.now() - 86400000 * 4) },
+            ];
+
+            addLog('INIT', 'Dados de exemplo carregados', 'success');
+            atualizarTudo();
+        }
+
+        // ==========================================
+        // NAVEGAÇÃO POR TABS
+        // ==========================================
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+            event.target.closest('.tab').classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        // ==========================================
+        // FILTRO DE PROCEDIMENTOS NO FORM
+        // ==========================================
+
+        function filtrarProcedimentos() {
+            const tipo = document.getElementById('tipoProcedimento').value;
+            const select = document.getElementById('procedimento');
+            select.innerHTML = '<option value="">Selecione...</option>';
+
+            if (tipo && PROCEDIMENTOS[tipo]) {
+                PROCEDIMENTOS[tipo].forEach(p => {
+                    select.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
+                });
+            }
+
+            atualizarDirecionamento();
+        }
+
+        function filtrarProcedimentosFila() {
+            const tipo = document.getElementById('filaTipo').value;
+            const select = document.getElementById('filaProc');
+            select.innerHTML = '<option value="">Selecione...</option>';
+
+            if (tipo && PROCEDIMENTOS[tipo]) {
+                PROCEDIMENTOS[tipo].forEach(p => {
+                    select.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
+                });
+            }
+        }
+
+        // ==========================================
+        // DIRECIONAMENTO AUTOMÁTICO
+        // ==========================================
+
+        function atualizarDirecionamento() {
+            const tipo = document.getElementById('tipoProcedimento').value;
+            const rua = document.getElementById('ruaPaciente').value;
+            const container = document.getElementById('medicoAutoContainer');
+            const medicoInput = document.getElementById('medicoAuto');
+            const info = document.getElementById('direcionamentoInfo');
+
+            if (tipo === 'medico' && rua) {
+                const dados = RUAS_MEDICOS[rua];
+                container.style.display = 'block';
+                medicoInput.value = `${dados.medico} (Grupo ${dados.grupo})`;
+
+                info.innerHTML = `
+                    <div style="padding:15px; background:#e8f0fe; border-radius:8px; border-left:4px solid var(--medico);">
+                        <strong>🩺 Tópico: consulta/medico/*</strong><br>
+                        <span>Rua: ${RUAS_NOMES[rua]} → Direcionado para <strong>${dados.medico}</strong></span><br>
+                        <span style="font-size:0.8rem; color:#666;">
+                            Filtro: tipo=medico AND rua_grupo=${dados.grupo}
+                        </span>
+                    </div>
+                `;
+            } else if (tipo === 'enfermagem') {
+                container.style.display = 'none';
+                info.innerHTML = `
+                    <div style="padding:15px; background:#f3e8ff; border-radius:8px; border-left:4px solid var(--enfermagem);">
+                        <strong>💉 Tópico: procedimento/enfermagem/*</strong><br>
+                        <span>Enfermagem não depende de rua - direcionado por tipo de procedimento</span><br>
+                        <span style="font-size:0.8rem; color:#666;">
+                            Filtro: tipo=enfermagem AND procedimento=*
+                        </span>
+                    </div>
+                `;
+            } else {
+                container.style.display = 'none';
+                info.innerHTML = 'Selecione o tipo de procedimento e a rua para ver o direcionamento automático.';
+            }
+        }
+
+        // Listeners para atualizar direcionamento
+        document.getElementById('ruaPaciente').addEventListener('change', atualizarDirecionamento);
+
+        // ==========================================
+        // AGENDAR CONSULTA
+        // ==========================================
+
+        function agendarConsulta() {
+            const nome = document.getElementById('nomePaciente').value.trim();
+            const rua = document.getElementById('ruaPaciente').value;
+            const tipo = document.getElementById('tipoProcedimento').value;
+            const proc = document.getElementById('procedimento').value;
+            const data = document.getElementById('dataConsulta').value;
+            const horario = document.getElementById('horarioConsulta').value;
+
+            if (!nome || !tipo || !proc || !horario) {
+                showNotification('Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+
+            if (tipo === 'medico' && !rua) {
+                showNotification('Para consulta médica, a rua é obrigatória!', 'error');
+                return;
+            }
+
+            let profissional = '';
+            let topico = '';
+
+            if (tipo === 'medico') {
+                const dados = RUAS_MEDICOS[rua];
+                profissional = dados.medico;
+                const procData = PROCEDIMENTOS.medico.find(p => p.id === proc);
+                topico = procData.topico;
+            } else {
+                // Enfermagem - direcionar por tipo
+                const procEnf = {
+                    'curativo': 'Enf. Maria', 'medicacao': 'Enf. Maria',
+                    'afericao': 'Enf. Maria', 'coleta': 'Enf. Paula',
+                    'vacinacao': 'Enf. Ana', 'prenatal_enf': 'Enf. Paula',
+                    'puericultura_enf': 'Enf. Ana', 'preventivo': 'Enf. Paula',
+                    'retirada_pontos': 'Enf. Maria'
+                };
+                profissional = procEnf[proc] || 'Enf. Maria';
+                const procData = PROCEDIMENTOS.enfermagem.find(p => p.id === proc);
+                topico = procData.topico;
+            }
+
+            const novoAgendamento = {
+                id: nextId++,
+                horario: horario,
+                paciente: nome,
+                tipo: tipo,
+                procedimento: proc,
+                rua: rua,
+                profissional: profissional,
+                status: 'agendado'
+            };
+
+            agenda.push(novoAgendamento);
+            agenda.sort((a, b) => a.horario.localeCompare(b.horario));
+
+            addLog('AGENDAR', `Novo agendamento: ${nome} → ${topico} → ${profissional}`, 'success');
+
+            showNotification(`✅ Consulta agendada! ${nome} → ${profissional} às ${horario}`, 'success');
+
+            // Limpar form
+            document.getElementById('nomePaciente').value = '';
+            document.getElementById('cpfPaciente').value = '';
+            document.getElementById('procedimento').innerHTML = '<option value="">Selecione o tipo primeiro...</option>';
+            document.getElementById('tipoProcedimento').value = '';
+            document.getElementById('medicoAutoContainer').style.display = 'none';
+
+            atualizarTudo();
+        }
+
+        // ==========================================
+        // RENDERIZAR AGENDA
+        // ==========================================
+
+        function renderAgenda(filtro = 'todos') {
+            const body = document.getElementById('agendaBody');
+            let filtered = agenda;
+
+            if (filtro === 'medico') filtered = agenda.filter(a => a.tipo === 'medico');
+            if (filtro === 'enfermagem') filtered = agenda.filter(a => a.tipo === 'enfermagem');
+            if (filtro === 'faltou') filtered = agenda.filter(a => a.status === 'faltou');
+
+            if (filtered.length === 0) {
+                body.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#999; padding:30px;">Nenhum agendamento encontrado</td></tr>';
+                return;
+            }
+
+            body.innerHTML = filtered.map(a => {
+                const procNome = getProcedimentoNome(a.tipo, a.procedimento);
+                const statusClass = 'status-' + a.status;
+                const tipoClass = 'tipo-' + (a.tipo === 'medico' ? 'medico' : 'enfermagem');
+                const statusLabel = {
+                    'agendado': 'Agendado',
+                    'confirmado': 'Confirmado',
+                    'faltou': 'Faltou',
+                    'remanejado': 'Remanejado'
+                }[a.status] || a.status;
+
+                let acoes = '';
+                if (a.status === 'agendado') {
+                    acoes = `
+                        <button class="btn btn-success btn-sm" onclick="confirmarPresenca(${a.id})">✅</button>
+                        <button class="btn btn-danger btn-sm" onclick="registrarFalta(${a.id})">❌</button>
+                    `;
+                } else if (a.status === 'faltou') {
+                    acoes = `<button class="btn btn-warning btn-sm" onclick="buscarMatch(${a.id})">🔄 Remanejar</button>`;
+                } else {
+                    acoes = '<span style="color:#999; font-size:0.8rem;">-</span>';
+                }
+
+                return `
+                    <tr class="agenda-row" data-tipo="${a.tipo}" data-status="${a.status}">
+                        <td><strong>${a.horario}</strong></td>
+                        <td>${a.paciente}</td>
+                        <td><span class="tipo-badge ${tipoClass}">${a.tipo === 'medico' ? 'Médico' : 'Enferm.'}</span></td>
+                        <td>${procNome}</td>
+                        <td>${a.profissional}</td>
+                        <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                        <td>${acoes}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filtrarAgenda(filtro, el) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderAgenda(filtro);
+        }
+
+        // ==========================================
+        // CONFIRMAR / REGISTRAR FALTA
+        // ==========================================
+
+        function confirmarPresenca(id) {
+            const ag = agenda.find(a => a.id === id);
+            if (ag) {
+                ag.status = 'confirmado';
+                addLog('PRESENÇA', `${ag.paciente} confirmou presença (${ag.horario})`, 'success');
+                showNotification(`✅ ${ag.paciente} - presença confirmada!`, 'success');
+                atualizarTudo();
+            }
+        }
+
+        function registrarFalta(id) {
+            const ag = agenda.find(a => a.id === id);
+            if (!ag) return;
+
+            openModal(
+                '❌ Confirmar Falta',
+                `
+                    <p>Registrar falta de <strong>${ag.paciente}</strong>?</p>
+                    <p style="margin-top:8px; color:var(--text-secondary); font-size:0.9rem;">
+                        Horário: ${ag.horario} | Procedimento: ${getProcedimentoNome(ag.tipo, ag.procedimento)}
+                    </p>
+                    <p style="margin-top:12px; color:#ff9800; font-size:0.9rem;">
+                        ⚠️ O sistema irá buscar automaticamente um paciente na fila de espera com procedimento compatível.
+                    </p>
+                `,
+                [
+                    { text: 'Cancelar', class: 'btn-outline', action: 'closeModal()' },
+                    { text: '❌ Registrar Falta', class: 'btn-danger', action: `confirmarFalta(${id})` }
+                ]
+            );
+        }
+
+        function confirmarFalta(id) {
+            closeModal();
+            const ag = agenda.find(a => a.id === id);
+            if (ag) {
+                ag.status = 'faltou';
+                const topico = getTopico(ag.tipo, ag.procedimento);
+                addLog('FALTA', `${ag.paciente} FALTOU (${ag.horario}) - Tópico: ${topico}`, 'error');
+                showNotification(`❌ Falta registrada: ${ag.paciente}. Buscando paciente na fila...`, 'warning');
+
+                // Buscar match automaticamente
+                setTimeout(() => buscarMatch(id), 1500);
+                atualizarTudo();
+            }
+        }
+
+        // ==========================================
+        // BUSCAR MATCH - REMANEJAMENTO
+        // ==========================================
+
+        function buscarMatch(agendaId) {
+            const ag = agenda.find(a => a.id === agendaId);
+            if (!ag) return;
+
+            addLog('MATCH', `Buscando match para vaga: ${ag.horario} - ${getProcedimentoNome(ag.tipo, ag.procedimento)}`, 'action');
+
+            let candidatos = [];
+
+            if (ag.tipo === 'medico') {
+                // Para médico: mesmo procedimento + mesma rua (mesmo grupo/médico)
+                const grupoRua = RUAS_MEDICOS[ag.rua]?.grupo;
+                candidatos = filaEspera.filter(f =>
+                    f.tipo === 'medico' &&
+                    f.procedimento === ag.procedimento &&
+                    RUAS_MEDICOS[f.rua]?.grupo === grupoRua
+                );
+                addLog('MATCH', `Filtro médico: proc=${ag.procedimento}, grupo_rua=${grupoRua} → ${candidatos.length} candidato(s)`, 'topic');
+            } else {
+                // Para enfermagem: apenas mesmo procedimento (não depende de rua)
+                candidatos = filaEspera.filter(f =>
+                    f.tipo === 'enfermagem' &&
+                    f.procedimento === ag.procedimento
+                );
+                addLog('MATCH', `Filtro enfermagem: proc=${ag.procedimento} → ${candidatos.length} candidato(s)`, 'topic');
+            }
+
+            // Ordenar por tempo de espera (mais antigo primeiro)
+            candidatos.sort((a, b) => a.dataEntrada - b.dataEntrada);
+
+            const matchCard = document.getElementById('matchResultCard');
+            const matchResult = document.getElementById('matchResult');
+
+            if (candidatos.length > 0) {
+                const match = candidatos[0];
+
+                matchResult.innerHTML = `
+                    <div class="match-result">
+                        <h4>✅ Match Encontrado!</h4>
+                        <div class="match-patients">
+                            <div class="match-patient-card" style="border-left:4px solid var(--danger);">
+                                <div style="font-size:0.75rem; color:var(--danger); font-weight:600;">FALTOU</div>
+                                <div style="font-weight:600;">${ag.paciente}</div>
+                                <div style="font-size:0.8rem; color:#666;">${ag.horario} - ${getProcedimentoNome(ag.tipo, ag.procedimento)}</div>
+                            </div>
+                            <div class="match-arrow-big">➡️</div>
+                            <div class="match-patient-card" style="border-left:4px solid var(--success);">
+                                <div style="font-size:0.75rem; color:var(--success); font-weight:600;">REMANEJADO</div>
+                                <div style="font-weight:600;">${match.nome}</div>
+                                <div style="font-size:0.8rem; color:#666;">Tel: ${match.tel}</div>
+                                <div style="font-size:0.8rem; color:#666;">Espera: ${diasEspera(match.dataEntrada)} dias</div>
+                            </div>
+                        </div>
+                        <div style="margin-top:15px;">
+                            <button class="btn btn-success" onclick="confirmarRemanejamento(${ag.id}, ${match.id})">
+                                ✅ Confirmar Remanejamento
+                            </button>
+                            <button class="btn btn-outline" onclick="document.getElementById('matchResultCard').style.display='none';" style="margin-left:8px;">
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                matchCard.style.display = 'block';
+                addLog('MATCH', `Match encontrado: ${match.nome} (espera: ${diasEspera(match.dataEntrada)} dias)`, 'success');
+                showNotification(`🎯 Match encontrado! ${match.nome} pode ocupar a vaga das ${ag.horario}`, 'info');
+
+                // Mudar para aba de faltas
+                switchTabDirect('faltas');
+
+            } else {
+                matchResult.innerHTML = `
+                    <div style="text-align:center; padding:20px; background:#fce8e6; border-radius:8px;">
+                        <div style="font-size:2rem; margin-bottom:10px;">😕</div>
+                        <h4 style="color:var(--danger);">Nenhum match encontrado</h4>
+                        <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:8px;">
+                            Não há pacientes na fila de espera com procedimento compatível
+                            ${ag.tipo === 'medico' ? 'e mesma área de rua' : ''}.
+                        </p>
+                        <p style="color:var(--text-secondary); font-size:0.85rem; margin-top:8px;">
+                            Procedimento: <strong>${getProcedimentoNome(ag.tipo, ag.procedimento)}</strong><br>
+                            ${ag.tipo === 'medico' ? `Grupo de rua: ${RUAS_MEDICOS[ag.rua]?.grupo || 'N/A'}` : 'Tipo: Enfermagem'}
+                        </p>
+                    </div>
+                `;
+                matchCard.style.display = 'block';
+                addLog('MATCH', `Nenhum match encontrado para ${ag.horario}`, 'error');
+                showNotification(`😕 Nenhum paciente compatível na fila de espera`, 'error');
+                switchTabDirect('faltas');
+            }
+
+            renderFaltas();
+        }
+
+        function confirmarRemanejamento(agendaId, filaId) {
+            const ag = agenda.find(a => a.id === agendaId);
+            const match = filaEspera.find(f => f.id === filaId);
+
+            if (ag && match) {
+                // Atualizar agenda
+                ag.status = 'remanejado';
+                ag.pacienteOriginal = ag.paciente;
+                ag.paciente = match.nome + ' ★';
+
+                // Remover da fila
+                filaEspera = filaEspera.filter(f => f.id !== filaId);
+
+                addLog('REMANEJAMENTO', `SUCESSO: ${match.nome} assumiu vaga de ${ag.pacienteOriginal} (${ag.horario})`, 'success');
+                showNotification(`🎉 Remanejamento confirmado! ${match.nome} vai ser atendido(a) às ${ag.horario}`, 'success');
+
+                document.getElementById('matchResultCard').style.display = 'none';
+                atualizarTudo();
+            }
+        }
+
+        // ==========================================
+        // FILA DE ESPERA
+        // ==========================================
+
+        function addFila() {
+            const nome = document.getElementById('filaName').value.trim();
+            const tel = document.getElementById('filaTel').value.trim();
+            const rua = document.getElementById('filaRua').value;
+            const tipo = document.getElementById('filaTipo').value;
+            const proc = document.getElementById('filaProc').value;
+
+            if (!nome || !tipo || !proc) {
+                showNotification('Preencha nome, tipo e procedimento!', 'error');
+                return;
+            }
+
+            if (tipo === 'medico' && !rua) {
+                showNotification('Para procedimento médico, a rua é obrigatória!', 'error');
+                return;
+            }
+
+            filaEspera.push({
+                id: nextId++,
+                nome,
+                tel,
+                rua,
+                tipo,
+                procedimento: proc,
+                dataEntrada: new Date()
+            });
+
+            const topico = getTopico(tipo, proc);
+            addLog('FILA', `${nome} adicionado à fila de espera - Tópico: ${topico}`, 'action');
+            showNotification(`⏳ ${nome} adicionado à fila de espera`, 'info');
+
+            // Limpar
+            document.getElementById('filaName').value = '';
+            document.getElementById('filaTel').value = '';
+            document.getElementById('filaProc').innerHTML = '<option value="">Selecione o tipo primeiro...</option>';
+
+            atualizarTudo();
+        }
+
+        function removerFila(id) {
+            const item = filaEspera.find(f => f.id === id);
+            filaEspera = filaEspera.filter(f => f.id !== id);
+            if (item) addLog('FILA', `${item.nome} removido da fila de espera`, 'action');
+            atualizarTudo();
+        }
+
+        function renderFila() {
+            const container = document.getElementById('filaContainer');
+
+            if (filaEspera.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:20px;">Nenhum paciente na fila de espera.</p>';
+                return;
+            }
+
+            // Verificar matches potenciais
+            const faltasAtuais = agenda.filter(a => a.status === 'faltou');
+
+            container.innerHTML = filaEspera.map(f => {
+                let hasMatch = false;
+                faltasAtuais.forEach(ag => {
+                    if (ag.tipo === f.tipo && ag.procedimento === f.procedimento) {
+                        if (ag.tipo === 'enfermagem' || RUAS_MEDICOS[ag.rua]?.grupo === RUAS_MEDICOS[f.rua]?.grupo) {
+                            hasMatch = true;
+                        }
+                    }
+                });
+
+                return `
+                    <div class="queue-item ${hasMatch ? 'match' : ''}" style="border-left-color: ${f.tipo === 'medico' ? 'var(--medico)' : 'var(--enfermagem)'}">
+                        <div class="queue-info">
+                            <div class="queue-name">
+                                ${f.nome}
+                                ${hasMatch ? '<span style="color:var(--success); font-weight:700;"> ← MATCH DISPONÍVEL!</span>' : ''}
+                            </div>
+                            <div class="queue-details">
+                                <span class="tipo-badge ${f.tipo === 'medico' ? 'tipo-medico' : 'tipo-enfermagem'}">
+                                    ${f.tipo === 'medico' ? 'Médico' : 'Enferm.'}
+                                </span>
+                                ${getProcedimentoNome(f.tipo, f.procedimento)}
+                                ${f.rua ? ' | ' + (RUAS_NOMES[f.rua] || f.rua) : ''}
+                                | Espera: ${diasEspera(f.dataEntrada)} dia(s)
+                                ${f.tel ? ' | 📞 ' + f.tel : ''}
+                            </div>
+                        </div>
+                        <div class="queue-actions">
+                            <button class="btn btn-danger btn-sm" onclick="removerFila(${f.id})">✕</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFaltas() {
+            const container = document.getElementById('faltasList');
+            const faltas = agenda.filter(a => a.status === 'faltou');
+
+            if (faltas.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:20px;">Nenhuma falta registrada.</p>';
+                return;
+            }
+
+            container.innerHTML = faltas.map(a => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; background:#fce8e6; border-radius:8px; margin-bottom:8px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <strong>❌ ${a.paciente}</strong> - ${a.horario}
+                        <br>
+                        <span style="font-size:0.85rem; color:#666;">
+                            ${getProcedimentoNome(a.tipo, a.procedimento)} | ${a.profissional}
+                            ${a.rua ? ' | ' + (RUAS_NOMES[a.rua] || '') : ''}
+                        </span>
+                    </div>
+                    <button class="btn btn-warning btn-sm" onclick="buscarMatch(${a.id})">🔄 Buscar Match</button>
+                </div>
+            `).join('');
+        }
+
+        // ==========================================
+        // UTILS
+        // ==========================================
+
+        function getProcedimentoNome(tipo, procId) {
+            const lista = PROCEDIMENTOS[tipo] || [];
+            const proc = lista.find(p => p.id === procId);
+            return proc ? proc.nome : procId;
+        }
+
+        function getTopico(tipo, procId) {
+            const lista = PROCEDIMENTOS[tipo] || [];
+            const proc = lista.find(p => p.id === procId);
+            return proc ? proc.topico : `${tipo}/${procId}`;
+        }
+
+        function diasEspera(data) {
+            const diff = Date.now() - new Date(data).getTime();
+            return Math.max(0, Math.floor(diff / 86400000));
+        }
+
+        function atualizarStats() {
+            document.getElementById('statTotal').textContent = agenda.length;
+            document.getElementById('statConfirmados').textContent = agenda.filter(a => a.status === 'confirmado').length;
+            document.getElementById('statFaltas').textContent = agenda.filter(a => a.status === 'faltou').length;
+            document.getElementById('statRemanejados').textContent = agenda.filter(a => a.status === 'remanejado').length;
+            document.getElementById('faltasBadge').textContent = agenda.filter(a => a.status === 'faltou').length;
+            document.getElementById('filaBadge').textContent = filaEspera.length;
+        }
+
+        function atualizarTudo() {
+            renderAgenda();
+            renderFila();
+            renderFaltas();
+            atualizarStats();
+        }
+
+        // ==========================================
+        // LOG
+        // ==========================================
+
+        function addLog(categoria, mensagem, tipo) {
+            const now = new Date();
+            const time = now.toLocaleTimeString('pt-BR');
+            const container = document.getElementById('logContainer');
+
+            const classMap = {
+                'success': 'log-success',
+                'error': 'log-error',
+                'action': 'log-action',
+                'topic': 'log-topic'
+            };
+
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="log-time">[${time}]</span>
+                <span class="log-topic">[${categoria}]</span>
+                <span class="${classMap[tipo] || 'log-action'}">${mensagem}</span>
+            `;
+
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = `
+                <div class="log-entry">
+                    <span class="log-time">[SISTEMA]</span>
+                    <span class="log-success">Log limpo</span>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // MODAL
+        // ==========================================
+
+        function openModal(title, body, buttons) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = body;
+
+            const footer = document.getElementById('modalFooter');
+            footer.innerHTML = buttons.map(b =>
+                `<button class="btn ${b.class}" onclick="${b.action}">${b.text}</button>`
+            ).join('');
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        // ==========================================
+        // NOTIFICAÇÕES
+        // ==========================================
+
+        function showNotification(message, type) {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.className = `notification ${type} show`;
+
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 4000);
+        }
+
+        // ==========================================
+        // SWITCH TAB DIRETO (sem event)
+        // ==========================================
+
+        function switchTabDirect(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+
+            // Ativar tab visual
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.textContent.includes(tabName === 'faltas' ? 'Faltas' : tabName === 'fila' ? 'Fila' : '')) {
+                    t.classList.add('active');
+                }
+            });
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
+
+        document.getElementById('dataAtual').textContent = new Date().toLocaleDateString('pt-BR', {
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        });
+
+        // Set data mínima
+        const hoje = new Date().toISOString().split('T')[0];
+        document.getElementById('dataConsulta').value = hoje;
+        document.getElementById('dataConsulta').min = hoje;
+
+        // Carregar dados de exemplo
+        carregarDadosExemplo();
+    </script>
+</body>
+</html>

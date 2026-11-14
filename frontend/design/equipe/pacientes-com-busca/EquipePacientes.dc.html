@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Equipe: pacientes</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#7CC4F5;text-decoration:none}a:hover{color:#CDE6FB}
+input::placeholder{color:#9FB3D1}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; overflow: hidden; background: #061A3D; color: #F2F7FD; font-family: 'Public Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.35">
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 56px 20px 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<span style="font-size: 14px; font-weight: 600; color: #B5C8E2">UBS Feitoria</span>
+<a href="Acessibilidade.dc.html" style="flex: none; min-height: 48px; padding: 0 12px; border: 1px solid #2F5287; border-radius: 10px; color: #F2F7FD; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5a1.6 1.6 0 110 3.2 1.6 1.6 0 010-3.2zM5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5L9 21M12 14.5l3 6.5"></path></svg>
+Acessibilidade
+</a>
+</div>
+<div style="flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Pacientes</h1>
+<a href="EquipeCadastro.dc.html" style="flex: none; min-height: 48px; padding: 0 14px; border-radius: 10px; background: #F2F7FD; color: #061A3D; display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 700">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+Cadastrar
+</a>
+</div>
+<div style="flex: none; position: relative; display: flex">
+<label for="busca" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar por nome ou CPF</label>
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B5C8E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 15px"><path d="M11 18a7 7 0 100-14 7 7 0 000 14zM20 20l-4-4"></path></svg>
+<input id="busca" type="search" value="{{q}}" onChange="{{buscar}}" placeholder="Buscar por nome ou CPF" style="flex: 1; min-width: 0; height: 52px; padding: 0 14px 0 46px; border: 1.5px solid #4D6FA3; border-radius: 10px; background: #0C2A5A; font-size: 17px">
+</div>
+<p role="status" style="flex: none; margin: 0; font-size: 13px; color: #B5C8E2">{{contagem}}</p>
+<div style="flex: none; display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{lista}}" as="p" hint-placeholder-count="7">
+<a href="EquipePaciente.dc.html" style="min-height: 64px; padding: 8px 14px; border: 1px solid #1F4177; border-radius: 10px; background: #0C2A5A; color: #F2F7FD; display: flex; align-items: center; gap: 12px">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 600">
+{{p.nome}}
+<sc-if value="{{p.selo}}" hint-placeholder-val="{{false}}">
+<svg role="img" aria-label="Selo de vulnerável" width="16" height="16" viewBox="0 0 24 24" fill="#7CC4F5" style="flex: none"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path></svg>
+</sc-if>
+</span>
+<span style="font-size: 13px; color: #B5C8E2">{{p.idade}} anos · {{p.rua}}</span>
+</span>
+<span style="flex: none; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 12px; color: #B5C8E2">{{p.cpfMascara}}</span>
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B5C8E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M9 6l6 6-6 6"></path></svg>
+</a>
+</sc-for>
+<sc-if value="{{vazio}}" hint-placeholder-val="{{false}}">
+<div style="padding: 16px; border: 1.5px dashed #4D6FA3; border-radius: 10px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 16px; font-weight: 600">Ninguém encontrado</span>
+<span style="font-size: 14px; color: #B5C8E2">Confira o nome ou o CPF. Se a pessoa ainda não tem cadastro, cadastre agora.</span>
+</div>
+</sc-if>
+</div>
+<div style="flex: none; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #B5C8E2">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="#7CC4F5" style="flex: none"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path></svg>
+<span>Selo de vulnerável. Só a equipe vê.</span>
+</div>
+</div>
+<div style="flex: none; height: 84px"><dc-import name="NavEquipe" active="pacientes" hint-size="390px,84px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = this.state || {};
+const q = s.q || '';
+const PACIENTES = [
+{ nome: 'Osvaldo Menezes', idade: 74, rua: 'Rua das Flores, 210', cpf: '12345678909', selo: true },
+{ nome: 'Maria Lúcia Prado', idade: 77, rua: 'Rua Nova, 45', cpf: '23456789012', selo: true },
+{ nome: 'José Antunes', idade: 81, rua: 'Rua Flores da Cunha, 88', cpf: '34567890123', selo: true },
+{ nome: 'Marina Souza', idade: 34, rua: 'Rua das Flores, 512', cpf: '45678901234', selo: false },
+{ nome: 'Jorge Alves', idade: 58, rua: 'Av. Feitoria, 1300', cpf: '56789012345', selo: false },
+{ nome: 'Sandra Pires', idade: 72, rua: 'Rua das Acácias, 19', cpf: '67890123456', selo: true },
+{ nome: 'Rita Lemos', idade: 45, rua: 'Rua das Flores, 77', cpf: '78901234567', selo: false }
+];
+const tira = (t) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const digitos = q.replace(/\D/g, '');
+const termo = tira(q.trim());
+const lista = PACIENTES.filter((p) => !termo || (digitos.length >= 3 ? p.cpf.indexOf(digitos) >= 0 : tira(p.nome).indexOf(termo) >= 0))
+.map((p) => Object.assign({}, p, { cpfMascara: '***.' + p.cpf.slice(3, 6) + '.' + p.cpf.slice(6, 9) + '-**' }));
+return {
+q,
+buscar: (e) => this.setState({ q: e.target.value }),
+lista,
+vazio: lista.length === 0,
+contagem: !termo ? PACIENTES.length + ' pacientes da UBS Feitoria' : lista.length === 1 ? '1 encontrado' : lista.length + ' encontrados'
+};
+}
+}
+</script>
+</body>
+</html>

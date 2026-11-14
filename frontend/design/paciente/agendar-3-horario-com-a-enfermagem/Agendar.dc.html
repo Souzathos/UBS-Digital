@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Agendar atendimento</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#0A5FB4;text-decoration:none}a:hover{color:#083F82}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; overflow: hidden; background: #F1F5FA; color: #082C63; font-family: 'Public Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.35">
+<div style="flex: 1; min-height: 0; padding: 56px 20px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 8px">
+<sc-if value="{{temVoltar}}" hint-placeholder-val="{{false}}">
+<button onClick="{{voltar}}" aria-label="Voltar" style="flex: none; width: 48px; height: 48px; padding: 0; border: 1.5px solid #082C63; border-radius: 24px; background: #FFFFFF; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>
+</button>
+</sc-if>
+<span style="flex: 1; font-size: 15px; font-weight: 600; color: #41536F">{{passoTexto}}</span>
+<a href="Acessibilidade.dc.html" style="flex: none; min-height: 48px; padding: 0 12px; border: 1px solid #C3CFDF; border-radius: 10px; background: #FFFFFF; color: #082C63; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5a1.6 1.6 0 110 3.2 1.6 1.6 0 010-3.2zM5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5L9 21M12 14.5l3 6.5"></path></svg>
+Acessibilidade
+</a>
+</div>
+
+<sc-if value="{{noTipo}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">O que você precisa?</h1>
+<p style="margin: 0; font-size: 16px; color: #41536F">Escolha com quem é o atendimento.</p>
+</div>
+<button onClick="{{escolherMedico}}" style="min-height: 150px; padding: 16px; border: 1.5px solid #082C63; border-radius: 12px; background: #FFFFFF; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; text-align: left">
+<span style="display: flex; align-items: center; gap: 10px">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 10px; background: #082C63; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v5a4 4 0 008 0V3M10 12v3a5 5 0 0010 0v-2M20 13a1.8 1.8 0 100-3.6 1.8 1.8 0 000 3.6z"></path></svg></span>
+<span style="font-size: 22px; font-weight: 700">Consulta</span>
+</span>
+<span style="font-size: 15px; color: #41536F">Consultas: clínica geral, pré-natal, puericultura, retorno, renovação de receita e hiperdia.</span>
+<span style="padding: 4px 10px; border-radius: 6px; background: #E4F1FC; font-size: 14px; font-weight: 600">Seu médico: Dra. Helena (pela sua rua)</span>
+</button>
+<button onClick="{{escolherEnfermagem}}" style="min-height: 130px; padding: 16px; border: 1.5px solid #082C63; border-radius: 12px; background: #FFFFFF; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; text-align: left">
+<span style="display: flex; align-items: center; gap: 10px">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 10px; border: 2px solid #0A5FB4; background: #E4F1FC; color: #082C63; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5z"></path></svg></span>
+<span style="font-size: 22px; font-weight: 700">Procedimentos</span>
+</span>
+<span style="font-size: 15px; color: #41536F">Procedimentos: curativo, vacinação, coleta de exames, aferição de pressão, preventivo e retirada de pontos.</span>
+</button>
+</div>
+</sc-if>
+
+<sc-if value="{{noItem}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-if value="{{ehMedico}}" hint-placeholder-val="{{true}}">
+<div style="padding: 10px 14px; border-radius: 10px; background: #FFFFFF; border: 1px solid #DCE5F0; display: flex; align-items: center; gap: 12px">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 10px; background: #082C63; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v5a4 4 0 008 0V3M10 12v3a5 5 0 0010 0v-2M20 13a1.8 1.8 0 100-3.6 1.8 1.8 0 000 3.6z"></path></svg></span>
+<span style="display: flex; flex-direction: column">
+<span style="font-size: 17px; font-weight: 600">Seu médico: Dra. Helena</span>
+<span style="font-size: 13px; color: #41536F">Definida pela sua rua (Rua das Flores)</span>
+</span>
+</div>
+</sc-if>
+<sc-if value="{{ehEnf}}" hint-placeholder-val="{{false}}">
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; border: 1.5px solid #0A5FB4; background: #E4F1FC; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5z"></path></svg>Enfermagem</span>
+</sc-if>
+<h1 style="margin: 0; font-size: 26px; line-height: 1.15; font-weight: 600">{{perguntaItem}}</h1>
+<div role="list" style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{itens}}" as="it" hint-placeholder-count="6">
+<button role="listitem" onClick="{{it.escolher}}" style="min-height: 64px; padding: 8px 14px; border: 1.5px solid #082C63; border-radius: 10px; background: #FFFFFF; display: flex; align-items: center; gap: 10px; text-align: left">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<span style="font-size: 19px; font-weight: 600">{{it.curto}}</span>
+<span style="font-size: 14px; color: {{it.dicaCor}}; font-weight: {{it.dicaPeso}}">{{it.dicaTexto}}</span>
+</span>
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M9 6l6 6-6 6"></path></svg>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{noDuplicado}}" hint-placeholder-val="{{false}}">
+<div role="alert" style="display: flex; flex-direction: column; gap: 14px">
+<span style="flex: none; width: 52px; height: 52px; border-radius: 50%; background: #FEC301; color: #082C63; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v6M12 16.5v.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+<h1 style="margin: 0; font-size: 26px; line-height: 1.15; font-weight: 700">Você já tem uma Consulta clínica geral marcada</h1>
+<div style="background: #FFFFFF; border: 1px solid #C9D4E3; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 15px; font-weight: 600">Médico · Consulta clínica geral</span>
+<span style="font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums">Qui, 10/12 · 9h</span>
+<span style="font-size: 15px; color: #41536F">Dra. Helena · UBS Feitoria</span>
+</div>
+<p style="margin: 0; font-size: 17px">Só dá para ter uma marcada de cada vez. Se precisa de outro dia, remarque a que já existe.</p>
+<a href="Remarcar.dc.html" style="min-height: 60px; border-radius: 10px; background: #082C63; color: #FFFFFF; font-size: 19px; font-weight: 700; display: flex; align-items: center; justify-content: center">Remarcar a que já existe</a>
+<button onClick="{{voltarItem}}" style="min-height: 52px; border-radius: 10px; border: 1.5px solid #082C63; background: #FFFFFF; font-size: 17px; font-weight: 600">Escolher outra consulta</button>
+</div>
+</sc-if>
+
+<sc-if value="{{noHorario}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Escolha o dia e a hora</h1>
+<p style="margin: 0; font-size: 15px; color: #41536F">{{etqNome}} · {{itemNome}}</p>
+</div>
+<sc-if value="{{temOcupado}}" hint-placeholder-val="{{false}}">
+<div role="alert" style="padding: 12px 14px; border: 2px solid #B31400; border-radius: 10px; background: #FFFFFF; display: flex; align-items: flex-start; gap: 10px; color: #8A1000">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M12 7v6M12 16.5v.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+<span style="display: flex; flex-direction: column">
+<span style="font-size: 18px; font-weight: 600">Esse horário acabou de ser ocupado</span>
+<span style="font-size: 15px; color: #082C63">Outra pessoa marcou antes. Escolha outro horário.</span>
+</span>
+</div>
+</sc-if>
+<sc-for list="{{dias}}" as="d" hint-placeholder-count="3">
+<div role="group" aria-label="{{d.dia}}, {{d.quem}}" style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px"><span style="font-size: 17px; font-weight: 600">{{d.dia}}</span><span style="font-size: 14px; font-weight: 500; color: #41536F">{{d.quem}}</span></h2>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{d.horas}}" as="h" hint-placeholder-count="3">
+<button onClick="{{h.escolher}}" disabled="{{h.ocupado}}" aria-pressed="{{h.sel}}" style="min-height: 56px; border-radius: 10px; border: 1.5px solid {{h.borda}}; background: {{h.fundo}}; color: {{h.tinta}}; font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1">
+<span style="display: flex; align-items: center; gap: 4px; text-decoration: {{h.risco}}">
+<sc-if value="{{h.sel}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4.5 4.5L19 7"></path></svg></sc-if>
+{{h.hora}}
+</span>
+<sc-if value="{{h.ocupado}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; font-weight: 600">ocupado</span></sc-if>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<button onClick="{{continuar}}" disabled="{{semHorario}}" style="margin-top: 4px; min-height: 60px; border-radius: 10px; border: 0; background: #082C63; color: #FFFFFF; opacity: {{contOpacidade}}; font-size: 19px; font-weight: 700">{{contTexto}}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{noConferir}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Confira o agendamento</h1>
+<div style="background: #FFFFFF; border: 1px solid #C9D4E3; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; border: 1.5px solid {{etqBorda}}; background: {{etqFundo}}; color: {{etqTinta}}; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{etqIcone}}"></path></svg>{{etqNome}}</span>
+<span style="font-size: 19px; font-weight: 600">{{itemNome}}</span>
+<span style="font-size: 28px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums">{{dataHora}}</span>
+<span style="font-size: 15px; color: #41536F">{{quemOnde}}</span>
+<sc-if value="{{temPreparo}}" hint-placeholder-val="{{false}}">
+<span style="margin-top: 4px; padding: 8px 12px; border-radius: 8px; background: #FEC301; font-size: 15px; font-weight: 600">Preparo: {{preparo}}</span>
+</sc-if>
+</div>
+<button onClick="{{marcar}}" style="min-height: 60px; border-radius: 10px; border: 0; background: #167A3E; color: #FFFFFF; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg>Confirmar agendamento</button>
+<button onClick="{{voltar}}" style="min-height: 52px; border-radius: 10px; border: 1.5px solid #082C63; background: #FFFFFF; font-size: 17px; font-weight: 600">Mudar o horário</button>
+</div>
+</sc-if>
+
+<sc-if value="{{noFeito}}" hint-placeholder-val="{{false}}">
+<div role="status" style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="flex: none; width: 52px; height: 52px; border-radius: 50%; background: #167A3E; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4.5 4.5L19 7"></path></svg></span>
+<h1 style="margin: 0; font-size: 30px; line-height: 1.1; font-weight: 700">Atendimento marcado</h1>
+</div>
+<div style="background: #082C63; border-radius: 12px; padding: 18px; color: #FFFFFF; display: flex; flex-direction: column; gap: 6px">
+<span style="align-self: flex-start; padding: 3px 10px; border-radius: 6px; background: #FFFFFF; color: #082C63; font-size: 14px; font-weight: 600">{{etqNome}}</span>
+<span style="font-size: 18px; font-weight: 600">{{itemNome}}</span>
+<span style="font-size: 30px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums">{{dataHora}}</span>
+<span style="font-size: 15px; color: #DCEBFA">{{quemOnde}}</span>
+</div>
+<div style="padding: 14px 16px; border-radius: 10px; background: #FFFFFF; border: 1px solid #DCE5F0; display: flex; align-items: center; gap: 12px">
+<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M6 16v-5a6 6 0 0112 0v5l2 2H4zM10 21h4"></path></svg>
+<span style="font-size: 17px; font-weight: 600">Vamos te lembrar 2 semanas, 1 semana e 3 dias antes.</span>
+</div>
+<a href="MeusAtendimentos.dc.html" style="min-height: 60px; border-radius: 10px; background: #082C63; color: #FFFFFF; font-size: 19px; font-weight: 700; display: flex; align-items: center; justify-content: center">Ver meus atendimentos</a>
+<button onClick="{{recomecar}}" style="min-height: 52px; border-radius: 10px; border: 1.5px solid #082C63; background: #FFFFFF; font-size: 17px; font-weight: 600">Marcar outro</button>
+</div>
+</sc-if>
+</div>
+<div style="flex: none; height: 84px"><dc-import name="NavCidadao" active="agendar" hint-size="390px,84px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"inicio":{"editor":"enum","options":["tipo","item","duplicado","hora","conferir","feito"],"default":"tipo"},"tipo":{"editor":"enum","options":["medico","enf"],"default":"medico"},"erro":{"editor":"enum","options":["nenhum","ocupado"],"default":"nenhum"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = this.state || {};
+const passo = s.passo || this.props.inicio || 'tipo';
+const tipo = s.tipo || this.props.tipo || 'medico';
+const simulaOcupado = (this.props.erro || 'nenhum') === 'ocupado';
+const med = tipo === 'medico';
+const ITENS = {
+medico: [
+{ curto: 'Clínica geral', nome: 'Consulta clínica geral', dica: 'Consulta de rotina', jaTem: 'Já marcada: qui, 10/12, às 9h' },
+{ curto: 'Pré-natal', nome: 'Consulta de pré-natal', dica: 'Acompanhamento da gravidez' },
+{ curto: 'Puericultura', nome: 'Consulta de puericultura', dica: 'Acompanhamento da criança' },
+{ curto: 'Retorno', nome: 'Consulta de retorno', dica: 'Mostrar exames ao médico' },
+{ curto: 'Renovação de receita', nome: 'Renovação de receita', dica: 'Remédio de uso contínuo' },
+{ curto: 'Hiperdia', nome: 'Consulta de hiperdia', dica: 'Pressão alta e diabetes' }
+],
+enf: [
+{ curto: 'Curativo', nome: 'Curativo', dica: 'Limpeza e troca de curativo' },
+{ curto: 'Vacinação', nome: 'Vacinação', dica: 'Vacinas do calendário' },
+{ curto: 'Coleta de exames', nome: 'Coleta de exames', dica: 'Sangue e urina · jejum de 8 horas', preparo: 'jejum de 8 horas' },
+{ curto: 'Aferição de pressão', nome: 'Aferição de pressão', dica: 'Medir a pressão' },
+{ curto: 'Preventivo', nome: 'Preventivo', dica: 'Exame do colo do útero' },
+{ curto: 'Retirada de pontos', nome: 'Retirada de pontos', dica: 'Tirar pontos de cirurgia' }
+]
+};
+const DIAS = {
+medico: [['Ter, 15/12', 'com a Dra. Helena', ['8h20', '9h', '10h20']], ['Qua, 16/12', 'com a Dra. Helena', ['14h10', '15h50']], ['Sex, 18/12', 'com a Dra. Helena', ['8h', '9h40', '13h30']]],
+enf: [['Seg, 14/12', 'com a enfermeira Rosana', ['7h30', '8h', '8h30']], ['Ter, 15/12', 'com o enfermeiro Paulo', ['13h', '14h']], ['Qua, 16/12', 'com a enfermeira Rosana', ['7h30', '9h']]]
+};
+const lista = ITENS[tipo];
+const padraoItem = med ? 3 : 2;
+const item = lista[typeof s.item === 'number' ? s.item : padraoItem];
+const precisaSlot = passo === 'conferir' || passo === 'feito';
+const slot = s.slot !== undefined ? s.slot : (precisaSlot ? '0-1' : '');
+const ocupado = s.ocupado !== undefined ? s.ocupado : (simulaOcupado && passo === 'hora' ? '0-1' : '');
+const ordem = ['tipo', 'item', 'hora', 'conferir', 'feito'];
+const idx = Math.max(0, ordem.indexOf(passo === 'duplicado' ? 'item' : passo));
+let dataHora = '';
+let quemDia = '';
+const dias = DIAS[tipo].map((d, di) => ({
+dia: d[0],
+quem: d[1],
+horas: d[2].map((h, hi) => {
+const id = di + '-' + hi;
+const occ = id === ocupado;
+const sel = !occ && id === slot;
+if (sel) { dataHora = d[0] + ' · ' + h; quemDia = d[1]; }
+return { hora: h, sel, ocupado: occ, risco: occ ? 'line-through' : 'none',
+borda: occ ? '#C4CEDC' : '#082C63',
+fundo: occ ? '#E3E9F1' : sel ? '#082C63' : '#FFFFFF',
+tinta: occ ? '#4F5F78' : sel ? '#FFFFFF' : '#082C63',
+escolher: () => this.setState({ slot: id }) };
+})
+}));
+const nomeProf = quemDia.replace(/^com (a |o )/, '');
+const prof = nomeProf ? nomeProf.charAt(0).toUpperCase() + nomeProf.slice(1) : (med ? 'Dra. Helena' : 'Enfermagem');
+return {
+temVoltar: idx > 0 && passo !== 'feito',
+passoTexto: passo === 'feito' ? 'Pronto' : 'Passo ' + (idx + 1) + ' de 4',
+noTipo: passo === 'tipo',
+noItem: passo === 'item',
+noDuplicado: passo === 'duplicado',
+noHorario: passo === 'hora',
+noConferir: passo === 'conferir',
+noFeito: passo === 'feito',
+ehMedico: med,
+ehEnf: !med,
+etqNome: med ? 'Médico' : 'Enfermagem',
+etqIcone: med ? 'M6 3v5a4 4 0 008 0V3M10 12v3a5 5 0 0010 0v-2M20 13a1.8 1.8 0 100-3.6 1.8 1.8 0 000 3.6z' : 'M9 4h6v5h5v6h-5v5H9v-5H4V9h5z',
+etqFundo: med ? '#082C63' : '#E4F1FC',
+etqTinta: med ? '#FFFFFF' : '#082C63',
+etqBorda: med ? '#082C63' : '#0A5FB4',
+perguntaItem: med ? 'Qual consulta você precisa?' : 'Qual procedimento você precisa?',
+itens: lista.map((it, i) => Object.assign({}, it, {
+dicaTexto: it.jaTem || it.dica,
+dicaCor: it.jaTem ? '#082C63' : '#41536F',
+dicaPeso: it.jaTem ? 700 : 400,
+escolher: () => this.setState(it.jaTem ? { item: i, passo: 'duplicado' } : { item: i, slot: '', ocupado: '', passo: 'hora' })
+})),
+itemNome: item.nome,
+quemOnde: prof + ' · UBS Feitoria',
+temPreparo: !!item.preparo,
+preparo: item.preparo || '',
+dias,
+temOcupado: !!ocupado,
+semHorario: !dataHora,
+contOpacidade: dataHora ? 1 : 0.45,
+contTexto: dataHora ? 'Continuar com ' + dataHora : 'Escolha um horário',
+dataHora: dataHora || 'Ter, 15/12 · 9h',
+escolherMedico: () => this.setState({ tipo: 'medico', passo: 'item' }),
+escolherEnfermagem: () => this.setState({ tipo: 'enf', passo: 'item' }),
+continuar: () => { if (dataHora) this.setState({ slot, passo: 'conferir' }); },
+marcar: () => this.setState(simulaOcupado && !s.jaOcupou ? { passo: 'hora', ocupado: slot, slot: '', jaOcupou: true } : { slot, passo: 'feito' }),
+voltar: () => this.setState({ slot, passo: ordem[Math.max(0, idx - 1)] }),
+voltarItem: () => this.setState({ passo: 'item' }),
+recomecar: () => this.setState({ passo: 'tipo', slot: '', ocupado: '', item: undefined })
+};
+}
+}
+</script>
+</body>
+</html>

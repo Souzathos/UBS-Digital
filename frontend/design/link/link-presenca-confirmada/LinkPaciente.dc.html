@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Página do link: paciente</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#0A5FB4;text-decoration:none}a:hover{color:#083F82}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow: hidden; background: {{bg}}; color: {{fg}}; font-family: 'Public Sans', system-ui, sans-serif; font-size: 18px; line-height: 1.4">
+<div style="height: 844px; overflow-y: auto">
+<div style="zoom: {{zoom}}; min-height: 100%; display: flex; flex-direction: column">
+<header style="flex: none; padding: 56px 20px 12px; display: flex; flex-direction: column; gap: 12px; border-bottom: 2px solid {{fg}}">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="flex: none; padding: 4px 6px; border-radius: 8px; background: #FFFFFF; display: flex"><img src="./assets/eb5bdd90ce37549e80ce27aaf805f342.png" alt="UBS Vale do Sinos" width="49" height="36" style="display: block; width: 49px; height: 36px"></span>
+<span style="display: flex; flex-direction: column; line-height: 1.2">
+<span style="font-size: 20px; font-weight: 600">UBS Feitoria</span>
+<span style="font-size: 14px; color: {{mute}}">UBS Vale do Sinos · São Leopoldo</span>
+</span>
+</div>
+<button onClick="{{alternarPainel}}" aria-expanded="{{painel}}" aria-controls="painelA11y" style="align-self: flex-start; min-height: 48px; padding: 0 14px; border: 1.5px solid {{fg}}; border-radius: 24px; background: {{bg}}; color: {{fg}}; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5a1.6 1.6 0 110 3.2 1.6 1.6 0 010-3.2zM5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5L9 21M12 14.5l3 6.5"></path></svg>
+Acessibilidade
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{seta}}"></path></svg>
+</button>
+<sc-if value="{{painel}}" hint-placeholder-val="{{false}}">
+<div id="painelA11y" style="padding: 14px; border: 2px solid {{fg}}; border-radius: 10px; background: {{painelFundo}}; display: flex; flex-direction: column; gap: 12px">
+<div role="group" aria-label="Tamanho da letra" style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 16px; font-weight: 600">Tamanho da letra</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{tamanhos}}" as="o" hint-placeholder-count="3">
+<button onClick="{{o.escolher}}" aria-pressed="{{o.sel}}" style="min-height: 48px; padding: 0 12px; border: 1.5px solid {{fg}}; border-radius: 10px; background: {{o.fundo}}; color: {{o.tinta}}; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 4px">
+<sc-if value="{{o.sel}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4.5 4.5L19 7"></path></svg></sc-if>
+{{o.nome}}
+</button>
+</sc-for>
+</div>
+</div>
+<div role="group" aria-label="Contraste" style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 16px; font-weight: 600">Contraste</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{contrastes}}" as="o" hint-placeholder-count="2">
+<button onClick="{{o.escolher}}" aria-pressed="{{o.sel}}" style="min-height: 48px; padding: 0 12px; border: 1.5px solid {{fg}}; border-radius: 10px; background: {{o.fundo}}; color: {{o.tinta}}; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 4px">
+<sc-if value="{{o.sel}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4.5 4.5L19 7"></path></svg></sc-if>
+{{o.nome}}
+</button>
+</sc-for>
+</div>
+</div>
+<p style="margin: 0; font-size: 14px; color: {{mute}}">Cada opção recarrega a página já ajustada e fica salva neste celular.</p>
+</div>
+</sc-if>
+</header>
+<main style="flex: 1; padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<sc-if value="{{mostraCard}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column">
+<span style="font-size: 16px; color: {{mute}}">Seu atendimento</span>
+<h1 style="margin: 0; font-size: 28px; line-height: 1.15; font-weight: 600">Osvaldo Menezes</h1>
+</div>
+<div style="padding: 16px; border: 2px solid {{fg}}; border-radius: 10px; display: flex; flex-direction: column; gap: 6px">
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; border: 2px solid {{chipFundo}}; background: {{chipFundo}}; color: {{chipTinta}}; font-size: 16px; font-weight: 600"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v5a4 4 0 008 0V3M10 12v3a5 5 0 0010 0v-2M20 13a1.8 1.8 0 100-3.6 1.8 1.8 0 000 3.6z"></path></svg>Médico</span>
+<span style="font-size: 20px; font-weight: 600">Consulta clínica geral</span>
+<span style="font-size: 26px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; text-decoration: {{risco}}">Quinta, 10/12, às 9h</span>
+<span style="font-size: 18px">Dra. Helena · UBS Feitoria</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{pendente}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 17px">Responda até terça, 8/12, às 9h.</p>
+<button onClick="{{confirmar}}" style="min-height: 96px; padding: 12px; border-radius: 10px; border: 0; background: {{okFundo}}; color: {{okTinta}}; font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg>Confirmar presença</button>
+<button onClick="{{remarcar}}" style="min-height: 56px; border-radius: 10px; border: 1.5px solid {{fg}}; background: {{bg}}; color: {{fg}}; font-size: 18px; font-weight: 600">Remarcar</button>
+<button onClick="{{pedirCancelar}}" style="min-height: 56px; border-radius: 10px; border: 1.5px solid {{perigo}}; background: {{bg}}; color: {{perigo}}; font-size: 18px; font-weight: 600">Cancelar atendimento</button>
+</div>
+</sc-if>
+
+<sc-if value="{{confirmado}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div role="status" style="padding: 16px; border-radius: 10px; border: 2px solid {{verdeFundo}}; background: {{verdeFundo}}; color: {{verdeTinta}}; display: flex; align-items: flex-start; gap: 10px">
+<svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+<span style="display: flex; flex-direction: column">
+<span style="font-size: 24px; font-weight: 700; line-height: 1.2">Pronto! Presença confirmada.</span>
+<span style="font-size: 16px">Até quinta, Sr. Osvaldo.</span>
+</span>
+</div>
+<p style="margin: 0; font-size: 17px">Se algo mudar, use este mesmo link:</p>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<button onClick="{{remarcar}}" style="flex: 1 1 140px; min-height: 56px; border-radius: 10px; border: 1.5px solid {{fg}}; background: {{bg}}; color: {{fg}}; font-size: 18px; font-weight: 600">Remarcar</button>
+<button onClick="{{pedirCancelar}}" style="flex: 1 1 140px; min-height: 56px; border-radius: 10px; border: 1.5px solid {{perigo}}; background: {{bg}}; color: {{perigo}}; font-size: 18px; font-weight: 600">Cancelar</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{perguntaCancelar}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 22px; font-weight: 700">Cancelar este atendimento?</p>
+<p style="margin: 0; font-size: 18px">A vaga vai para outra pessoa. Cancelar não prejudica você.</p>
+<button onClick="{{cancelar}}" style="min-height: 56px; border-radius: 10px; border: 2px solid {{perigoFundo}}; background: {{perigoFundo}}; color: {{perigoTinta}}; font-size: 19px; font-weight: 700">Sim, cancelar</button>
+<button onClick="{{voltar}}" style="min-height: 56px; border-radius: 10px; border: 1.5px solid {{fg}}; background: {{bg}}; color: {{fg}}; font-size: 18px; font-weight: 600">Não, manter</button>
+</div>
+</sc-if>
+
+<sc-if value="{{cancelado}}" hint-placeholder-val="{{false}}">
+<div role="status" style="padding: 16px; border-radius: 10px; border: 2px solid {{fg}}; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 22px; font-weight: 700">Atendimento cancelado</span>
+<span style="font-size: 17px">A vaga vai para outra pessoa. Para marcar de novo, use o app ou procure a recepção da UBS Feitoria.</span>
+</div>
+</sc-if>
+
+<sc-if value="{{escolhendo}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<p style="margin: 0; font-size: 22px; font-weight: 700">Escolha o novo horário</p>
+<p style="margin: 0; font-size: 16px; color: {{mute}}">Tocou, está remarcado. Mesmo médico, mesma UBS.</p>
+</div>
+<sc-for list="{{grupos}}" as="g" hint-placeholder-count="3">
+<div role="group" aria-label="{{g.dia}}" style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0; font-size: 19px; font-weight: 600">{{g.dia}}</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{g.horas}}" as="h" hint-placeholder-count="2">
+<button onClick="{{h.escolher}}" aria-label="{{g.dia}}, às {{h.hora}}" style="flex: 1 1 130px; min-height: 60px; padding: 8px 12px; border-radius: 10px; border: 1.5px solid {{fg}}; background: {{bg}}; color: {{fg}}; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums">{{h.hora}}</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<button onClick="{{voltar}}" style="min-height: 56px; border-radius: 10px; border: 0; background: transparent; color: {{fg}}; font-size: 18px; font-weight: 600; text-decoration: underline">Voltar</button>
+</div>
+</sc-if>
+
+<sc-if value="{{remarcado}}" hint-placeholder-val="{{false}}">
+<div role="status" style="padding: 16px; border-radius: 10px; border: 2px solid {{infoFundo}}; background: {{infoFundo}}; color: {{infoTinta}}; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 22px; font-weight: 700">Atendimento remarcado</span>
+<span style="font-size: 18px">Nova data: {{novaData}}. Já está confirmada.</span>
+</div>
+</sc-if>
+
+<sc-if value="{{finalRemarcado}}" hint-placeholder-val="{{false}}">
+<div role="status" style="padding: 18px 16px; border-radius: 10px; border: 2px solid {{fg}}; background: {{painelFundo}}; display: flex; align-items: flex-start; gap: 12px">
+<svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M4 12h14M13 6l6 6-6 6"></path></svg>
+<span style="font-size: 22px; font-weight: 700; line-height: 1.3">Este atendimento foi remarcado para seg, 14/12, às 8h40.</span>
+</div>
+</sc-if>
+
+<sc-if value="{{finalCancelado}}" hint-placeholder-val="{{false}}">
+<div role="status" style="padding: 18px 16px; border-radius: 10px; border: 2px solid {{fg}}; background: {{painelFundo}}; display: flex; align-items: flex-start; gap: 12px">
+<svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+<span style="font-size: 22px; font-weight: 700; line-height: 1.3">Este atendimento já foi cancelado.</span>
+</div>
+</sc-if>
+
+<sc-if value="{{finalExpirado}}" hint-placeholder-val="{{false}}">
+<div role="status" style="padding: 48px 8px 0; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center">
+<svg aria-hidden="true" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+<h1 style="margin: 0; font-size: 28px; line-height: 1.2; font-weight: 700">Este link expirou. Procure a UBS.</h1>
+<p style="margin: 0; font-size: 18px; color: {{mute}}">UBS Feitoria · recepção</p>
+</div>
+</sc-if>
+</main>
+<footer style="flex: none; padding: 14px 20px 30px; border-top: 1px solid {{linha}}; display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: {{mute}}">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M7 11V8a5 5 0 0110 0v3M5 11h14v10H5z"></path></svg>
+<span>Link pessoal de Osvaldo Menezes. Vale até o horário do atendimento.</span>
+</footer>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"estado":{"editor":"enum","options":["pendente","confirmado","remarcar","remarcado","cancelado","expirado"],"default":"pendente"},"letra":{"editor":"enum","options":["normal","grande","muito grande"],"default":"normal"},"altoContraste":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = this.state || {};
+const INICIO = { pendente: '', confirmado: 'confirmado', remarcar: 'remarcar', remarcado: 'final_remarcado', cancelado: 'final_cancelado', expirado: 'final_expirado' };
+const passo = s.passo !== undefined ? s.passo : (INICIO[this.props.estado] || '');
+const letra = s.letra || (this.props.letra ?? 'normal');
+const alto = s.alto === undefined ? !!(this.props.altoContraste ?? false) : s.alto;
+const ZOOM = { normal: 1, grande: 1.2, 'muito grande': 1.4 };
+const T = alto
+? { bg: '#000000', fg: '#FFFFFF', mute: '#FFFFFF', linha: '#FFFFFF', painelFundo: '#000000', okFundo: '#FFE14D', okTinta: '#000000', perigo: '#FFFFFF', perigoFundo: '#FFFFFF', perigoTinta: '#000000', infoFundo: '#FFE14D', infoTinta: '#000000', verdeFundo: '#FFE14D', verdeTinta: '#000000', chipFundo: '#FFFFFF', chipTinta: '#000000' }
+: { bg: '#FFFFFF', fg: '#082C63', mute: '#41536F', linha: '#DCE5F0', painelFundo: '#F1F5FA', okFundo: '#167A3E', okTinta: '#FFFFFF', perigo: '#B31400', perigoFundo: '#B31400', perigoTinta: '#FFFFFF', infoFundo: '#82CBF6', infoTinta: '#082C63', verdeFundo: '#167A3E', verdeTinta: '#FFFFFF', chipFundo: '#082C63', chipTinta: '#FFFFFF' };
+const opcao = (nome, sel, escolher) => ({ nome, sel, fundo: sel ? T.fg : T.bg, tinta: sel ? T.bg : T.fg, escolher });
+const GRUPOS = [['Seg, 14/12', ['8h40', '10h']], ['Ter, 15/12', ['8h20', '9h']], ['Sex, 18/12', ['9h40', '13h30']]];
+const painel = !!s.painel;
+return Object.assign({}, T, {
+zoom: ZOOM[letra] || 1,
+painel,
+seta: painel ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6',
+alternarPainel: () => this.setState({ painel: !painel }),
+tamanhos: ['normal', 'grande', 'muito grande'].map((n) => opcao(n === 'normal' ? 'Normal' : n === 'grande' ? 'Grande' : 'Muito grande', n === letra, () => this.setState({ letra: n }))),
+contrastes: [opcao('Normal', !alto, () => this.setState({ alto: false })), opcao('Alto contraste', alto, () => this.setState({ alto: true }))],
+risco: ['cancelado', 'remarcado', 'final_remarcado', 'final_cancelado'].indexOf(passo) >= 0 ? 'line-through' : 'none',
+mostraCard: passo !== 'final_expirado',
+finalRemarcado: passo === 'final_remarcado',
+finalCancelado: passo === 'final_cancelado',
+finalExpirado: passo === 'final_expirado',
+pendente: passo === '',
+confirmado: passo === 'confirmado',
+perguntaCancelar: passo === 'cancelar',
+cancelado: passo === 'cancelado',
+escolhendo: passo === 'remarcar',
+remarcado: passo === 'remarcado',
+grupos: GRUPOS.map((g) => ({ dia: g[0], horas: g[1].map((hora) => ({ hora, escolher: () => this.setState({ passo: 'remarcado', nova: g[0].toLowerCase() + ', às ' + hora }) })) })),
+novaData: s.nova || 'seg, 14/12, às 8h40',
+confirmar: () => this.setState({ passo: 'confirmado' }),
+remarcar: () => this.setState({ antes: passo, passo: 'remarcar' }),
+pedirCancelar: () => this.setState({ antes: passo, passo: 'cancelar' }),
+cancelar: () => this.setState({ passo: 'cancelado' }),
+voltar: () => this.setState({ passo: s.antes || '' })
+});
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Cancelar atendimento</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#0A5FB4;text-decoration:none}a:hover{color:#083F82}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; display: flex; flex-direction: column; overflow: hidden; background: #F1F5FA; color: #082C63; font-family: 'Public Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.35">
+<div style="flex: 1; min-height: 0; padding: 56px 20px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 8px">
+<a href="MeusAtendimentos.dc.html" aria-label="Voltar" style="flex: none; width: 48px; height: 48px; border: 1.5px solid #082C63; border-radius: 24px; background: #FFFFFF; color: #082C63; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>
+</a>
+<span style="flex: 1"></span>
+<a href="Acessibilidade.dc.html" style="flex: none; min-height: 48px; padding: 0 12px; border: 1px solid #C3CFDF; border-radius: 10px; background: #FFFFFF; color: #082C63; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5a1.6 1.6 0 110 3.2 1.6 1.6 0 010-3.2zM5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5L9 21M12 14.5l3 6.5"></path></svg>
+Acessibilidade
+</a>
+</div>
+
+<sc-if value="{{ativo}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Seu atendimento</h1>
+<div style="background: #FFFFFF; border: 1px solid #C9D4E3; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="display: flex; flex-wrap: wrap; gap: 6px">
+<span style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; background: #082C63; color: #FFFFFF; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v5a4 4 0 008 0V3M10 12v3a5 5 0 0010 0v-2M20 13a1.8 1.8 0 100-3.6 1.8 1.8 0 000 3.6z"></path></svg>Médico</span>
+<span style="display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; background: #FEC301; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Falta confirmar</span>
+</span>
+<span style="font-size: 18px; font-weight: 600">Consulta clínica geral</span>
+<span style="font-size: 28px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums">Qui, 10/12 · 9h</span>
+<span style="font-size: 15px; color: #41536F">Dra. Helena · UBS Feitoria</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<a href="Remarcar.dc.html" style="min-height: 52px; border-radius: 10px; border: 1.5px solid #082C63; color: #082C63; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center">Remarcar</a>
+<button onClick="{{abrir}}" style="min-height: 52px; border-radius: 10px; border: 1.5px solid #B31400; background: #FFFFFF; color: #B31400; font-size: 17px; font-weight: 600">Cancelar</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{cancelado}}" hint-placeholder-val="{{false}}">
+<div role="status" style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-size: 30px; line-height: 1.1; font-weight: 700">Atendimento cancelado</h1>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; border: 1.5px solid #082C63; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>Cancelado por você</span>
+<span style="font-size: 17px; font-weight: 600">Médico · Consulta clínica geral</span>
+<span style="font-size: 26px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; text-decoration: line-through; color: #41536F">Qui, 10/12 · 9h</span>
+<span style="font-size: 15px; color: #41536F">A vaga já está sendo oferecida a outra pessoa.</span>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px; background: #82CBF6; font-size: 16px; font-weight: 600">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+<span>Cancelar não prejudica você.</span>
+</div>
+<a href="Agendar.dc.html" style="min-height: 60px; border-radius: 10px; background: #082C63; color: #FFFFFF; font-size: 19px; font-weight: 700; display: flex; align-items: center; justify-content: center">Marcar outro dia</a>
+<a href="MeusAtendimentos.dc.html" style="min-height: 52px; border-radius: 10px; border: 1.5px solid #082C63; color: #082C63; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center">Ver meus atendimentos</a>
+</div>
+</sc-if>
+</div>
+<div style="flex: none; height: 84px"><dc-import name="NavCidadao" active="atendimentos" hint-size="390px,84px"></dc-import></div>
+
+<sc-if value="{{modal}}" hint-placeholder-val="{{true}}">
+<div style="position: absolute; inset: 0; background: rgba(6, 26, 61, 0.62); display: flex; flex-direction: column; justify-content: flex-end">
+<div role="dialog" aria-modal="true" aria-labelledby="tituloCancelar" style="padding: 22px 20px 34px; border-radius: 22px 22px 0 0; background: #FFFFFF; display: flex; flex-direction: column; gap: 14px">
+<h2 id="tituloCancelar" style="margin: 0; font-size: 26px; line-height: 1.15; font-weight: 700">Cancelar este atendimento?</h2>
+<div style="padding: 12px 14px; border-radius: 10px; background: #F1F5FA; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; font-weight: 600">Médico · Consulta clínica geral</span>
+<span style="font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums">Qui, 10/12 · 9h</span>
+</div>
+<p style="margin: 0; font-size: 19px; line-height: 1.4">A vaga vai para outra pessoa. <strong>Cancelar não prejudica você.</strong></p>
+<button onClick="{{cancelar}}" style="min-height: 60px; border-radius: 10px; border: 0; background: #B31400; color: #FFFFFF; font-size: 20px; font-weight: 700">Sim, cancelar</button>
+<button onClick="{{fechar}}" style="min-height: 60px; border-radius: 10px; border: 1.5px solid #082C63; background: #FFFFFF; font-size: 19px; font-weight: 600">Não, manter meu horário</button>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"comecaAberto":{"editor":"boolean","default":true},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = this.state || {};
+const aberto = s.aberto === undefined ? !!(this.props.comecaAberto ?? true) : s.aberto;
+const feito = !!s.feito;
+return {
+ativo: !feito,
+cancelado: feito,
+modal: aberto && !feito,
+abrir: () => this.setState({ aberto: true }),
+fechar: () => this.setState({ aberto: false }),
+cancelar: () => this.setState({ feito: true, aberto: false })
+};
+}
+}
+</script>
+</body>
+</html>

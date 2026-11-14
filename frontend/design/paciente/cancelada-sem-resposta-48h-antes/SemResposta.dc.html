@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Consulta cancelada por falta de resposta</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#0A5FB4;text-decoration:none}a:hover{color:#083F82}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; overflow: hidden; background: #F1F5FA; color: #082C63; font-family: 'Public Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.35">
+<div style="flex: 1; min-height: 0; padding: 56px 20px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Sua consulta foi cancelada</h1>
+<p style="margin: 0; font-size: 14px; color: #41536F">Não recebemos resposta a nenhum dos 3 avisos. Por isso, 48 horas antes, a vaga foi para outra pessoa.</p>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex">
+<span style="padding: 5px 10px; border-radius: 6px; background: #F1F5FA; color: #082C63; font-size: 13px; font-weight: 600">Cancelada por falta de resposta</span>
+</div>
+<span style="font-size: 26px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; text-decoration: line-through">Qui, 10/12 · 9h40</span>
+<span style="font-size: 14px; color: #41536F">Médico · Consulta clínica geral · Dra. Helena · UBS Feitoria</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600; color: #41536F">O que aconteceu</h2>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 2px 14px; display: flex; flex-direction: column">
+<sc-for list="{{passos}}" as="p" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 5px 0; border-bottom: 1px solid {{p.borda}}">
+<span style="flex: none; width: 46px; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600">{{p.data}}</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<span style="font-size: 15px; font-weight: 600">{{p.titulo}}</span>
+<span style="font-size: 13px; color: #41536F">{{p.nota}}</span>
+</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: 10px; background: #82CBF6; color: #082C63; font-size: 14px; font-weight: 600">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+<span>Isso não prejudica você. Só perde ofertas de vaga mais cedo quem confirma e falta.</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<a href="Agendar.dc.html" style="min-height: 52px; border-radius: 10px; background: #082C63; color: #FFFFFF; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center">Marcar nova consulta</a>
+<button style="min-height: 48px; border-radius: 8px; border: 1.5px solid #082C63; background: transparent; font-size: 15px; font-weight: 600">Não recebi os avisos</button>
+</div>
+</div>
+<div style="flex: none; height: 84px"><dc-import name="NavCidadao" active="atendimentos" hint-size="390px,84px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const canais = 'App, WhatsApp e SMS · sem resposta';
+return { passos: [
+{ data: '26/11', titulo: '1º aviso', nota: canais, borda: '#F1F5FA' },
+{ data: '3/12', titulo: '2º aviso', nota: canais, borda: '#F1F5FA' },
+{ data: '7/12', titulo: '3º aviso', nota: canais, borda: '#F1F5FA' },
+{ data: '8/12', titulo: 'Cancelada às 9h40', nota: '48 horas antes da consulta · vaga liberada', borda: 'transparent' }
+] };
+}
+}
+</script>
+</body>
+</html>

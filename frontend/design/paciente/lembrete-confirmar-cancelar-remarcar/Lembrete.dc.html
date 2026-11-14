@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Lembrete da consulta</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#0A5FB4;text-decoration:none}a:hover{color:#083F82}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; overflow: hidden; background: #F1F5FA; color: #082C63; font-family: 'Public Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.35">
+<div style="flex: 1; min-height: 0; padding: 56px 20px 0">
+<sc-if value="{{aguardando}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600; text-wrap: balance">Sua consulta é em 2 semanas</h1>
+
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex">
+<span style="padding: 5px 10px; border-radius: 6px; background: #FEC301; color: #082C63; font-size: 13px; font-weight: 600">Falta confirmar</span>
+</div>
+<span style="font-size: 26px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums">Qui, 10/12 · 9h</span>
+<span style="font-size: 14px; color: #41536F">Médico · Consulta clínica geral · Dra. Helena · UBS Feitoria</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<button onClick="{{confirmar}}" style="min-height: 52px; border-radius: 10px; border: 0; background: #167A3E; color: #FFFFFF; font-size: 21px; font-weight: 700; height: 86px; display: flex; align-items: center; justify-content: center; gap: 10px"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg>Confirmar presença</button>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button onClick="{{remarcar}}" style="min-height: 48px; border-radius: 8px; border: 1.5px solid #082C63; background: transparent; font-size: 15px; font-weight: 600">Remarcar</button>
+<button onClick="{{pedirCancelar}}" style="min-height: 48px; border-radius: 8px; border: 1.5px solid #C81E3A; background: #FFFFFF; color: #9E1830; font-size: 15px; font-weight: 600">Cancelar</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600; color: #41536F">Avisos desta consulta</h2>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 2px 14px; display: flex; flex-direction: column">
+<sc-for list="{{avisos}}" as="a" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 42px; border-bottom: 1px solid {{a.borda}}">
+<span style="flex: none; width: 46px; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600">{{a.data}}</span>
+<span style="flex: 1; font-size: 15px; font-weight: 600">{{a.quando}}</span>
+<sc-if value="{{a.temSelo}}" hint-placeholder-val="{{false}}">
+<span style="flex: none; padding: 4px 10px; border-radius: 6px; background: {{a.seloFundo}}; color: #082C63; font-size: 13px; font-weight: 600">{{a.selo}}</span>
+</sc-if>
+<sc-if value="{{a.temNota}}" hint-placeholder-val="{{true}}">
+<span style="flex: none; font-size: 13px; color: #41536F">{{a.nota}}</span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 13px; color: #41536F">Responda pelo app, WhatsApp ou SMS. Sem resposta até 8/12, 9h (48 horas antes), a consulta é cancelada e a vaga vai para outra pessoa.</p>
+</div>
+<a href="Compromisso.dc.html" style="align-self: flex-start; min-height: 44px; margin: -13px 0; display: flex; align-items: center; font-size: 14px; font-weight: 600">Como funcionam as ofertas de vaga mais cedo</a>
+</div>
+</sc-if>
+<sc-if value="{{confirmada}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Presença confirmada</h1>
+<p style="margin: 0; font-size: 14px; color: #41536F">Mudou de planos? Cancele ou remarque quando quiser.</p>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex">
+<span style="display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 6px; background: #82CBF6; color: #082C63; font-size: 13px; font-weight: 600">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+Confirmada
+</span>
+</div>
+<span style="font-size: 26px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums">Qui, 10/12 · 9h</span>
+<span style="font-size: 14px; color: #41536F">Médico · Consulta clínica geral · Dra. Helena · UBS Feitoria</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button onClick="{{remarcar}}" style="min-height: 48px; border-radius: 8px; border: 1.5px solid #082C63; background: transparent; font-size: 15px; font-weight: 600">Remarcar</button>
+<button onClick="{{pedirCancelar}}" style="min-height: 48px; border-radius: 8px; border: 1.5px solid #C81E3A; background: #FFFFFF; color: #9E1830; font-size: 15px; font-weight: 600">Cancelar consulta</button>
+</div>
+<p style="margin: 0; font-size: 13px; color: #41536F; text-align: center">Cancelar ou remarcar não prejudica você, nem depois de confirmar.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600; color: #41536F">Avisos desta consulta</h2>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 2px 14px; display: flex; flex-direction: column">
+<sc-for list="{{avisos}}" as="a" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 42px; border-bottom: 1px solid {{a.borda}}">
+<span style="flex: none; width: 46px; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600">{{a.data}}</span>
+<span style="flex: 1; font-size: 15px; font-weight: 600">{{a.quando}}</span>
+<sc-if value="{{a.temSelo}}" hint-placeholder-val="{{false}}">
+<span style="flex: none; padding: 4px 10px; border-radius: 6px; background: {{a.seloFundo}}; color: #082C63; font-size: 13px; font-weight: 600">{{a.selo}}</span>
+</sc-if>
+<sc-if value="{{a.temNota}}" hint-placeholder-val="{{true}}">
+<span style="flex: none; font-size: 13px; color: #41536F">{{a.nota}}</span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 13px; color: #41536F">Você já respondeu, a vaga está garantida. Os próximos avisos só lembram e trazem as opções de cancelar e remarcar.</p>
+</div>
+<a href="Compromisso.dc.html" style="align-self: flex-start; min-height: 44px; margin: -13px 0; display: flex; align-items: center; font-size: 14px; font-weight: 600">Como funcionam as ofertas de vaga mais cedo</a>
+</div>
+</sc-if>
+<sc-if value="{{confirmandoCancelamento}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Cancelar esta consulta?</h1>
+<p style="margin: 0; font-size: 14px; color: #41536F">A vaga vai para a próxima pessoa da fila.</p>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 26px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums">Qui, 10/12 · 9h</span>
+<span style="font-size: 14px; color: #41536F">Médico · Consulta clínica geral · Dra. Helena · UBS Feitoria</span>
+</div>
+<p style="margin: 0; font-size: 14px">Você pode cancelar até o horário da consulta, mesmo depois de confirmar. Isso não prejudica você.</p>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<button onClick="{{cancelar}}" style="min-height: 52px; border-radius: 10px; border: 0; background: #B31400; color: #FFFFFF; font-size: 16px; font-weight: 600">Sim, cancelar</button>
+<button onClick="{{voltar}}" style="min-height: 48px; border-radius: 8px; border: 1.5px solid #082C63; background: transparent; font-size: 15px; font-weight: 600">Voltar</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{cancelada}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Consulta cancelada</h1>
+<p style="margin: 0; font-size: 14px; color: #41536F">A vaga já está sendo oferecida a outra pessoa.</p>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex">
+<span style="padding: 5px 10px; border-radius: 6px; background: #F1F5FA; color: #082C63; font-size: 13px; font-weight: 600">Cancelada por você</span>
+</div>
+<span style="font-size: 26px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; text-decoration: line-through">Qui, 10/12 · 9h</span>
+<span style="font-size: 14px; color: #41536F">Médico · Consulta clínica geral · Dra. Helena · UBS Feitoria</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: 10px; background: #82CBF6; color: #082C63; font-size: 14px; font-weight: 600">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+<span>Cancelar não prejudica você</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<a href="Agendar.dc.html" style="min-height: 52px; border-radius: 10px; background: #082C63; color: #FFFFFF; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center">Marcar outra data</a>
+<a href="MeusAtendimentos.dc.html" style="min-height: 48px; border-radius: 8px; border: 1.5px solid #082C63; color: #082C63; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">Ver meus atendimentos</a>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{escolhendo}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Remarcar consulta</h1>
+<p style="margin: 0; font-size: 14px; color: #41536F">Horários livres de consulta clínica geral com a Dra. Helena</p>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-size: 14px; color: #41536F">Horário atual</span>
+<span style="flex: none; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums">Qui, 10/12 · 9h</span>
+</div>
+<div role="group" aria-label="Novos horários" style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{horarios}}" as="h" hint-placeholder-count="4">
+<button onClick="{{h.escolher}}" aria-pressed="{{h.sel}}" style="min-height: 52px; padding: 0 16px; border-radius: 10px; border: 1.5px solid #082C63; background: {{h.fundo}}; color: {{h.tinta}}; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: space-between">
+<span>{{h.texto}}</span>
+<span style="font-size: 13px">{{h.marca}}</span>
+</button>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 13px; color: #41536F">A nova consulta já fica confirmada. O horário antigo vai para a próxima pessoa da fila.</p>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<button onClick="{{trocar}}" disabled="{{semHorario}}" style="min-height: 52px; border-radius: 10px; border: 0; background: #082C63; color: #FFFFFF; opacity: {{trocaOpacidade}}; font-size: 16px; font-weight: 600">Confirmar troca</button>
+<button onClick="{{voltar}}" style="min-height: 48px; border-radius: 8px; border: 1.5px solid #082C63; background: transparent; font-size: 15px; font-weight: 600">Voltar</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{remarcada}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Consulta remarcada</h1>
+<p style="margin: 0; font-size: 14px; color: #41536F">A nova data já está confirmada.</p>
+</div>
+<div style="background: #082C63; border-radius: 10px; padding: 18px; color: #FFFFFF; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; font-weight: 600; color: #BFE3FA">Nova data</span>
+<span style="font-size: 30px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums">{{novaData}}</span>
+<span style="font-size: 14px">Médico · Consulta clínica geral · Dra. Helena · UBS Feitoria</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-size: 14px; color: #41536F">Liberado para outra pessoa</span>
+<span style="flex: none; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; text-decoration: line-through">Qui, 10/12 · 9h</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: 10px; background: #82CBF6; color: #082C63; font-size: 14px; font-weight: 600">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+<span>Os avisos agora seguem a nova data, só para lembrar</span>
+</div>
+<a href="MeusAtendimentos.dc.html" style="min-height: 52px; border-radius: 10px; background: #082C63; color: #FFFFFF; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center">Ver meus atendimentos</a>
+</div>
+</sc-if>
+</div>
+<div style="flex: none; height: 84px"><dc-import name="NavCidadao" active="atendimentos" hint-size="390px,84px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = this.state || {};
+const resp = s.resp || '';
+const ok = resp === 'ok';
+const linha = (data, quando, selo, seloFundo, nota, ultima) => ({ data, quando, temSelo: !!selo, selo: selo || '', seloFundo: seloFundo || '#FEC301', temNota: !!nota, nota: nota || '', borda: ultima ? 'transparent' : '#F1F5FA' });
+const HORARIOS = ['Ter, 15/12 · 8h20', 'Qua, 16/12 · 14h10', 'Sex, 18/12 · 9h', 'Seg, 21/12 · 15h50'];
+const slot = typeof s.slot === 'number' ? s.slot : -1;
+const antes = resp === 'ok' ? 'ok' : '';
+return {
+aguardando: resp === '',
+confirmada: ok,
+confirmandoCancelamento: resp === 'cancelar',
+cancelada: resp === 'cancel',
+escolhendo: resp === 'remarcar',
+remarcada: resp === 'remarcada',
+avisos: [
+linha('26/11', '2 semanas antes', ok ? 'Você confirmou' : 'Agora', ok ? '#82CBF6' : '#FEC301', ''),
+linha('3/12', '1 semana antes', '', '', ok ? 'lembrete' : 'pede resposta'),
+linha('7/12', '3 dias antes', '', '', ok ? 'lembrete' : 'pede resposta'),
+linha('10/12', 'No dia', '', '', 'só lembrete', true)
+],
+horarios: HORARIOS.map((texto, i) => {
+const sel = i === slot;
+return { texto, sel, marca: sel ? 'escolhido' : '', fundo: sel ? '#082C63' : '#FFFFFF', tinta: sel ? '#FFFFFF' : '#082C63', escolher: () => this.setState({ slot: i }) };
+}),
+semHorario: slot < 0,
+trocaOpacidade: slot < 0 ? 0.45 : 1,
+novaData: slot >= 0 ? HORARIOS[slot] : HORARIOS[0],
+confirmar: () => this.setState({ resp: 'ok' }),
+remarcar: () => this.setState({ antes, resp: 'remarcar', slot: -1 }),
+pedirCancelar: () => this.setState({ antes, resp: 'cancelar' }),
+cancelar: () => this.setState({ resp: 'cancel' }),
+voltar: () => this.setState({ resp: s.antes || '' }),
+trocar: () => { if (slot >= 0) this.setState({ resp: 'remarcada' }); }
+};
+}
+}
+</script>
+</body>
+</html>

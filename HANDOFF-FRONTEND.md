@@ -11,7 +11,7 @@ Este documento é o ponto de partida do chat que vai arquitetar e construir o ap
    - **13 (Como rodar):** subir o backend e os logins do seed.
    - **14 (Contrato da API):** todas as rotas, corpos e respostas.
 3. **[`frontend/AGENTS.md`](frontend/AGENTS.md)**: o Expo muda a cada versão. Antes de usar qualquer API do Expo ou do React Native, leia a documentação da versão instalada (`https://docs.expo.dev/versions/v58.0.0/`). Instale pacotes com `npx expo install`.
-4. **`frontend/design/`**: as telas exportadas do Claude Design, com HTML e PNG de cada uma. São a referência visual de cada tela. Se a pasta não existir ou estiver incompleta, peça ao usuário para exportar antes de desenhar componentes.
+4. **[`frontend/design/INDEX.md`](frontend/design/INDEX.md)**: as 37 telas exportadas do Claude Design, uma pasta por tela, separadas em paciente, equipe, link e componentes. O índice diz qual é o arquivo principal de cada tela e se a API está pronta. Os valores visuais (cores, fontes, espaçamentos, raios) estão nos `style` inline e no `<helmet><style>` de cada `*.dc.html`: replique esses valores no tema e nos componentes, sem copiar o HTML. Para ver uma tela, rode `python3 -m http.server` dentro da pasta dela.
 
 ## 2. Decisões já tomadas (não reabra sem o usuário pedir)
 

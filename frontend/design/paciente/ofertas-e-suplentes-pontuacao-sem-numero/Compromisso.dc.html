@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Ofertas de vaga mais cedo</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#0A5FB4;text-decoration:none}a:hover{color:#083F82}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; overflow: hidden; background: #F1F5FA; color: #082C63; font-family: 'Public Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.35">
+<div style="flex: 1; min-height: 0; padding: 56px 20px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600; text-wrap: balance">Ofertas de vaga mais cedo</h1>
+<p style="margin: 0; font-size: 14px; color: #41536F">Quando alguém cancela, a vaga é oferecida a quem tem consulta marcada depois.</p>
+</div>
+<div>
+<sc-if value="{{recebe}}" hint-placeholder-val="{{true}}">
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 16px; display: flex; align-items: flex-start; gap: 12px">
+<span style="flex: none; width: 36px; height: 36px; border-radius: 50%; background: #82CBF6; color: #082C63; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+</span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 18px; font-weight: 600">Você recebe ofertas</span>
+<span style="font-size: 14px; color: #41536F">Avisamos quando abrir uma vaga antes da sua consulta. Você aceita ou mantém seu horário.</span>
+</span>
+</div>
+</sc-if>
+<sc-if value="{{semOfertas}}" hint-placeholder-val="{{false}}">
+<div style="background: #FEC301; border-radius: 10px; padding: 16px; display: flex; align-items: flex-start; gap: 12px; color: #082C63">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 2px"><path d="M12 8v.5M12 11v5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 18px; font-weight: 600">Sem ofertas por enquanto</span>
+<span style="font-size: 15px">Comparecendo às próximas consultas você volta a receber ofertas de adiantamento.</span>
+<span style="font-size: 14px">Sua consulta marcada continua garantida.</span>
+</span>
+</div>
+</sc-if>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600; color: #41536F">Como funciona</h2>
+<sc-for list="{{regras}}" as="r" hint-placeholder-count="5">
+<div style="display: flex; align-items: flex-start; gap: 10px; font-size: 15px">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A5FB4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+<span>{{r.t}}</span>
+</div>
+</sc-for>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Lista de suplentes</h2>
+<span style="font-size: 14px; color: #41536F">Avisamos se abrir vaga, mesmo sem consulta marcada.</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<span style="display: flex; flex-direction: column">
+<span style="font-size: 15px; font-weight: 600">Médico · Consulta clínica geral</span>
+<span style="font-size: 13px; color: #41536F">{{suplenteTexto}}</span>
+</span>
+<button onClick="{{alternarSuplente}}" disabled="{{semOfertas}}" aria-pressed="{{suplente}}" style="flex: none; min-width: 96px; min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1.5px solid {{botaoBorda}}; background: {{botaoFundo}}; color: {{botaoTinta}}; font-size: 15px; font-weight: 600">{{botaoTexto}}</button>
+</div>
+</div>
+</div>
+<div style="flex: none; height: 84px"><dc-import name="NavCidadao" active="atendimentos" hint-size="390px,84px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"semOfertas":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = this.state || {};
+const sem = !!(this.props.semOfertas ?? false);
+const sup = !sem && !!s.suplente;
+return {
+recebe: !sem,
+semOfertas: sem,
+regras: [
+{ t: 'A vaga vai primeiro para quem tem consulta mais perto da data. Depois, para os suplentes.' },
+{ t: 'Cada pessoa tem um prazo para responder. Sem resposta, a vaga passa para a próxima, sem penalidade.' },
+{ t: 'Cancelar ou remarcar não prejudica você.' },
+{ t: 'Só deixa de receber ofertas quem confirma e não comparece.' },
+{ t: 'Sua consulta marcada nunca é afetada.' }
+],
+suplente: sup,
+suplenteTexto: sem ? 'Volta quando você comparecer às próximas consultas' : sup ? 'Você está na lista' : 'Você não está na lista',
+botaoTexto: sup ? 'Sair' : 'Entrar',
+botaoFundo: sem ? '#E3E9F1' : sup ? '#FFFFFF' : '#082C63',
+botaoTinta: sem ? '#4F5F78' : sup ? '#082C63' : '#FFFFFF',
+botaoBorda: sem ? '#E3E9F1' : '#082C63',
+alternarSuplente: () => this.setState({ suplente: !s.suplente })
+};
+}
+}
+</script>
+</body>
+</html>

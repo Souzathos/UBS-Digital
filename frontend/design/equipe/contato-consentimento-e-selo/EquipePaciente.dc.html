@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Equipe: familiar e selo de vulnerável</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}*{box-sizing:border-box}button,input{font:inherit;color:inherit}
+a{color:#7CC4F5;text-decoration:none}a:hover{color:#CDE6FB}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; overflow: hidden; background: #061A3D; color: #F2F7FD; font-family: 'Public Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.35">
+<div style="flex: 1; min-height: 0; padding: 56px 20px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 600">Osvaldo Menezes</h1>
+<p style="margin: 0; font-size: 14px; color: #B5C8E2">74 anos · Feitoria · sem celular próprio</p>
+</div>
+<div style="background: #0C2A5A; border: 1px solid #1F4177; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 13px; font-weight: 600; color: #7CC4F5">Pessoa de contato</h2>
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<span style="font-size: 16px; font-weight: 600">Lúcia Menezes · filha</span>
+<span style="flex: none; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600; color: #B5C8E2">(51) 99999-0142</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: #B5C8E2">Canais que ela autorizou</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{canais}}" as="c" hint-placeholder-count="2">
+<button onClick="{{c.alternar}}" aria-pressed="{{c.ativo}}" style="min-height: 44px; padding: 0 12px; border-radius: 8px; border: 1.5px solid {{c.borda}}; background: transparent; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600">
+<span style="flex: none; width: 22px; height: 22px; border-radius: 6px; border: 2px solid #82CBF6; background: {{c.caixa}}; color: #061A3D; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="visibility: {{c.visto}}"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+</span>
+{{c.nome}}
+</button>
+</sc-for>
+</div>
+<span style="font-size: 13px; color: #B5C8E2">{{ordemCanais}}</span>
+</div>
+<button onClick="{{alternarAut}}" aria-pressed="{{aut}}" style="min-height: 44px; padding: 0; border: 0; background: transparent; display: flex; align-items: center; gap: 12px; text-align: left">
+<span style="flex: none; width: 24px; height: 24px; border-radius: 6px; border: 2px solid #82CBF6; background: {{autFundo}}; color: #061A3D; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="visibility: {{autVisto}}"><path d="M5 12l4.5 4.5L19 7"></path></svg>
+</span>
+<span style="font-size: 15px; font-weight: 600">O Sr. Osvaldo autorizou avisar a Lúcia</span>
+</button>
+<div>
+<sc-if value="{{aut}}" hint-placeholder-val="{{true}}">
+<p style="margin: 0; font-size: 13px; color: #B5C8E2">Termo assinado na recepção em 12/11. Ela recebe só UBS, data e horário, nunca o tipo de atendimento.</p>
+</sc-if>
+<sc-if value="{{semAut}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 8px 12px; border-radius: 8px; background: #FEC301; color: #061A3D; font-size: 13px; font-weight: 600">Sem autorização do paciente, nenhum aviso é enviado.</p>
+</sc-if>
+</div>
+</div>
+<div style="background: #0C2A5A; border: 1px solid #1F4177; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; gap: 12px">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7CC4F5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path></svg>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<span style="font-size: 16px; font-weight: 600">Selo de vulnerável</span>
+<span style="font-size: 13px; color: #B5C8E2">{{seloTexto}}</span>
+</div>
+<button onClick="{{alternarSelo}}" aria-pressed="{{selo}}" aria-label="Selo de vulnerável" style="flex: none; width: 52px; height: 44px; padding: 0; border: 0; background: transparent; display: flex; align-items: center">
+<span style="width: 52px; height: 30px; padding: 3px; border-radius: 15px; background: {{seloTrilho}}; display: flex; align-items: center; justify-content: {{seloLado}}">
+<span style="width: 24px; height: 24px; border-radius: 50%; background: {{seloBola}}"></span>
+</span>
+</button>
+</div>
+<div>
+<sc-if value="{{selo}}" hint-placeholder-val="{{true}}">
+<p style="margin: 0; font-size: 13px; color: #B5C8E2">Não perde pontos e não tem cancelamento automático. Sem resposta, vira alerta para a recepção e o ACS. Só a equipe vê o selo.</p>
+</sc-if>
+<sc-if value="{{semSelo}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; font-size: 13px; color: #B5C8E2">Sem o selo, vale a regra geral: sem resposta até 48 horas antes, a consulta é cancelada.</p>
+</sc-if>
+</div>
+</div>
+<div style="background: #0C2A5A; border: 1px solid #1F4177; border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<span style="font-size: 16px; font-weight: 600">Pontuação de compromisso</span>
+<div>
+<sc-if value="{{selo}}" hint-placeholder-val="{{true}}">
+<span style="font-size: 13px; color: #B5C8E2">Protegida pelo selo: não cai se ele faltar.</span>
+</sc-if>
+<sc-if value="{{semSelo}}" hint-placeholder-val="{{false}}">
+<span style="font-size: 13px; color: #B5C8E2">Cai 30 pontos se ele confirmar e faltar.</span>
+</sc-if>
+</div>
+</div>
+<span style="flex: none; font-size: 30px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums">70</span>
+</div>
+<button style="min-height: 52px; border-radius: 10px; border: 0; background: #F2F7FD; color: #061A3D; font-size: 16px; font-weight: 600">Salvar cadastro</button>
+</div>
+<div style="flex: none; height: 84px"><dc-import name="NavEquipe" active="pacientes" hint-size="390px,84px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const s = this.state || {};
+const aut = s.aut !== false;
+const selo = s.selo !== false;
+const whats = s.whats !== false;
+const sms = s.sms !== false;
+const canais = [{ id: 'whats', nome: 'WhatsApp', ativo: whats }, { id: 'sms', nome: 'SMS', ativo: sms }];
+return {
+canais: canais.map((c) => ({
+nome: c.nome,
+ativo: c.ativo,
+caixa: c.ativo ? '#82CBF6' : 'transparent',
+visto: c.ativo ? 'visible' : 'hidden',
+borda: c.ativo ? '#82CBF6' : '#4D6FA3',
+alternar: () => this.setState({ [c.id]: !c.ativo })
+})),
+ordemCanais: whats && sms ? 'Ordem: WhatsApp e, sem resposta em 12h, SMS.'
+: whats ? 'Só WhatsApp. Sem resposta, a recepção é avisada.'
+: sms ? 'Só SMS. Sem resposta, a recepção é avisada.'
+: 'Sem canal autorizado: a recepção faz o contato.',
+aut,
+semAut: !aut,
+autFundo: aut ? '#82CBF6' : 'transparent',
+autVisto: aut ? 'visible' : 'hidden',
+alternarAut: () => this.setState({ aut: !aut }),
+selo,
+semSelo: !selo,
+seloTexto: selo ? 'Ativo · por Ana (recepção) em 12/11' : 'Inativo',
+seloTrilho: selo ? '#82CBF6' : '#1F4177',
+seloBola: selo ? '#061A3D' : '#B5C8E2',
+seloLado: selo ? 'flex-end' : 'flex-start',
+alternarSelo: () => this.setState({ selo: !selo })
+};
+}
+}
+</script>
+</body>
+</html>
