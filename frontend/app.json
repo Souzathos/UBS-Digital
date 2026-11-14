@@ -34,7 +34,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#F1F5FA"
         }
-      ]
+      ],
+      "expo-notifications"
     ],
     "scheme": "ubsdigital",
     "experiments": {

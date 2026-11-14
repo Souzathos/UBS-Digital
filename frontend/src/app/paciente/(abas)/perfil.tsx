@@ -89,7 +89,15 @@ export default function Perfil() {
             <Texto cor="textoSuave">Ao ligar um canal, você autoriza a UBS a mandar avisos de consulta por ele.</Texto>
 
             <Botao titulo="Trocar senha" variante="contorno" onPress={() => router.push('/paciente/trocar-senha')} />
-            <Botao titulo="Sair" variante="perigo" onPress={sair} />
+            <Botao
+                titulo="Sair"
+                variante="perigo"
+                onPress={async () => {
+                    // Este celular para de receber os avisos de quem saiu.
+                    await servicos.auth.registrarPush(null).catch(() => {})
+                    await sair()
+                }}
+            />
         </Tela>
     )
 }

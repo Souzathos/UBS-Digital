@@ -10,6 +10,8 @@ export interface AuthServico {
     eu(token: string): Promise<RespostaEu>
     // RN-80: a lista dos canais ligados; os de fora ficam recusados.
     atualizarCanais(canais: Canal[]): Promise<PacienteProprio>
+    // RN-60: token de push deste aparelho (null ao sair da conta).
+    registrarPush(token: string | null): Promise<void>
 }
 
 export const authApi: AuthServico = {
@@ -18,5 +20,6 @@ export const authApi: AuthServico = {
     trocarSenha: (token, senhaAtual, novaSenha) =>
         requisitar('POST', '/auth/paciente/trocar-senha', { corpo: { senhaAtual, novaSenha }, token, encerraSessaoEm401: false }),
     eu: token => requisitar('GET', '/auth/eu', { token }),
-    atualizarCanais: canais => requisitar('PATCH', '/auth/paciente/canais', { corpo: { canais } })
+    atualizarCanais: canais => requisitar('PATCH', '/auth/paciente/canais', { corpo: { canais } }),
+    registrarPush: token => requisitar('PATCH', '/auth/paciente/push-token', { corpo: { token } })
 }
