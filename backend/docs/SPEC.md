@@ -376,17 +376,26 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 
 | Parte | Item da seção 8 | RN | Estado | Commit |
 |---|---|---|---|---|
-| 0 | Estrutura base, Postgres, harness de testes, SPEC.md e CLAUDE.md | — | ☑ | (ver `git log`) |
-| 1 | Modelo de dados, migração inicial e seed | seção 5 e 7 | ☑ | |
-| 2 | `Clock` injetável, runner de jobs e endpoints `/dev` | RN-90 | ☑ | |
-| 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☑ | |
-| 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☑ | |
-| 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☑ | |
-| 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☑ | |
-| 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☑ | |
-| 8 | Página do link | RN-70 a RN-73 | ☑ | |
-| 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☑ | |
-| 10 | Fechamento: estado, mapa RN → código, contrato da API | — | ☐ | |
+| 0 | Estrutura base, Postgres, harness de testes, SPEC.md e CLAUDE.md | — | ☑ | `f6d4015` |
+| 1 | Modelo de dados, migração inicial e seed | seção 5 e 7 | ☑ | `35fee99` |
+| 2 | `Clock` injetável, runner de jobs e endpoints `/dev` | RN-90 | ☑ | `e0cabb3` |
+| 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☑ | `20b8d4d` |
+| 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☑ | `b78eb54` |
+| 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☑ | `e4564d0` |
+| 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☑ | `3a72ac9` |
+| 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☑ | `fc7a31e` |
+| 8 | Página do link | RN-70 a RN-73 | ☑ | `61360b8` |
+| 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☑ | `9783d29` |
+| 10 | Fechamento: estado, mapa RN → código, contrato da API, verificação de ponta a ponta | — | ☑ | (este commit) |
+
+**Camada 1 concluída em 13/11/2026**: 84 testes passando (`npm test`), typecheck limpo, e o roteiro de ponta a ponta da seção 13 rodado contra o servidor real.
+
+**O que a Camada 1 deixou pronto para a Camada 2** (pontos de extensão, todos dentro da transação da ação):
+- `AgendamentoService.aoLiberarVaga(manager, slot, agora)`: chamado por cancelar e remarcar. É onde nasce a oferta de adiantamento (RN-30 a RN-35). O cancelamento automático (RN-26) também deve passar por ele.
+- `PresencaService.aoRegistrarPresenca(manager, agendamento, statusAnterior, agora)`: onde entra a pontuação (RN-40 a RN-42).
+- `Notificacao.status = RESPONDIDA` já é gravado em toda ação (RN-62): o job de "sem resposta" (RN-25, RN-26) pode olhar para isso.
+- `Autor.tipo = CONTATO` já é aceito pelo `AgendamentoService` e pelo `LinkService` (RN-58); falta o cadastro do contato e o envio para ele (RN-55 a RN-57).
+- Antes da Camada 2, decidir a seção 9: "próximo paciente compatível" (tipo na UBS × mesmo profissional) e RN-56.
 
 **Camadas 2, 3 e 4:** não iniciadas.
 
@@ -469,6 +478,115 @@ npm run test:db:stop
 
 As variáveis de teste ficam em `tests/setup.ts` (não há `.env.test`). O harness recusa qualquer banco cujo nome não termine em `_test`.
 
+### Logins do seed
+
+| Quem | Login | Senha |
+|---|---|---|
+| Recepção | `recepcao@ubs.local` | `123456` |
+| ACS | `acs@ubs.local` | `123456` |
+| Gestor | `gestor@ubs.local` | `123456` |
+| Pacientes | CPF (ver `src/seeds/dados/pacientes.ts`, ex.: Maria `11122233396`) | `123456` (Fernanda ainda com troca obrigatória) |
+
+### Roteiro de ponta a ponta (dev)
+
+1. `POST /auth/equipe/entrar` como recepção e guardar o token.
+2. `GET /slots?tipoAtendimentoId=1&de=<hoje+20>` e `POST /equipe/agendamentos { pacienteId, slotId }`: nasce PENDENTE.
+3. `POST /dev/relogio/avancar { "dias": 14 }` e `GET /dev/envios`: aparecem D-14 e D-7 com o link.
+4. Abrir o link no navegador e tocar em Confirmar: a página passa a mostrar "Presença confirmada".
+5. `POST /auth/paciente/entrar` com o CPF e `GET /agendamentos/meus`: status CONFIRMADO.
+6. `POST /agendamentos/:id/remarcar { slotId }` como paciente: o antigo fica REMARCADO e o link antigo mostra "remarcada para ...".
+7. Avançar até o dia e `POST /equipe/agendamentos/:id/presenca { "resultado": "COMPARECEU" }`.
+8. `POST /dev/relogio/zerar` para voltar ao relógio real. `npm run seed -- --reset` recria os dados.
+
 ## 14. Contrato da API
 
-Preenchido na Parte 10, para o app consumir. Até lá, os endpoints de cada parte estão descritos na seção 11 e nos testes.
+Base: `http://localhost:3333` em dev. JSON em tudo, exceto a página do link (HTML). Autenticação por `Authorization: Bearer <token>`. Erros sempre como `{ "message": "texto para o usuário" }`; erros de validação trazem também `errors: [{ campo, mensagem }]`.
+
+| Código | Quando |
+|---|---|
+| 400 | dados inválidos ou regra de prazo (RN-03, horário passado, presença antes do dia) |
+| 401 | sem login, token inválido ou senha errada |
+| 403 | perfil sem permissão, regra de acesso (RN-01, RN-02) ou senha provisória pendente |
+| 404 | não existe ou é de outra UBS / outro paciente |
+| 409 | conflito de estado (RN-04, slot ocupado, consulta já cancelada/remarcada/realizada) |
+
+### Autenticação
+
+| Método e rota | Quem | Corpo | Resposta |
+|---|---|---|---|
+| `POST /auth/equipe/entrar` | público | `{ email, senha }` | `{ token, usuario: { id, ubsId, nome, email, perfil } }` |
+| `POST /auth/paciente/entrar` | público | `{ cpf, senha }` (CPF com ou sem máscara) | `{ token, deveTrocarSenha, paciente }` |
+| `POST /auth/paciente/trocar-senha` | paciente (mesmo com senha provisória) | `{ senhaAtual, novaSenha }` | `{ token, deveTrocarSenha: false, paciente }` (use o token novo) |
+| `GET /auth/eu` | qualquer logado | — | `{ tipo: "EQUIPE", usuario }` ou `{ tipo: "PACIENTE", paciente }` |
+
+Enquanto `deveTrocarSenha` for `true`, o paciente só consegue usar `trocar-senha` e `/auth/eu` (403 no resto).
+
+### Catálogo e horários
+
+| Método e rota | Quem | Parâmetros | Resposta |
+|---|---|---|---|
+| `GET /tipos-atendimento` | equipe ou paciente | — | `[{ id, nome, categoria, duracaoMin, antecedenciaMaximaDias, permiteAgendamentoApp, instrucoesPreparo }]` (paciente: só liberados, RN-01) |
+| `GET /profissionais` | equipe ou paciente | — | `[{ id, nome, funcao }]` |
+| `GET /slots` | equipe ou paciente | `tipoAtendimentoId` (obrigatório para paciente), `profissionalId`, `de`, `ate` (AAAA-MM-DD), `status` (só equipe; padrão LIVRE) | `[{ id, inicio, fim, profissional, tipoAtendimento }]`; a equipe recebe também `origem` e `status` |
+| `POST /slots/lote` | recepção, gestor | `{ profissionalId, tipoAtendimentoId, dataInicio, dataFim, horaInicio, horaFim, apenasDiasUteis? }` | `{ criados, ignorados, cotaApp, cotaAppPercentual }` |
+
+### Agendamentos (app do paciente)
+
+| Método e rota | Corpo | Resposta |
+|---|---|---|
+| `POST /agendamentos` | `{ slotId }` | 201 + agendamento |
+| `GET /agendamentos/meus` | — | `{ proximos: [agendamento], historico: [agendamento] }` |
+| `POST /agendamentos/:id/confirmar` | — | agendamento (idempotente) |
+| `POST /agendamentos/:id/cancelar` | — | agendamento (idempotente) |
+| `POST /agendamentos/:id/remarcar` | `{ slotId }` | o agendamento **novo** (idempotente para o mesmo slot) |
+
+Formato do agendamento para o paciente:
+
+```json
+{
+  "id": 4, "status": "CONFIRMADO", "origem": "REMARCACAO",
+  "inicio": "2026-11-30T11:40:00.000Z", "fim": "2026-11-30T12:00:00.000Z",
+  "remarcadoDeId": 3, "confirmadoEm": "...", "canceladoEm": null, "criadoEm": "...",
+  "tipoAtendimento": { "id": 1, "nome": "Consulta médica", "categoria": "CONSULTA", "instrucoesPreparo": null },
+  "profissional": { "id": 1, "nome": "Dra. Ana Lima", "funcao": "médico" },
+  "ubs": { "nome": "UBS Centro", "endereco": "...", "telefone": "..." },
+  "acoes": { "confirmar": false, "cancelar": true, "remarcar": true }
+}
+```
+
+`acoes` diz quais botões mostrar; a API valida de novo em cada ação.
+
+### Painel da UBS
+
+| Método e rota | Quem | Corpo / parâmetros | Resposta |
+|---|---|---|---|
+| `POST /pacientes` | recepção, gestor | `{ nome, cpf, dataNascimento, cns?, telefone?, email?, possuiCelular, consentimentoCanais: ["WHATSAPP", "SMS", ...] }` | 201 `{ paciente, senhaProvisoria }` (a senha só aparece aqui) |
+| `GET /pacientes` | equipe | `q` (nome ou início do CPF) | `[paciente]` com `pontuacao` e `vulneravel` |
+| `GET /pacientes/:id` | equipe | — | paciente |
+| `POST /pacientes/:id/redefinir-senha` | recepção, gestor | — | `{ paciente, senhaProvisoria }` |
+| `POST /equipe/agendamentos` | recepção, gestor | `{ pacienteId, slotId }` | 201 + agendamento da equipe |
+| `GET /equipe/agenda` | equipe | `data` (AAAA-MM-DD), `profissionalId?` | `[agendamento da equipe]` do dia |
+| `POST /equipe/agendamentos/:id/confirmar` · `/cancelar` · `/remarcar` | recepção, gestor | remarcar: `{ slotId }` | agendamento da equipe |
+| `POST /equipe/agendamentos/:id/presenca` | recepção, gestor | `{ resultado: "COMPARECEU" \| "FALTOU" }` | agendamento da equipe |
+
+O agendamento da equipe é o do paciente mais `slotId`, `criadoPorTipo`, `canceladoPorTipo`, `presencaRegistradaEm` e `paciente: { id, nome, cpf, telefone, vulneravel }` (RN-52: o selo só aparece aqui).
+
+### Página do link (HTML, sem login)
+
+| Método e rota | O que faz |
+|---|---|
+| `GET /l/:token` | mostra a consulta e os botões possíveis; 404 link inválido, 410 link expirado |
+| `POST /l/:token/confirmar` | confirma e redireciona (303) para `/l/:token?ok=confirmado` |
+| `GET /l/:token/cancelar` · `POST /l/:token/cancelar` | pede confirmação · cancela e redireciona |
+| `GET /l/:token/remarcar` · `POST /l/:token/remarcar` (form `slotId`) | lista horários · remarca e redireciona |
+
+### Desenvolvimento (fora de produção, login de equipe)
+
+| Método e rota | O que faz |
+|---|---|
+| `GET /dev/relogio` | `{ agora, deslocamentoMs, congelado, jobs }` |
+| `POST /dev/relogio/avancar` | `{ dias?, horas?, minutos? }`: avança em passos de 1h rodando os jobs |
+| `POST /dev/relogio/definir` | `{ para: "2026-11-20T07:00:00-03:00" }` |
+| `POST /dev/relogio/zerar` | volta ao relógio real |
+| `POST /dev/jobs/rodar` | roda os jobs uma vez agora |
+| `GET /dev/envios?limite=` · `DELETE /dev/envios` | caixa de saída do mock (texto, canal, link de cada envio) |

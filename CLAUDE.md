@@ -72,6 +72,10 @@ npm run migration:generate -- src/migrations/NomeDaMigration
 
 Nunca rode `npm test` apontando para o banco de desenvolvimento: o harness recusa bancos cujo nome não termina em `_test`.
 
+## Estado
+
+**Camada 1 concluída em 13/11/2026** (branch `feat/camada-1`, 84 testes). O que existe, onde está cada regra e o contrato da API para o app estão no SPEC.md (seções 11, 12 e 14). A Camada 2 começa pelos pontos de extensão `AgendamentoService.aoLiberarVaga` e `PresencaService.aoRegistrarPresenca`, e depende das decisões abertas da seção 9 da spec.
+
 ## Git
 
 Branch de trabalho: `feat/camada-1`. Um commit por parte do plano, com o RN-xx na mensagem. Sem push até o usuário pedir.
