@@ -385,7 +385,7 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☑ | |
 | 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☑ | |
 | 8 | Página do link | RN-70 a RN-73 | ☑ | |
-| 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☐ | |
+| 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☑ | |
 | 10 | Fechamento: estado, mapa RN → código, contrato da API | — | ☐ | |
 
 **Camadas 2, 3 e 4:** não iniciadas.
@@ -446,6 +446,8 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | RN-73: nome da UBS na página | cabeçalho de `pagina()` em `src/web/templates/layout.ts` | `tests/link.test.ts` ("RN-73") |
 | RN-52 / RN-57 na página | `LinkService.montarPagina` só põe tipo e profissional se o destinatário for o paciente; o selo nunca entra | `tests/link.test.ts` ("RN-52 e escape") |
 | Acessibilidade (seção 6) | HTML puro, sem JavaScript, fonte grande e alto contraste; passo de confirmação antes de cancelar | — |
+| Fluxo C: comparecimento ou falta | `PresencaService.registrar` em `src/services/PresencaService.ts` (de PENDENTE ou CONFIRMADO, a partir do dia da consulta; cancela lembretes; log PRESENCA com o status anterior) | `tests/presenca.test.ts` |
+| RN-40 a RN-42 (ponto de extensão) | `PresencaService.aoRegistrarPresenca` recebe o status anterior; vazio até a Camada 2 | — |
 
 ## 13. Como rodar
 

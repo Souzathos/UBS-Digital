@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { EquipeController } from "../controllers/EquipeController";
 import { AgendaDoDiaDTO, CriarAgendamentoEquipeDTO, RemarcarDTO } from "../dtos/agendamento";
+import { RegistrarPresencaDTO } from "../dtos/presenca";
 import { PerfilEquipe } from "../models/enums";
 import { authEquipe } from "../middlewares/auth";
 import { validateBody, validateIds, validateQuery } from "../middlewares/validateBody";
@@ -14,6 +15,7 @@ equipeRoutes.get('/agenda', authEquipe(), validateQuery(AgendaDoDiaDTO), equipe.
 equipeRoutes.post('/agendamentos', recepcaoOuGestor, validateBody(CriarAgendamentoEquipeDTO), equipe.agendar.bind(equipe))
 equipeRoutes.post('/agendamentos/:id/confirmar', validateIds('id'), recepcaoOuGestor, equipe.confirmar.bind(equipe))
 equipeRoutes.post('/agendamentos/:id/cancelar', validateIds('id'), recepcaoOuGestor, equipe.cancelar.bind(equipe))
+equipeRoutes.post('/agendamentos/:id/presenca', validateIds('id'), recepcaoOuGestor, validateBody(RegistrarPresencaDTO), equipe.registrarPresenca.bind(equipe))
 equipeRoutes.post('/agendamentos/:id/remarcar', validateIds('id'), recepcaoOuGestor, validateBody(RemarcarDTO), equipe.remarcar.bind(equipe))
 
 export default equipeRoutes
