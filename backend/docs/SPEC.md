@@ -376,7 +376,7 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 1 | Modelo de dados, migração inicial e seed | seção 5 e 7 | ☑ | |
 | 2 | `Clock` injetável, runner de jobs e endpoints `/dev` | RN-90 | ☑ | |
 | 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☑ | |
-| 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☐ | |
+| 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☑ | |
 | 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☐ | |
 | 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☐ | |
 | 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☐ | |
@@ -407,6 +407,12 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | RN-90: avançar o relógio em dev | `avancarRelogioRodandoJobs` em `src/jobs/relogioDev.ts` (passos de 1h); rotas `/dev/*` em `src/routes/devRoutes.ts`, bloqueadas em produção por `apenasDev` | `tests/clock.test.ts` ("endpoints /dev") |
 | Seção 7: leitura com sobrescrita por UBS | `ConfiguracaoService.get` em `src/services/ConfiguracaoService.ts` (UBS → global → erro); formato de cada chave em `src/services/configuracaoChaves.ts` | `tests/configuracao.test.ts` |
 | Seção 7: nada fixo no código | `get` lança erro se a chave não existe na tabela; o seed (`src/seeds/dados/configuracao.ts`) é o único lugar com os padrões | `tests/configuracao.test.ts` ("chave ausente lança erro") |
+| Seção 6 "Entrar": login por CPF + senha | `AuthService.entrarPaciente`; equipe por e-mail em `AuthService.entrarEquipe`; JWT com a sessão em `src/utils/jwt.ts` | `tests/auth.test.ts` |
+| Senha provisória [sugestão confirmada] | `PacienteService.cadastrar` e `redefinirSenha` geram a senha; `authPaciente()` em `src/middlewares/auth.ts` bloqueia até `AuthService.trocarSenhaPaciente` | `tests/auth.test.ts`, `tests/pacientes.test.ts` |
+| Perfis da equipe (RECEPCAO, ACS, GESTOR) | `authEquipe(...perfis)` em `src/middlewares/auth.ts`; dados sempre filtrados pela UBS da sessão | `tests/pacientes.test.ts` ("ACS não cadastra", "só dentro da UBS") |
+| RN-52: selo só no painel | `PacienteMapper.paraPaciente` (sem selo nem pontuação) × `paraEquipe` em `src/mappers/PacienteMapper.ts` | `tests/pacientes.test.ts` ("RN-52") |
+| RN-80: consentimento por canal | `PacienteService.cadastrar` grava `{ aceito, em }` por canal | `tests/pacientes.test.ts` |
+| Seção 7: `pontos.inicial` | `PacienteService.cadastrar` lê da configuração da UBS | `tests/pacientes.test.ts` ("pontuação inicial") |
 
 ## 13. Como rodar
 

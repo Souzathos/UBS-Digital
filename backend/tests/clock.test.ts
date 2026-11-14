@@ -6,7 +6,8 @@ import { AdjustableClock } from "../src/clock/AdjustableClock";
 import { relogioAjustavel } from "../src/clock";
 import { JobRunner } from "../src/jobs/runner";
 import { avancarRelogioRodandoJobs } from "../src/jobs/relogioDev";
-import { api } from "./helpers";
+import { after, before, beforeEach } from "node:test";
+import { api, authEquipe, clearDb, criarEquipe, criarUbs, startDb, stopDb } from "./helpers";
 
 const HORA = 60 * 60 * 1000
 
@@ -77,20 +78,32 @@ describe('relógio injetável (RN-90)', () => {
         assert.equal(relogio.now().toISOString(), new Date('2026-11-19T00:30:00').toISOString())
     })
 
+    describe('endpoints /dev', () => {
+    before(startDb)
+    beforeEach(clearDb)
+    after(stopDb)
+
+    it('RN-90: endpoints /dev exigem login da equipe', async () => {
+        const res = await api().get('/dev/relogio')
+        assert.equal(res.status, 401)
+    })
+
     it('RN-90: endpoints /dev avançam, definem e zeram o relógio', async () => {
-        const definir = await api().post('/dev/relogio/definir').send({ para: '2030-01-01T07:00:00-03:00' })
+        const auth = authEquipe(await criarEquipe((await criarUbs()).id))
+        const definir = await api().post('/dev/relogio/definir').set('Authorization', auth).send({ para: '2030-01-01T07:00:00-03:00' })
         assert.equal(definir.status, 200)
         assert.equal(new Date(definir.body.agora).getFullYear(), 2030)
 
-        const avancar = await api().post('/dev/relogio/avancar').send({ horas: 5 })
+        const avancar = await api().post('/dev/relogio/avancar').set('Authorization', auth).send({ horas: 5 })
         assert.equal(avancar.status, 200)
         assert.equal(avancar.body.passos, 5)
         assert.ok(new Date(avancar.body.agora).getTime() - new Date(definir.body.agora).getTime() >= 5 * HORA)
 
-        const invalido = await api().post('/dev/relogio/avancar').send({})
+        const invalido = await api().post('/dev/relogio/avancar').set('Authorization', auth).send({})
         assert.equal(invalido.status, 400)
 
-        const zerar = await api().post('/dev/relogio/zerar')
+        const zerar = await api().post('/dev/relogio/zerar').set('Authorization', auth)
         assert.ok(Math.abs(new Date(zerar.body.agora).getTime() - new Date().getTime()) < 5000)
+    })
     })
 })

@@ -5,6 +5,9 @@ import { CONFIGURACAO_PADRAO } from "../src/seeds/dados/configuracao";
 import { CategoriaAtendimento, Configuracao, OrigemSlot, Paciente, PerfilEquipe, Profissional, Slot, StatusSlot, TipoAtendimento, Ubs, UsuarioEquipe } from "../src/models";
 import { cpfComDigitos } from "../src/utils/cpf";
 import { gerarHash } from "../src/utils/hash";
+import { gerarToken } from "../src/utils/jwt";
+import { relogioAjustavel } from "../src/clock";
+import { TipoAutor } from "../src/models";
 
 export const api = () => supertest(app)
 
@@ -89,4 +92,22 @@ export async function criarPaciente(ubsId: number, dados: Partial<Paciente> = {}
 export async function semearConfiguracao() {
     const repo = AppDataSource.getRepository(Configuracao)
     await repo.save(Object.entries(CONFIGURACAO_PADRAO).map(([chave, valor]) => repo.create({ chave, valor: JSON.stringify(valor), ubsId: null })))
+}
+
+// Cabeçalho Authorization sem passar pelo login (o login tem testes próprios)
+export function authEquipe(usuario: UsuarioEquipe) {
+    return `Bearer ${gerarToken({ tipo: TipoAutor.EQUIPE, id: usuario.id, ubsId: usuario.ubsId, perfil: usuario.perfil })}`
+}
+
+export function authPaciente(paciente: Paciente) {
+    return `Bearer ${gerarToken({ tipo: TipoAutor.PACIENTE, id: paciente.id, ubsId: paciente.ubsId, deveTrocarSenha: paciente.deveTrocarSenha })}`
+}
+
+// RN-90: congela o relógio da aplicação num instante (horário local)
+export function congelarEm(data: string | Date) {
+    relogioAjustavel!.congelar(new Date(data))
+}
+
+export function zerarRelogio() {
+    relogioAjustavel!.zerar()
 }
