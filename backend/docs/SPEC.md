@@ -384,7 +384,7 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☑ | |
 | 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☑ | |
 | 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☑ | |
-| 8 | Página do link | RN-70 a RN-73 | ☐ | |
+| 8 | Página do link | RN-70 a RN-73 | ☑ | |
 | 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☐ | |
 | 10 | Fechamento: estado, mapa RN → código, contrato da API | — | ☐ | |
 
@@ -440,6 +440,12 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | RN-62: resposta encerra a etapa | `LembreteService.marcarRespondidas` chamado nas três ações | `tests/acoes.test.ts` ("RN-20") |
 | RN-71: idempotência das ações | early return em `confirmar`, `cancelar` e `remarcar` (mesmo slot) | `tests/acoes.test.ts` ("RN-71") |
 | RN-82: autor das ações | `autorPaciente` / `autorEquipe` em `src/services/autor.ts` + `LogAcaoService` | `tests/acoes.test.ts` ("recepção cancela em nome do paciente") |
+| RN-70: link com token, só hash, expira na consulta | `LinkService.validar` (via `LinkTokenService.resolver`); página de link inválido (404) ou expirado (410) em `src/web/templates/estado.ts` | `tests/link.test.ts` ("RN-70") |
+| RN-71: página mostra o estado; ações idempotentes | `LinkService.montarPagina` + `src/web/templates/agendamento.ts`; ações via `AgendamentoService` com POST → 303 (PRG) em `LinkController` | `tests/link.test.ts` ("RN-71", "RN-21 / RN-71") |
+| RN-22 pelo link | `LinkService.horariosParaRemarcar` (mesmas regras do app via `SlotService.listarParaPaciente`) + `src/web/templates/remarcar.ts` | `tests/link.test.ts` ("RN-22") |
+| RN-73: nome da UBS na página | cabeçalho de `pagina()` em `src/web/templates/layout.ts` | `tests/link.test.ts` ("RN-73") |
+| RN-52 / RN-57 na página | `LinkService.montarPagina` só põe tipo e profissional se o destinatário for o paciente; o selo nunca entra | `tests/link.test.ts` ("RN-52 e escape") |
+| Acessibilidade (seção 6) | HTML puro, sem JavaScript, fonte grande e alto contraste; passo de confirmação antes de cancelar | — |
 
 ## 13. Como rodar
 
