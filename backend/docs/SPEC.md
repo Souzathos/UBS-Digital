@@ -200,7 +200,7 @@ O modelo tem 16 entidades e serve para qualquer banco relacional. Os nomes estã
 - **Slot:** `id`, `profissionalId`, `tipoAtendimentoId`, `inicio`, `fim`, `origem: OrigemSlot`, `status: StatusSlot`
 - **Paciente:** `id`, `ubsId`, `nome`, `cpf`, `cns?`, `dataNascimento`, `telefone?`, `email?`, `possuiCelular`, `pushToken?`, `pontuacao` (inicial 100), `vulneravel`, `vulneravelAtribuidoPor?`, `vulneravelEm?`, `consentimentoCanais` (por canal: aceito e data), `senhaHash?`, **`deveTrocarSenha`** (acréscimo: senha provisória, ver seção 10)
 - **ContatoVinculado:** `id`, `pacienteId`, `nome`, `relacao` (pai, mãe, filho, cônjuge, outro parente, vizinho, amigo, outro), `telefone?`, `email?`, `contaPacienteId?` (quando o contato também usa o app), `recebeNotificacoes`, `consentimentoEm`, `consentimentoForma`, `ativo`
-- **Agendamento:** `id`, `pacienteId`, `slotId`, `status: StatusAgendamento`, `origem: OrigemAgendamento`, `remarcadoDeId?`, `criadoPorTipo: TipoAutor`, `criadoPorId`, `confirmadoEm?`, `canceladoEm?`, `canceladoPorTipo?`, `presencaRegistradaEm?`
+- **Agendamento:** `id`, `pacienteId`, `slotId`, `status: StatusAgendamento`, `origem: OrigemAgendamento`, `remarcadoDeId?`, `criadoPorTipo: TipoAutor`, `criadoPorId`, `confirmadoEm?`, `canceladoEm?`, `canceladoPorTipo?`, `presencaRegistradaEm?`, **`criadoEm`** (acréscimo: ordenação da agenda e do histórico)
 - **Notificacao:** `id`, `agendamentoId?`, `ofertaId?`, `destinatarioTipo` (paciente, contato, equipe), `destinatarioId`, `etapa: EtapaNotificacao`, `canal: Canal`, `status: StatusNotificacao`, `agendadaPara`, `enviadaEm?`, `respondidaEm?`, `tentativa`
 - **LinkToken:** `id`, `tokenHash`, `agendamentoId?`, `ofertaId?`, `destinatarioTipo`, `destinatarioId`, `expiraEm`, `usadoEm?`
 - **OfertaAdiantamento:** `id`, `slotId`, `agendamentoCandidatoId?`, `suplenteId?`, `ordem`, `simultanea`, `status: StatusOferta`, `enviadaEm`, `expiraEm`, `respondidaEm?`
@@ -212,7 +212,9 @@ O modelo tem 16 entidades e serve para qualquer banco relacional. Os nomes estã
 
 ### Restrições
 
-- Um slot tem no máximo 1 agendamento ativo (`PENDENTE` ou `CONFIRMADO`). Isso é garantido no banco (índice único parcial), para duas ofertas simultâneas aceitas ao mesmo tempo não ocuparem a mesma vaga.
+- Um slot tem no máximo 1 agendamento ativo (`PENDENTE` ou `CONFIRMADO`). Isso é garantido no banco pelo índice único parcial `agendamento_slot_ativo_uq`, para duas ofertas simultâneas aceitas ao mesmo tempo não ocuparem a mesma vaga.
+- Um profissional não tem dois slots começando no mesmo instante (`slot_profissional_inicio_uq`).
+- `Configuracao` tem uma linha por chave no escopo global e uma por (chave, UBS) (`configuracao_global_uq`, `configuracao_ubs_uq`).
 - Aceitar uma oferta, remarcar e cancelar rodam em uma transação única, com lock no slot.
 
 ## 6. Telas
@@ -354,7 +356,7 @@ Decidido em 13/11: o painel da UBS fica dentro do app React Native, e o login do
 2. **Hora de envio**: D-14, D-7 e D-3 saem na mesma hora de `lembrete.d0Hora` (07:00), única chave de hora da seção 7.
 3. **Token do link (RN-70)**: um por (agendamento, destinatário), reaproveitado nas etapas seguintes; expira no horário da consulta. O banco guarda só o hash SHA-256.
 4. **Paciente sem canal** na Camada 1: a notificação é criada e "enviada" pelo adaptador mock assim mesmo (o contato vinculado só entra na Camada 2).
-5. **Campo extra** `Paciente.deveTrocarSenha` para a senha provisória. Único acréscimo ao modelo da seção 5.
+5. **Campos extras** ao modelo da seção 5: `Paciente.deveTrocarSenha` (senha provisória) e `Agendamento.criadoEm` (ordenação). Nada mais foi acrescentado.
 6. **Presença** (`COMPARECEU`/`FALTOU`) só pode ser registrada a partir do início do dia da consulta.
 7. **Portas**: API 3333; Postgres dev 5433; Postgres de teste 5434.
 8. **Git**: branch `feat/camada-1`, um commit por parte, sem push até o usuário pedir.
@@ -371,7 +373,7 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | Parte | Item da seção 8 | RN | Estado | Commit |
 |---|---|---|---|---|
 | 0 | Estrutura base, Postgres, harness de testes, SPEC.md e CLAUDE.md | — | ☑ | (ver `git log`) |
-| 1 | Modelo de dados, migração inicial e seed | seção 5 e 7 | ☐ | |
+| 1 | Modelo de dados, migração inicial e seed | seção 5 e 7 | ☑ | |
 | 2 | `Clock` injetável, runner de jobs e endpoints `/dev` | RN-90 | ☐ | |
 | 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☐ | |
 | 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☐ | |
@@ -390,7 +392,15 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 
 | Regra | Onde é aplicada | Teste |
 |---|---|---|
-| (vazio até a Parte 1) | | |
+| Seção 5: modelo (16 entidades, 12 enums) | `src/models/*.ts`, registradas em `src/models/index.ts`; schema em `src/migrations/1794618432397-SchemaInicial.ts` | `tests/migrations.test.ts` ("deixa o banco igual aos modelos") |
+| Seção 5: 1 agendamento ativo por slot | índice parcial `agendamento_slot_ativo_uq` em `src/models/Agendamento.ts` | `tests/migrations.test.ts` ("recusa 2 agendamentos ativos no mesmo slot") |
+| Seção 7: padrões na tabela `Configuracao` | `src/seeds/dados/configuracao.ts` gravado por `executarSeed` em `src/seeds/seed.ts` | `tests/seed.test.ts` ("grava as 15 chaves") |
+| RN-02 (distribuição da cota) | `SlotService.marcarCota` em `src/services/SlotService.ts` (regra pura; a criação em lote vem na Parte 5) | `tests/seed.test.ts` ("40% dos slots na cota do app", "marcarCota distribui") |
+| RN-03 (antecedência por tipo) | campo `TipoAtendimento.antecedenciaMaximaDias` (a validação vem na Parte 5) | — |
+| RN-13 (preparo) | campo `TipoAtendimento.instrucoesPreparo` (vai nas mensagens na Parte 6) | — |
+| RN-70 (só o hash no banco) | campo `LinkToken.tokenHash` (geração na Parte 6) | — |
+| RN-82 (log de ações) | entidade `LogAcao` com `criadoEm` vindo do Clock (serviço na Parte 5) | — |
+| Senha provisória | campo `Paciente.deveTrocarSenha` (fluxo na Parte 4) | `tests/seed.test.ts` (1 paciente com troca pendente) |
 
 ## 13. Como rodar
 
@@ -401,7 +411,8 @@ cd backend
 cp .env.example .env                       # primeira vez
 npm install
 npm run dev                                # API em http://localhost:3333 (roda as migrations pendentes)
-npm run seed                               # dados de demonstração
+npm run seed                               # dados de demonstração (avisa se já aplicado)
+npm run seed -- --reset                    # apaga tudo e recria
 
 # testes
 npm run test:db                            # Postgres descartável na 5434
