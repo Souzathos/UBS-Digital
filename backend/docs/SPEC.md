@@ -383,7 +383,7 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☑ | |
 | 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☑ | |
 | 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☑ | |
-| 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☐ | |
+| 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☑ | |
 | 8 | Página do link | RN-70 a RN-73 | ☐ | |
 | 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☐ | |
 | 10 | Fechamento: estado, mapa RN → código, contrato da API | — | ☐ | |
@@ -433,6 +433,13 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | RN-63 / RN-73: link e nome da UBS na mensagem | `textoLembrete` | `tests/lembretes.test.ts` ("RN-63 / RN-70 / RN-73") |
 | RN-70: token aleatório, só hash, expira na consulta | `LinkTokenService.criar` e `resolver` em `src/services/LinkTokenService.ts` | `tests/lembretes.test.ts` ("RN-63 / RN-70 / RN-73") |
 | Canais mock | `CanalAdapter` (interface) e `MockAdapter` + `caixaDeSaida` em `src/notifications/`; `GET /dev/envios` | `tests/lembretes.test.ts` ("GET /dev/envios") |
+| RN-20: confirmar | `AgendamentoService.confirmar` | `tests/acoes.test.ts` ("RN-20") |
+| RN-21: cancelar antes do horário, inclusive confirmado | `AgendamentoService.cancelar` (slot volta a LIVRE, lembretes cancelados) | `tests/acoes.test.ts` ("RN-21") |
+| RN-22: remarcar como troca direta | `AgendamentoService.remarcar` (lock no paciente e nos dois slots em ordem de id; reaproveita `validarSlotParaAgendar` e `validarUmAtivoPorTipo`) | `tests/acoes.test.ts` ("RN-22") |
+| RN-30 (ponto de extensão) | `AgendamentoService.aoLiberarVaga`, chamado por cancelar e remarcar dentro da transação; vazio até a Camada 2 | — |
+| RN-62: resposta encerra a etapa | `LembreteService.marcarRespondidas` chamado nas três ações | `tests/acoes.test.ts` ("RN-20") |
+| RN-71: idempotência das ações | early return em `confirmar`, `cancelar` e `remarcar` (mesmo slot) | `tests/acoes.test.ts` ("RN-71") |
+| RN-82: autor das ações | `autorPaciente` / `autorEquipe` em `src/services/autor.ts` + `LogAcaoService` | `tests/acoes.test.ts` ("recepção cancela em nome do paciente") |
 
 ## 13. Como rodar
 

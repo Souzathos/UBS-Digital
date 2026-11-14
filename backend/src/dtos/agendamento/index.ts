@@ -13,3 +13,6 @@ export const AgendaDoDiaDTO = z.object({
     profissionalId: id.optional()
 })
 export type AgendaDoDiaInput = z.infer<typeof AgendaDoDiaDTO>
+
+export const RemarcarDTO = z.object({ slotId: id })
+export type RemarcarInput = z.infer<typeof RemarcarDTO>

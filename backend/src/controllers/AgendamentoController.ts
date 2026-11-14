@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { CriarAgendamentoInput } from "../dtos/agendamento";
+import { CriarAgendamentoInput, RemarcarInput } from "../dtos/agendamento";
 import { AgendamentoMapper } from "../mappers/AgendamentoMapper";
 import { sessaoPaciente } from "../middlewares/auth";
 import { AgendamentoService } from "../services/AgendamentoService";
+import { autorPaciente } from "../services/autor";
 
 // Ações do paciente pelo app
 export class AgendamentoController {
@@ -20,5 +21,24 @@ export class AgendamentoController {
             proximos: proximos.map(i => AgendamentoMapper.paraPaciente(i.agendamento, i.acoes)),
             historico: historico.map(i => AgendamentoMapper.paraPaciente(i.agendamento, i.acoes))
         })
+    }
+
+    async confirmar(req: Request, res: Response) {
+        const sessao = sessaoPaciente(req)
+        const agendamento = await this.service.confirmar(Number(req.params.id), autorPaciente(sessao), sessao.ubsId)
+        return res.status(200).json(AgendamentoMapper.paraPaciente(agendamento, this.service.acoesDisponiveis(agendamento)))
+    }
+
+    async cancelar(req: Request, res: Response) {
+        const sessao = sessaoPaciente(req)
+        const agendamento = await this.service.cancelar(Number(req.params.id), autorPaciente(sessao), sessao.ubsId)
+        return res.status(200).json(AgendamentoMapper.paraPaciente(agendamento, this.service.acoesDisponiveis(agendamento)))
+    }
+
+    async remarcar(req: Request, res: Response) {
+        const sessao = sessaoPaciente(req)
+        const { slotId } = req.body as RemarcarInput
+        const agendamento = await this.service.remarcar(Number(req.params.id), slotId, autorPaciente(sessao), sessao.ubsId)
+        return res.status(200).json(AgendamentoMapper.paraPaciente(agendamento, this.service.acoesDisponiveis(agendamento)))
     }
 }

@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { AgendamentoController } from "../controllers/AgendamentoController";
-import { CriarAgendamentoDTO } from "../dtos/agendamento";
+import { CriarAgendamentoDTO, RemarcarDTO } from "../dtos/agendamento";
 import { authPaciente } from "../middlewares/auth";
-import { validateBody } from "../middlewares/validateBody";
+import { validateBody, validateIds } from "../middlewares/validateBody";
 
 // Rotas do paciente (app)
 const agendamentoRoutes = Router()
@@ -12,5 +12,8 @@ agendamentoRoutes.use(authPaciente())
 
 agendamentoRoutes.post('/', validateBody(CriarAgendamentoDTO), agendamento.criar.bind(agendamento))
 agendamentoRoutes.get('/meus', agendamento.meus.bind(agendamento))
+agendamentoRoutes.post('/:id/confirmar', validateIds('id'), agendamento.confirmar.bind(agendamento))
+agendamentoRoutes.post('/:id/cancelar', validateIds('id'), agendamento.cancelar.bind(agendamento))
+agendamentoRoutes.post('/:id/remarcar', validateIds('id'), validateBody(RemarcarDTO), agendamento.remarcar.bind(agendamento))
 
 export default agendamentoRoutes
