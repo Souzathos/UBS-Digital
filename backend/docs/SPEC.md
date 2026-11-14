@@ -348,6 +348,7 @@ Para ligar uma rota quando ela sair: escrever a implementação real da interfac
 | Cadastro, senha provisória, ficha | `app/equipe/paciente/novo.tsx`, `app/equipe/senha-gerada.tsx`, `app/equipe/paciente/[id].tsx` |
 | RN-90: relógio de testes | `app/equipe/relogio.tsx` |
 | Camada 2: contratos, falsos e registro | `servicos/camada2/contratos.ts`, `servicos/camada2/falsos.ts`, `servicos/index.ts` |
+| Push do paciente: permissão, token, abrir o atendimento ao tocar | `notificacoes/push.ts` (usado em `app/paciente/_layout.tsx`) |
 | Avisos da consulta pela API real (paciente e painel) e UBS da sessão no cabeçalho | `servicos/avisos.ts`, `componentes/AvisosDaConsulta.tsx`, `useNomeUbs` em `sessao/SessaoProvider.tsx` |
 
 ## 7. Configurações
@@ -488,9 +489,10 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 10 | Fechamento: estado, mapa RN → código, contrato da API, verificação de ponta a ponta | — | ☑ | `63bbaaa` |
 | 11 | Ajuste às telas (14/11): consulta × procedimento, ruas e médico de referência, endereço, canais do Perfil, filtro da agenda | RN-06, RN-80, seção 9 | ☑ | `836e9b1` |
 
-| 12 | Rotas pedidas pelo app (14/11): avisos de um agendamento, UBS na sessão, destinatário na caixa de saída de dev | RN-10 a RN-12, RN-90 | ☑ | — |
+| 12 | Rotas pedidas pelo app (14/11): avisos de um agendamento, UBS na sessão, destinatário na caixa de saída de dev | RN-10 a RN-12, RN-90 | ☑ | `c5f2e01` |
+| 13 | Push pelo serviço do Expo (adiantado da Camada 3 para o vídeo da apresentação): registro do token e `ExpoPushAdapter` | RN-60, RN-80 | ☑ | `1deeac0` |
 
-**Camada 1 concluída em 13/11/2026**, ajustada às telas em 14/11 e completada com as rotas pedidas pelo app: 105 testes passando (`npm test`), typecheck limpo, e o roteiro de ponta a ponta da seção 13 rodado contra o servidor real.
+**Camada 1 concluída em 13/11/2026**, ajustada às telas em 14/11 e completada com as rotas pedidas pelo app e o push: 111 testes passando (`npm test`), typecheck limpo, e o roteiro de ponta a ponta da seção 13 rodado contra o servidor real.
 
 **O que a Camada 1 deixou pronto para a Camada 2** (pontos de extensão, todos dentro da transação da ação):
 - `AgendamentoService.aoLiberarVaga(manager, slot, agora)`: chamado por cancelar e remarcar. É onde nasce a oferta de adiantamento (RN-30 a RN-35). O cancelamento automático (RN-26) também deve passar por ele.
@@ -499,7 +501,7 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 - `Autor.tipo = CONTATO` já é aceito pelo `AgendamentoService` e pelo `LinkService` (RN-58); falta o cadastro do contato e o envio para ele (RN-55 a RN-57).
 - O "próximo paciente compatível" já está decidido (seção 9). Antes da Camada 2, falta decidir a RN-56.
 
-**Camadas 2, 3 e 4:** não iniciadas.
+**Camada 2:** não iniciada (falta decidir a RN-56). **Camada 3:** só o push pelo Expo está pronto (`PUSH_EXPO=true`); WhatsApp, SMS, e-mail e o escalonamento entre canais (RN-61) seguem no mock. **Camada 4:** não iniciada.
 
 ## 12. Mapa RN → código
 
@@ -567,6 +569,7 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | RN-10 a RN-12 no app: linha do tempo dos avisos | `AvisoService.doAgendamento` em `src/services/AvisoService.ts` (lê as `Notificacao` do agendamento); rotas `GET /agendamentos/:id/avisos` e `GET /equipe/agendamentos/:id/avisos` | `tests/avisos.test.ts` |
 | UBS na sessão (cabeçalho do app) | `AuthService.ubsDa` + `UbsMapper`; campo `ubs` no login e em `/auth/eu` | `tests/avisos.test.ts` ("o login e /auth/eu trazem a UBS") |
 | RN-90: destinatário na caixa de saída | `MensagemSaida.destinatarioNome` preenchido em `src/jobs/lembretesJob.ts` | `tests/avisos.test.ts` ("caixa de saída de dev") |
+| RN-60: push pelo Expo | `PacienteService.atualizarPushToken` (rota `PATCH /auth/paciente/push-token`); `ExpoPushAdapter` em `src/notifications/adapters/`, ligado por `PUSH_EXPO` no `Despachante`; `textoPush` em `src/notifications/mensagens.ts` | `tests/push.test.ts` |
 
 ## 13. Como rodar
 
@@ -631,6 +634,7 @@ Base: `http://localhost:3333` em dev. JSON em tudo, exceto a página do link (HT
 
 `ubs` é `{ id, nome, endereco, telefone }` (nome no cabeçalho do app).
 | `PATCH /auth/paciente/canais` | paciente | `{ canais: ["PUSH", "WHATSAPP", "SMS", "EMAIL"] }` (os ligados) | paciente; os canais fora da lista ficam `{ aceito: false, em }` (RN-80) |
+| `PATCH /auth/paciente/push-token` | paciente | `{ token: "ExponentPushToken[...]" \| null }` | 204; o token fica só com este paciente (RN-60) |
 
 O paciente (para ele mesmo e para a equipe) traz também `rua: { id, nome } | null`, `numero` e `medicoReferencia: { id, nome } | null`, usado em "Seu médico: Dra. Helena (pela sua rua)".
 
