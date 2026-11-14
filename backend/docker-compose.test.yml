@@ -1,0 +1,26 @@
+# Banco descartável para os testes: os dados ficam em memória (tmpfs) e somem no "down".
+# Nome próprio: sem ele, o "down" dos testes derrubaria a rede do banco de desenvolvimento.
+#
+#   npm run test:db        # sobe e espera ficar saudável
+#   npm test               # roda os testes
+#   npm run test:db:stop   # derruba
+
+name: ubs-digital-test
+
+services:
+  postgres-test:
+    image: postgres:17
+    container_name: ubs-digital-postgres-test
+    environment:
+      POSTGRES_USER: ubs
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: ubs_digital_test
+    ports:
+      - "5434:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ubs -d ubs_digital_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 30

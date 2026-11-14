@@ -1,13 +1,50 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "ubs-digital-backend",
+  "version": "0.1.0",
+  "description": "API do sistema de redução de faltas na APS (Camada 1)",
+  "main": "dist/server.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node-dev --files --respawn src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p tests/tsconfig.json --noEmit",
+    "typeorm": "typeorm-ts-node-commonjs -d src/config/dataSource.ts",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert",
+    "seed": "ts-node --files src/seeds/seed.ts",
+    "test": "TS_NODE_PROJECT=tests/tsconfig.json node --require ts-node/register --require ./tests/setup.ts --test --test-concurrency=1 tests/*.test.ts",
+    "test:db": "docker compose -f docker-compose.test.yml up -d --wait",
+    "test:db:stop": "docker compose -f docker-compose.test.yml down"
   },
-  "keywords": [],
-  "author": "",
+  "engines": {
+    "node": ">=22.13"
+  },
   "license": "ISC",
-  "type": "commonjs"
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "date-fns": "^4.4.0",
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^1.1.3",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.3.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^6.0.3"
+  }
 }

@@ -1,0 +1,32 @@
+# Infra local de desenvolvimento: só o banco. A API roda em Node no host (cd backend && npm run dev).
+#
+#   docker compose up -d        # sobe o Postgres
+#   docker compose down         # para (mantém os dados)
+#   docker compose down -v      # para e APAGA os dados
+#
+# Porta 5433 no host porque a 5432 já é usada pelo Postgres de outro projeto nesta máquina.
+# As credenciais batem com backend/.env.example.
+
+name: ubs-digital
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: ubs-digital-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ubs
+      POSTGRES_PASSWORD: ubs
+      POSTGRES_DB: ubs_digital
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ubs -d ubs_digital"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  pgdata:
