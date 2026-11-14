@@ -50,3 +50,10 @@ export function sessaoPaciente(req: Request): SessaoPaciente {
     if(req.auth?.tipo !== TipoAutor.PACIENTE) throw new UnauthorizedError()
     return req.auth
 }
+
+// Equipe, ou paciente que já trocou a senha provisória (catálogo, slots)
+export function authEquipeOuPaciente(req: Request, _res: Response, next: NextFunction) {
+    const sessao = lerSessao(req)
+    if(sessao.tipo === TipoAutor.PACIENTE && sessao.deveTrocarSenha) throw new ForbiddenError('Troque a senha provisória antes de continuar')
+    next()
+}

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { OrigemAgendamento, StatusAgendamento, TipoAutor } from "./enums";
 import { Paciente } from "./Paciente";
 import { Slot } from "./Slot";
@@ -59,6 +59,7 @@ export class Agendamento {
     presencaRegistradaEm: Date | null
 
     // Acréscimo ao modelo da spec: ordenação da agenda e do histórico
-    @CreateDateColumn({ type: 'timestamptz' })
+    // Gravado pelo service com o horário do Clock (RN-90); o default só cobre inserts manuais
+    @Column({ type: 'timestamptz', default: () => 'now()' })
     criadoEm: Date
 }

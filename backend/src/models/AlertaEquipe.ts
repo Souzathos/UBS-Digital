@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Agendamento } from "./Agendamento";
 import { StatusAlerta } from "./enums";
 import { Paciente } from "./Paciente";
@@ -48,7 +48,8 @@ export class AlertaEquipe {
     @Column({ type: 'text', nullable: true })
     observacao: string | null
 
-    @CreateDateColumn({ type: 'timestamptz' })
+    // Gravado pelo service com o horário do Clock (RN-90); o default só cobre inserts manuais
+    @Column({ type: 'timestamptz', default: () => 'now()' })
     criadoEm: Date
 
     @Column({ type: 'timestamptz', nullable: true })

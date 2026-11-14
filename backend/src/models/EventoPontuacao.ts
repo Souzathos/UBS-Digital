@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Agendamento } from "./Agendamento";
 import { Paciente } from "./Paciente";
 
@@ -31,6 +31,7 @@ export class EventoPontuacao {
     @Column({ type: 'int' })
     saldoApos: number
 
-    @CreateDateColumn({ type: 'timestamptz' })
+    // Gravado pelo service com o horário do Clock (RN-90); o default só cobre inserts manuais
+    @Column({ type: 'timestamptz', default: () => 'now()' })
     criadoEm: Date
 }

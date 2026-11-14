@@ -377,7 +377,7 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 2 | `Clock` injetável, runner de jobs e endpoints `/dev` | RN-90 | ☑ | |
 | 3 | `ConfiguracaoService` (global + sobrescrita por UBS) | seção 7 | ☑ | |
 | 4 | Autenticação da equipe e do paciente; cadastro com senha provisória | seção 6, RN-52 | ☑ | |
-| 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☐ | |
+| 5 | Slots com cota, agendar pela recepção e pelo app | RN-01 a RN-05, RN-82 | ☑ | |
 | 6 | Lembretes D-14/D-7/D-3/D-0 via job, canal mock, token do link | RN-10 a RN-13, RN-63, RN-70 | ☐ | |
 | 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☐ | |
 | 8 | Página do link | RN-70 a RN-73 | ☐ | |
@@ -413,6 +413,14 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | RN-52: selo só no painel | `PacienteMapper.paraPaciente` (sem selo nem pontuação) × `paraEquipe` em `src/mappers/PacienteMapper.ts` | `tests/pacientes.test.ts` ("RN-52") |
 | RN-80: consentimento por canal | `PacienteService.cadastrar` grava `{ aceito, em }` por canal | `tests/pacientes.test.ts` |
 | Seção 7: `pontos.inicial` | `PacienteService.cadastrar` lê da configuração da UBS | `tests/pacientes.test.ts` ("pontuação inicial") |
+| RN-01: app só agenda tipos liberados | `AgendamentoService.validarSlotParaAgendar`; listas filtradas em `CatalogoService.listarTipos` e `SlotService.listarParaPaciente` | `tests/agendamento.test.ts` ("RN-01") |
+| RN-02: cota do app | criação em lote `SlotService.criarEmLote` (cota da Configuracao via `marcarCota`); app só vê/usa `origem=APP` em `listarParaPaciente` e `validarSlotParaAgendar` | `tests/agendamento.test.ts` ("RN-02") |
+| RN-03: antecedência máxima do tipo | `validarSlotParaAgendar` (app e recepção) e janela de `listarParaPaciente` | `tests/agendamento.test.ts` ("RN-03") |
+| RN-04: 1 agendamento ativo por tipo | `AgendamentoService.validarUmAtivoPorTipo`, com lock no paciente | `tests/agendamento.test.ts` ("RN-04") |
+| RN-05: < N dias nasce CONFIRMADO | `AgendamentoService.criar` (`agendamento.confirmadoAutomaticoDias`) | `tests/agendamento.test.ts` ("RN-05") |
+| RN-82: log de ações | `LogAcaoService.registrar` (mesma transação da ação; horário do Clock) | `tests/agendamento.test.ts` ("RN-82") |
+| Restrição: lock no slot | `AgendamentoService.travarSlot` (`SELECT ... FOR UPDATE`) + índice parcial | `tests/agendamento.test.ts` ("só um leva") |
+| Seção 6: "Minhas consultas" e "Agenda do dia" | `AgendamentoService.listarDoPaciente`, `agendaDoDia`, `acoesDisponiveis` | `tests/agendamento.test.ts` |
 
 ## 13. Como rodar
 

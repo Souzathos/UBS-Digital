@@ -111,3 +111,32 @@ export function congelarEm(data: string | Date) {
 export function zerarRelogio() {
     relogioAjustavel!.zerar()
 }
+
+// Cenário-base dos testes de agendamento: relógio congelado na segunda 16/11/2026 às 10:00,
+// configuração padrão, uma UBS com recepção, um profissional, um tipo liberado para o app e um só de balcão.
+export const AGORA = '2026-11-16T10:00:00'
+
+export function emDias(dias: number, hora = '09:00') {
+    const base = new Date(`2026-11-16T${hora}:00`)
+    base.setDate(base.getDate() + dias)
+    return base
+}
+
+export async function montarCenario() {
+    await semearConfiguracao()
+    congelarEm(AGORA)
+    const ubs = await criarUbs()
+    const recepcao = await criarEquipe(ubs.id, PerfilEquipe.RECEPCAO)
+    const profissional = await criarProfissional(ubs.id)
+    const tipoApp = await criarTipo(ubs.id, { nome: 'Consulta médica', permiteAgendamentoApp: true, antecedenciaMaximaDias: 60 })
+    const tipoBalcao = await criarTipo(ubs.id, { nome: 'Enfermagem', permiteAgendamentoApp: false, antecedenciaMaximaDias: 30 })
+    const paciente = await criarPaciente(ubs.id)
+
+    return {
+        ubs, recepcao, profissional, tipoApp, tipoBalcao, paciente,
+        authRecepcao: authEquipe(recepcao),
+        authPaciente: authPaciente(paciente),
+        slot: (dias: number, dados: Partial<Slot> = {}, hora = '09:00') =>
+            criarSlot(profissional.id, dados.tipoAtendimentoId ?? tipoApp.id, emDias(dias, hora), dados)
+    }
+}
