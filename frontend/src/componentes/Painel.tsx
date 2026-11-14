@@ -12,11 +12,12 @@ export function IconeSelo() {
     return <Icone nome="selo" cor={cores.aviso} tamanho={18} traco={2.2} />
 }
 
-// Número grande com legenda ("3 compareceram").
+// Número grande com legenda ("3 compareceram"). A largura mínima cresce com a letra: com letra
+// grande, os indicadores passam para a linha de baixo em vez de quebrar a palavra no meio.
 export function Indicador({ valor, rotulo, exemplo }: { valor: number; rotulo: string; exemplo?: boolean }) {
     const { cores, raio, fonte } = useTheme()
     return (
-        <View accessible accessibilityLabel={`${valor} ${rotulo}${exemplo ? ', exemplo' : ''}`} style={{ flex: 1, paddingVertical: 8, paddingHorizontal: 12, borderWidth: 1, borderColor: cores.borda, borderRadius: raio.md, backgroundColor: cores.superficie }}>
+        <View accessible accessibilityLabel={`${valor} ${rotulo}${exemplo ? ', exemplo' : ''}`} style={{ flexGrow: 1, flexBasis: fonte(100), minWidth: fonte(100), paddingVertical: 8, paddingHorizontal: 10, borderWidth: 1, borderColor: cores.borda, borderRadius: raio.md, backgroundColor: cores.superficie }}>
             <Texto peso="600" numeros style={{ fontSize: fonte(22), lineHeight: fonte(26) }}>
                 {String(valor)}
             </Texto>

@@ -1,5 +1,7 @@
 # Handoff: frontend do UBS Digital
 
+> **Estado em 14/11/2026:** o app foi construído a partir deste handoff (partes 0 a 9). O que existe, o que ainda usa dados falsos e as rotas que faltam no backend estão em [`backend/docs/SPEC.md`](backend/docs/SPEC.md), seção 6, "Estado do front". Este documento fica como registro das decisões iniciais.
+
 Este documento é o ponto de partida do chat que vai arquitetar e construir o app. O backend da Camada 1 está pronto e testado: 97 testes, branch `feat/camada-1`. O app ainda não começou: `frontend/` é um projeto Expo 58 vazio.
 
 ## 1. Leia antes de qualquer coisa

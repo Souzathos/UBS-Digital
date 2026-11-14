@@ -52,7 +52,7 @@ export function MenuAcessibilidade({ visivel, fechar, leitura }: Props) {
                             <Texto titulo variante="titulo" peso="700" style={{ fontSize: tema.fonte(24) }}>
                                 Acessibilidade
                             </Texto>
-                            <Pressable onPress={aoFechar} accessibilityRole="button" style={e.fechar}>
+                            <Pressable onPress={aoFechar} accessibilityRole="button" accessibilityLabel="Fechar" style={e.fechar}>
                                 <Texto variante="botao" style={{ fontSize: tema.fonte(16) }}>
                                     Fechar
                                 </Texto>

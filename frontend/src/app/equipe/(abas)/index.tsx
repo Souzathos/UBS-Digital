@@ -81,7 +81,7 @@ export default function Agenda() {
                 ))}
             </View>
 
-            <View style={{ flexDirection: 'row', gap: 8 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                 <Indicador valor={compareceram} rotulo={compareceram === 1 ? 'compareceu' : 'compareceram'} />
                 <Indicador valor={faltaram} rotulo={faltaram === 1 ? 'faltou' : 'faltaram'} />
                 <Indicador valor={reaproveitadas.data ?? 0} rotulo="reaproveitadas" exemplo />

@@ -4,7 +4,7 @@
 
 ## O que é
 
-Backend Node + TypeScript + Express que lembra o paciente de consultas e exames da UBS em várias etapas (D-14, D-7, D-3, D-0), deixa confirmar, cancelar ou remarcar pelo app ou por um link sem instalação, e reaproveita cada vaga liberada. O app React Native (Expo) para paciente e equipe da UBS **está em construção** em `frontend/`, a partir de [`HANDOFF-FRONTEND.md`](HANDOFF-FRONTEND.md); as telas desenhadas ficam em `frontend/design/`.
+Backend Node + TypeScript + Express que lembra o paciente de consultas e exames da UBS em várias etapas (D-14, D-7, D-3, D-0), deixa confirmar, cancelar ou remarcar pelo app ou por um link sem instalação, e reaproveita cada vaga liberada. O app React Native (Expo) para paciente e equipe da UBS está em `frontend/`, com todas as telas do design (as da Camada 2 com dados falsos atrás das interfaces de serviço); as telas desenhadas ficam em `frontend/design/`.
 
 ## Stack
 
@@ -106,7 +106,7 @@ npm run typecheck && npm run lint && npm test
 
 - **Modelo de atendimento (RN-06):** Médico faz **consultas** (`CONSULTA`), sempre com o médico de referência da rua do paciente. Enfermagem faz **procedimentos** (`PROCEDIMENTO`), que não dependem da rua.
 - **Próximo passo do backend:** a Camada 2, que começa pelos pontos de extensão `AgendamentoService.aoLiberarVaga` e `PresencaService.aoRegistrarPresenca`. Falta decidir a RN-56.
-- **Front:** arquitetura aprovada em 14/11 (plano em partes 0 a 9, estado em "Estado do front" na seção 6 do SPEC). Partes 0 (fundação) e 1 (API, sessão, login, guardas de rota) concluídas; próxima: Parte 2 (Meus atendimentos, confirmar, cancelar).
+- **Front concluído em 14/11** (partes 0 a 9, 46 testes, roteiros de ponta a ponta no Expo Web). Estado, mapa das peças, rotas que faltam no backend e roteiro de demonstração em "Estado do front", seção 6 do SPEC. Quando uma rota da Camada 2 sair, troque o serviço falso pelo real em `frontend/src/servicos/index.ts`.
 
 ## Git
 

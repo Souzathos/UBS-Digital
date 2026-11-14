@@ -56,7 +56,7 @@ export function Tela({ children, titulo, leitura, cabecalho = 'ubs', rodape, rol
                     <View style={painel ? e.caixaLogo : undefined}>
                         <Image source={require('../../assets/imagens/logo-ubs.png')} style={painel ? e.logoPainel : e.logo} resizeMode="contain" accessible={false} />
                     </View>
-                    <View>
+                    <View style={{ flexShrink: 1 }}>
                         <Texto variante="subtitulo" peso="600" style={{ lineHeight: tema.fonte(21) }}>
                             {UBS_NOME}
                         </Texto>
@@ -130,7 +130,7 @@ const useEstilos = criarEstilos(t => ({
     raiz: { flex: 1, backgroundColor: t.cores.fundo },
     conteudo: { paddingHorizontal: t.espaco.lg, paddingBottom: t.espaco.xl, gap: 14 },
     cabecalho: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-    marca: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
+    marca: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 },
     logo: { width: 49, height: 36 },
     caixaLogo: { paddingVertical: 3, paddingHorizontal: 5, borderRadius: 8, backgroundColor: '#FFFFFF' },
     logoPainel: { width: 42, height: 31 },

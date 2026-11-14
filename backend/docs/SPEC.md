@@ -221,7 +221,7 @@ O modelo tem 16 entidades e serve para qualquer banco relacional. Os nomes estã
 
 ## 6. Telas
 
-São 3 superfícies: o app (paciente e contato vinculado no mesmo app), a página do link e o painel da UBS. A página do link é servida pelo backend. O app (paciente e painel da equipe) está em construção em `frontend/`; o estado de cada parte está em "Estado do front", no fim desta seção.
+São 3 superfícies: o app (paciente e contato vinculado no mesmo app), a página do link e o painel da UBS. A página do link é servida pelo backend. O app (paciente e painel da equipe) está em `frontend/`, com todas as telas desenhadas; o estado de cada parte está em "Estado do front", no fim desta seção.
 
 ### App React Native: paciente
 
@@ -276,15 +276,51 @@ Atualizado ao fim de cada parte. ☑ = feito e verificado, ☐ = pendente.
 | Parte | Conteúdo | RN | Estado | Commit |
 |---|---|---|---|---|
 | 0 | Fundação: Expo Router, fontes, tokens e 3 paletas, ThemeProvider + `useTheme` + `criarEstilos`, componentes base, preferências e menu de acessibilidade, datas e rótulos, vitrine de desenvolvimento | seção 6 | ☑ | `ce0936a` |
-| 1 | Cliente da API, tipos, sessão, guardas de rota, Entrar (paciente e equipe), Crie sua senha, abas do paciente e da equipe | senha provisória, RN-52 | ☑ | — |
-| 2 | Paciente: Meus atendimentos, detalhe, Confirmar, Cancelar | RN-12, RN-20, RN-21 | ☐ | |
-| 3 | Paciente: Agendar 1 a 4, erros, Remarcar | RN-01, RN-04, RN-06, RN-22 | ☐ | |
-| 4 | Paciente: Perfil e ouvir esta tela | RN-06, RN-80 | ☐ | |
-| 5 | Equipe: Agenda de hoje e presença | fluxo C, RN-82 | ☐ | |
-| 6 | Equipe: Pacientes, cadastro, senha gerada, ficha, agendar pela recepção | RN-06, RN-52 | ☐ | |
-| 7 | Equipe: Relógio de desenvolvimento | RN-90 | ☐ | |
-| 8 | Camada 2 com dados falsos | RN-26, 27, 30–36, 40, 50, 55 | ☐ | |
-| 9 | Fechamento: rotas que faltam no backend, roteiro de demonstração | — | ☐ | |
+| 1 | Cliente da API, tipos, sessão, guardas de rota, Entrar (paciente e equipe), Crie sua senha, abas do paciente e da equipe | senha provisória, RN-52 | ☑ | `3febb65` |
+| 2 | Paciente: Meus atendimentos (próximo, depois, histórico), detalhe, confirmar, cancelar em dois passos, remarcar com grade de horários | RN-12, RN-20 a RN-22 | ☑ | `8da059b` |
+| 3 | Paciente: agendar em 4 passos (Médico/Enfermagem → item → horário → conferir), aviso de duplicado, paciente sem rua | RN-01, RN-04, RN-05, RN-06 | ☑ | `05a7a38` |
+| 4 | Paciente: Perfil com canais (PATCH na hora), seu médico, trocar senha | RN-06, RN-80 | ☑ | `fd43052` |
+| 5 | Equipe: agenda do dia com navegação, filtros, indicadores, presença, confirmar/cancelar/remarcar em nome do paciente | fluxo C, RN-20 a RN-22, RN-52, RN-82 | ☑ | `b86b7b4` |
+| 6 | Equipe: pacientes com busca, cadastro com rua → médico, senha provisória, ficha, agendar pela recepção com "Só recepção" | RN-01, RN-02, RN-06, RN-52, RN-80 | ☑ | `d1dfc72` |
+| 7 | Equipe: relógio de testes (avançar, voltar ao real, caixa de saída) | RN-90 | ☑ | `972feb6` |
+| 8 | Camada 2 com dados falsos: avisos da consulta, sem resposta, oferta, ofertas e suplentes, ofertas em andamento, alertas, contato e selo, reaproveitadas | RN-25 a RN-27, RN-30 a RN-36, RN-40, RN-50, RN-55 a RN-57 | ☑ | `bb5605c` |
+| 9 | Fechamento: acessibilidade conferida nas telas reais, rotas que faltam no backend, roteiro de demonstração | — | ☑ | — |
+
+**Verificação:** 46 testes unitários (`npm test` em `frontend/`), typecheck e lint limpos, pacote iOS e web gerados. Roteiros de ponta a ponta no Expo Web contra a API real (Chrome automatizado): login e guardas (20 cenários), paciente do primeiro acesso ao cancelamento (20), painel (19), Camada 2 (16) e acessibilidade (3: letra muito grande, alto contraste, preferências salvas). Os roteiros criam pacientes de teste próprios e não mexem nos pacientes do seed.
+
+**Decisões tomadas durante a construção (14/11):**
+- O detalhe de um agendamento sai da lista (`/agendamentos/meus` ou `/equipe/agenda` do dia), porque não existe rota de um agendamento só.
+- Agendar pelo app avisa "você já tem uma marcada" ao escolher o item quando a lista já mostra um ativo do mesmo tipo. É só um atalho de exibição: quem decide é a API (RN-04, 409). Depois de um 409, o app relê a lista para saber se foi duplicado ou horário ocupado.
+- A agenda da equipe usa o relógio da API como "hoje" quando `/dev/relogio` existe, para a demonstração dos 14 dias funcionar; fora de dev vale o relógio do aparelho.
+- O botão de sair da equipe fica no fim da Agenda (o design do painel não tem sair).
+- A senha provisória passa da tela de cadastro para a tela da senha só em memória, nunca pela URL.
+- Nenhum valor da seção 7 aparece fixo nas telas (ex.: o app não escreve "48 horas" nem "−30 pontos"); os textos de prazo usam as datas que o serviço devolve.
+
+**O que falta no backend para o app** (nenhuma rota foi criada no backend; os contratos propostos estão em `frontend/src/servicos/camada2/contratos.ts`):
+
+| Rota proposta | Para quê | Hoje no app |
+|---|---|---|
+| `GET /agendamentos/:id/avisos` | Linha do tempo D-14 a D-0 no detalhe, prazo de resposta (RN-26) e explicação de cancelada sem resposta | Dados falsos (`AvisosServico`) |
+| Nome da UBS em `/auth/eu` (ou `GET /ubs/atual`) | Cabeçalho "UBS Feitoria" | Fixo em `src/config.ts` |
+| `GET /ofertas/minhas`, `POST /ofertas/:id/aceitar`, `POST /ofertas/:id/manter` | Oferta de vaga mais cedo (RN-30 a RN-35) | Dados falsos |
+| `GET /pacientes/eu/compromisso`, `GET/POST/DELETE /suplentes` | Aviso de pontuação sem número (RN-40) e lista de suplentes (RN-36) | Dados falsos |
+| `GET /equipe/ofertas` e o número de vagas reaproveitadas no dia | Ofertas em andamento e indicador da agenda | Dados falsos |
+| `GET /equipe/alertas`, `POST /equipe/alertas/:id/atribuir`, `/resolver` | Alertas de vulneráveis (RN-27) | Dados falsos |
+| `GET/POST /pacientes/:id/contatos`, `PATCH /pacientes/:id/selo` | Contato vinculado (RN-55 a RN-58) e selo (RN-50) na ficha | Dados falsos |
+| Horário e nome do destinatário em `GET /dev/envios` | Relógio de testes mostrar "26/11 07:00 · Osvaldo M." | Mostra "paciente nº 12" |
+
+Para ligar uma rota quando ela sair: escrever a implementação real da interface (ex.: `ofertasApi` com `requisitar`) e trocar a linha correspondente em `frontend/src/servicos/index.ts`. As telas não mudam.
+
+**Roteiro de demonstração** (backend rodando, `npm run seed -- --reset`, app com `npx expo start`):
+1. Paciente: entrar como Fernanda (`555.666.777-20`, senha `123456`) e criar a senha. Ver "Meus atendimentos" e "Seu médico".
+2. Agendar: Médico → Consulta clínica geral → só horários da médica da rua → conferir → marcado. Tentar marcar outra igual: aviso de duplicado (RN-04).
+3. Confirmar presença, remarcar (o antigo vai para o histórico como Remarcado) e cancelar com o aviso de que não prejudica.
+4. Perfil: desligar e ligar canais; "Acessibilidade": letra Muito grande, alto contraste, Ouvir esta tela.
+5. Rita (`666.777.888-30`): consulta médica dá a orientação de procurar a recepção (sem rua).
+6. Equipe (`recepcao@ubs.local`): cadastrar paciente escolhendo a rua (mostra o médico), entregar a senha provisória, agendar pela recepção com os horários "Só recepção".
+7. Agenda: navegar até o dia do atendimento, abrir a linha e registrar Compareceu. Antes do dia, a API recusa com mensagem.
+8. Relógio de testes: +14 dias e ver os lembretes na caixa de saída. "Voltar ao horário real" no fim.
+9. Camada 2 (etiqueta "Exemplo"): oferta de vaga mais cedo, avisos da consulta, alertas, ofertas em andamento, selo na ficha.
 
 **Onde está cada peça do app** (`frontend/src/`):
 
@@ -305,6 +341,16 @@ Atualizado ao fim de cada parte. ☑ = feito e verificado, ☐ = pendente.
 | Sessão: token no SecureStore (localStorage na web), restaura com `/auth/eu` | `sessao/SessaoProvider.tsx`, `sessao/armazenamento.ts` |
 | Senha provisória: só "Crie sua senha"; cada perfil só na sua área | `sessao/guardas.ts` + `Stack.Protected` em `app/_layout.tsx` |
 | Barras de abas do design (paciente e equipe) | `componentes/BarraAbas.tsx` |
+| Hooks de dados por área (TanStack Query, invalidação depois de cada ação) | `hooks/paciente.ts`, `hooks/equipe.ts`, `hooks/camada2.ts` |
+| RN-06 na tela: seu médico pela rua; rua → médico no cadastro | `componentes/CartaoMedico.tsx`, `componentes/SeletorRua.tsx` |
+| RN-20 a RN-22 (paciente): confirmar, cancelar, remarcar | `app/paciente/atendimento/[id]/index.tsx`, `.../remarcar.tsx` |
+| RN-01 a RN-06 no agendar pelo app | `app/paciente/(abas)/agendar.tsx` |
+| RN-80: canais no Perfil | `app/paciente/(abas)/perfil.tsx` |
+| Fluxo C e ações da recepção | `app/equipe/(abas)/index.tsx`, `app/equipe/agendamento/[id].tsx` |
+| RN-02 "Só recepção" na grade | `componentes/GradeHorarios.tsx` (`marcarReservados`) |
+| Cadastro, senha provisória, ficha | `app/equipe/paciente/novo.tsx`, `app/equipe/senha-gerada.tsx`, `app/equipe/paciente/[id].tsx` |
+| RN-90: relógio de testes | `app/equipe/relogio.tsx` |
+| Camada 2: contratos, falsos e registro | `servicos/camada2/contratos.ts`, `servicos/camada2/falsos.ts`, `servicos/index.ts` |
 
 ## 7. Configurações
 
