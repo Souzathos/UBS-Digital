@@ -4,7 +4,7 @@
 
 ## O que é
 
-Backend Node + TypeScript + Express que lembra o paciente de consultas e exames da UBS em várias etapas (D-14, D-7, D-3, D-0), deixa confirmar, cancelar ou remarcar pelo app ou por um link sem instalação, e reaproveita cada vaga liberada. O app React Native (Expo) para paciente, contato vinculado e equipe da UBS **ainda não começou: nesta fase o trabalho é 100% backend**. Nada em `frontend/` deve ser alterado até o usuário pedir.
+Backend Node + TypeScript + Express que lembra o paciente de consultas e exames da UBS em várias etapas (D-14, D-7, D-3, D-0), deixa confirmar, cancelar ou remarcar pelo app ou por um link sem instalação, e reaproveita cada vaga liberada. O app React Native (Expo) para paciente, contato vinculado e equipe da UBS **ainda não começou**. O trabalho do front começa por um novo chat a partir de [`HANDOFF-FRONTEND.md`](HANDOFF-FRONTEND.md); as telas desenhadas ficam em `frontend/design/`.
 
 ## Stack
 
@@ -13,7 +13,7 @@ Backend Node + TypeScript + Express que lembra o paciente de consultas e exames 
 | Backend | Node 24 · TypeScript · Express 5 · TypeORM (migrations, nunca `synchronize`) · PostgreSQL 17 · Zod · JWT + bcryptjs |
 | Testes | `node:test` + supertest, banco descartável em Docker (`backend/docker-compose.test.yml`, porta 5434) |
 | Infra dev | `docker-compose.yml` na raiz: Postgres na porta **5433** (a 5432 é de outro projeto nesta máquina) |
-| App (futuro) | Expo / React Native com Expo Router (`frontend/AGENTS.md`); tema via `useTheme` |
+| App (a começar) | Expo 58 / React Native com Expo Router (`frontend/AGENTS.md`); ThemeProvider próprio + `useTheme` + StyleSheet; telas em `frontend/design/`; ver `HANDOFF-FRONTEND.md` |
 
 ## Estrutura do backend
 
@@ -74,7 +74,11 @@ Nunca rode `npm test` apontando para o banco de desenvolvimento: o harness recus
 
 ## Estado
 
-**Camada 1 concluída em 13/11/2026** (branch `feat/camada-1`, 84 testes). O que existe, onde está cada regra e o contrato da API para o app estão no SPEC.md (seções 11, 12 e 14). A Camada 2 começa pelos pontos de extensão `AgendamentoService.aoLiberarVaga` e `PresencaService.aoRegistrarPresenca`, e depende das decisões abertas da seção 9 da spec.
+**Camada 1 concluída em 13/11/2026 e ajustada às telas em 14/11** (branch `feat/camada-1`, 97 testes). O que existe, onde está cada regra e o contrato da API para o app estão no SPEC.md (seções 11, 12 e 14).
+
+- **Modelo de atendimento (RN-06):** Médico faz **consultas** (`CONSULTA`), sempre com o médico de referência da rua do paciente. Enfermagem faz **procedimentos** (`PROCEDIMENTO`), que não dependem da rua.
+- **Próximo passo do backend:** a Camada 2, que começa pelos pontos de extensão `AgendamentoService.aoLiberarVaga` e `PresencaService.aoRegistrarPresenca`. Falta decidir a RN-56.
+- **Próximo passo do front:** `HANDOFF-FRONTEND.md`.
 
 ## Git
 

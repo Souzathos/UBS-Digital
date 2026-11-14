@@ -52,6 +52,7 @@ Cada regra tem um código (RN-xx) para ser citada no código, nos testes e nos c
 - **RN-03** A antecedência máxima é definida por tipo de atendimento (consulta na UBS: 60 dias; exames: 60 dias até o time definir outro valor).
 - **RN-04** [sugestão, **confirmada**] O paciente tem no máximo 1 agendamento ativo por tipo de atendimento. Evita que alguém segure várias vagas.
 - **RN-05** [sugestão, **confirmada**] Agendamento criado com menos de 3 dias de antecedência já nasce `CONFIRMADO`.
+- **RN-06** [**decidida em 14/11**] Todo atendimento é de um de dois tipos: **Médico**, cujos itens são **consultas** (categoria `CONSULTA`), ou **Enfermagem**, cujos itens são **procedimentos** (categoria `PROCEDIMENTO`). Consulta médica é sempre com o **médico de referência da rua do paciente**, pelo app, pela recepção e na remarcação; nem o paciente nem a recepção escolhem o médico. Paciente sem rua cadastrada não agenda consulta médica. Procedimentos de enfermagem não dependem da rua: cada procedimento tem seus profissionais.
 
 ### 3.2 Lembretes
 
@@ -182,7 +183,7 @@ O modelo tem 16 entidades e serve para qualquer banco relacional. Os nomes estã
 | `OrigemAgendamento` | `RECEPCAO`, `APP`, `REMARCACAO`, `ADIANTAMENTO` |
 | `OrigemSlot` | `RECEPCAO`, `APP` |
 | `StatusSlot` | `LIVRE`, `OCUPADO`, `BLOQUEADO` |
-| `CategoriaAtendimento` | `CONSULTA`, `EXAME` |
+| `CategoriaAtendimento` | `CONSULTA` (médico), `PROCEDIMENTO` (enfermagem). Até 13/11 era `CONSULTA`, `EXAME` |
 | `EtapaNotificacao` | `D14`, `D7`, `D3`, `D0`, `PRE_AVISO`, `OFERTA`, `CONFIRMACAO_AGENDAMENTO` |
 | `Canal` | `PUSH`, `WHATSAPP`, `SMS`, `EMAIL` |
 | `StatusNotificacao` | `AGENDADA`, `ENVIADA`, `ENTREGUE`, `FALHOU`, `RESPONDIDA`, `CANCELADA` |
@@ -195,10 +196,11 @@ O modelo tem 16 entidades e serve para qualquer banco relacional. Os nomes estã
 
 - **Ubs:** `id`, `nome`, `endereco`, `telefone`
 - **UsuarioEquipe:** `id`, `ubsId`, `nome`, `email`, `senhaHash`, `perfil: PerfilEquipe`
-- **Profissional:** `id`, `ubsId`, `nome`, `funcao` (médico, enfermeiro, dentista, técnico)
+- **Profissional:** `id`, `ubsId`, `nome`, `funcao` (médico, enfermeiro, técnico), **`categoria: CategoriaAtendimento`** (acréscimo de 14/11: médico atende `CONSULTA`, enfermagem atende `PROCEDIMENTO`; os horários do profissional só podem ser de tipos da mesma categoria)
+- **Rua** (entidade nova, 14/11): `id`, `ubsId`, `nome`, `medicoReferenciaId` (o médico de referência de quem mora nela). Lados de uma avenida dividida entram como ruas separadas, ex.: "Av. Central (par)"
 - **TipoAtendimento:** `id`, `ubsId`, `nome`, `categoria: CategoriaAtendimento`, `duracaoMin`, `antecedenciaMaximaDias`, `permiteAgendamentoApp`, `instrucoesPreparo?`
 - **Slot:** `id`, `profissionalId`, `tipoAtendimentoId`, `inicio`, `fim`, `origem: OrigemSlot`, `status: StatusSlot`
-- **Paciente:** `id`, `ubsId`, `nome`, `cpf`, `cns?`, `dataNascimento`, `telefone?`, `email?`, `possuiCelular`, `pushToken?`, `pontuacao` (inicial 100), `vulneravel`, `vulneravelAtribuidoPor?`, `vulneravelEm?`, `consentimentoCanais` (por canal: aceito e data), `senhaHash?`, **`deveTrocarSenha`** (acréscimo: senha provisória, ver seção 10)
+- **Paciente:** `id`, `ubsId`, `nome`, `cpf`, `cns?`, `dataNascimento`, `telefone?`, `email?`, `possuiCelular`, `pushToken?`, `pontuacao` (inicial 100), `vulneravel`, `vulneravelAtribuidoPor?`, `vulneravelEm?`, `consentimentoCanais` (por canal: aceito e data), `senhaHash?`, **`deveTrocarSenha`** (acréscimo: senha provisória, ver seção 10), **`ruaId?`** e **`numero?`** (acréscimo de 14/11: definem o médico de referência; opcionais no banco por causa de cadastros antigos, obrigatórios no cadastro novo)
 - **ContatoVinculado:** `id`, `pacienteId`, `nome`, `relacao` (pai, mãe, filho, cônjuge, outro parente, vizinho, amigo, outro), `telefone?`, `email?`, `contaPacienteId?` (quando o contato também usa o app), `recebeNotificacoes`, `consentimentoEm`, `consentimentoForma`, `ativo`
 - **Agendamento:** `id`, `pacienteId`, `slotId`, `status: StatusAgendamento`, `origem: OrigemAgendamento`, `remarcadoDeId?`, `criadoPorTipo: TipoAutor`, `criadoPorId`, `confirmadoEm?`, `canceladoEm?`, `canceladoPorTipo?`, `presencaRegistradaEm?`, **`criadoEm`** (acréscimo: ordenação da agenda e do histórico)
 - **Notificacao:** `id`, `agendamentoId?`, `ofertaId?`, `destinatarioTipo` (paciente, contato, equipe), `destinatarioId`, `etapa: EtapaNotificacao`, `canal: Canal`, `status: StatusNotificacao`, `agendadaPara`, `enviadaEm?`, `respondidaEm?`, `tentativa`
@@ -259,9 +261,11 @@ A pontuação não aparece como número. Quando estiver abaixo de 50, o app most
 8. **Indicadores:** taxa de faltas, vagas reaproveitadas e confirmações por canal.
 9. **Relógio de desenvolvimento:** botão para avançar o tempo (só em ambiente de desenvolvimento, RN-90).
 
-### Decisão de front (13/11)
+### Decisões de front
 
-O app vai usar **`useTheme`** para cores e tema. Mais nada do front foi definido ainda; o `frontend/AGENTS.md` (plugin Expo) pede Expo Router com rotas em `src/app/`.
+- **13/11:** o app vai usar **`useTheme`** para cores e tema.
+- **14/11:** ThemeProvider próprio + `useTheme` + `StyleSheet`, sem biblioteca de UI. Expo Router com rotas em `src/app/` (pedido pelo `frontend/AGENTS.md`). As telas que dependem da Camada 2 são construídas com dados falsos atrás da mesma interface de serviço e ligadas à API depois. As telas desenhadas no Claude Design ficam exportadas em `frontend/design/`. O handoff completo está em [`HANDOFF-FRONTEND.md`](../../HANDOFF-FRONTEND.md).
+- **Textos:** no tipo Médico, fale em "consulta"; no tipo Enfermagem, em "procedimento"; para os dois, "atendimento". Toda consulta e procedimento leva a etiqueta "Médico" ou "Enfermagem".
 
 ## 7. Configurações
 
@@ -326,7 +330,7 @@ Nada foi cortado do escopo. As camadas definem só a ordem. Uma camada começa q
 
 Estes pontos travam partes do código e precisam de resposta antes da camada indicada. **Perguntar ao usuário antes de implementar.**
 
-- ☐ **"Próximo paciente compatível"** (camada 2): mesmo tipo de atendimento na mesma UBS (padrão atual da RN-31) ou mesmo profissional? Na APS o paciente costuma ser acompanhado pela mesma equipe.
+- ☑ **"Próximo paciente compatível"** (camada 2), **decidido em 14/11**: na vaga de **consulta médica**, os candidatos da RN-31 são pacientes com a **mesma consulta** e da **mesma área** (mesmo médico de referência). Na vaga de **procedimento de enfermagem**, pacientes com o **mesmo procedimento**. Os demais critérios da RN-31 (ordem por data, suplentes, pontuação ≥ 50 ou selo) continuam.
 - ☐ **Antecedência de exames** (camada 4): manter 60 dias ou definir outro valor.
 - ☐ **RN-56** [sugestão] (camada 2): o time confirma ou troca.
 - ☑ RN-04, RN-05, RN-11 e senha provisória: **confirmadas em 13/11** (ver seção 10).
@@ -349,6 +353,18 @@ Decidido em 13/11: o painel da UBS fica dentro do app React Native, e o login do
 | Sugestões confirmadas | **RN-04** (1 ativo por tipo), **RN-05** (< 3 dias nasce `CONFIRMADO`), **RN-11** (pula etapas passadas), **senha provisória** (recepção gera; troca obrigatória no 1º acesso; recepção redefine). |
 | Front | Vai usar **`useTheme`** para tema. Só isso foi definido. |
 | Nomes | Domínio em português como a spec; infraestrutura em inglês. |
+
+### 14/11/2026 — ajuste às telas do Claude Design
+
+| Decisão | Escolha |
+|---|---|
+| Tipos de atendimento | Médico (consultas, `CONSULTA`) e Enfermagem (procedimentos, `PROCEDIMENTO`); ver RN-06 |
+| Médico da consulta | Sempre o médico de referência da rua do paciente (RN-06); exemplo de referência: `teste fluxo.html` |
+| Próximo paciente compatível (seção 9) | Consulta: mesma consulta + mesma área. Procedimento: mesmo procedimento |
+| Seed | UBS Feitoria; 3 médicos com 9 ruas (Dra. Helena: Rua das Flores, Rua Boa Vista, Av. Central (par); Dra. Santos: Rua São José, Rua Nova, Av. Central (ímpar); Dr. Oliveira: Rua do Comércio, Rua Esperança, Rua Liberdade); 3 enfermeiras; 6 consultas e 9 procedimentos; Osvaldo Menezes (CPF 123.456.789-09) na Rua das Flores. A consulta odontológica saiu |
+| Liberados no app (premissa do seed, o gestor ajusta) | Todas as consultas, mais vacinação, aferição de pressão e glicemia e coleta de exames. Os demais procedimentos só pela recepção |
+| Canais no Perfil (RN-80) | O paciente liga e desliga cada canal. Canal desligado nunca é usado, nem o push |
+| Frontend | Ver "Decisões de front" na seção 6 |
 
 ### Premissas adotadas na Camada 1 (o usuário pode revisar)
 
@@ -386,16 +402,17 @@ Atualizado ao fim de cada parte. ☑ = feito e testado, ☐ = pendente.
 | 7 | Confirmar, cancelar e remarcar | RN-20 a RN-22, RN-71, RN-82 | ☑ | `fc7a31e` |
 | 8 | Página do link | RN-70 a RN-73 | ☑ | `61360b8` |
 | 9 | Registro de comparecimento ou falta | fluxo C, RN-82 | ☑ | `9783d29` |
-| 10 | Fechamento: estado, mapa RN → código, contrato da API, verificação de ponta a ponta | — | ☑ | (este commit) |
+| 10 | Fechamento: estado, mapa RN → código, contrato da API, verificação de ponta a ponta | — | ☑ | `63bbaaa` |
+| 11 | Ajuste às telas (14/11): consulta × procedimento, ruas e médico de referência, endereço, canais do Perfil, filtro da agenda | RN-06, RN-80, seção 9 | ☑ | `836e9b1` |
 
-**Camada 1 concluída em 13/11/2026**: 84 testes passando (`npm test`), typecheck limpo, e o roteiro de ponta a ponta da seção 13 rodado contra o servidor real.
+**Camada 1 concluída em 13/11/2026** e ajustada às telas em 14/11: 97 testes passando (`npm test`), typecheck limpo, e o roteiro de ponta a ponta da seção 13 rodado contra o servidor real.
 
 **O que a Camada 1 deixou pronto para a Camada 2** (pontos de extensão, todos dentro da transação da ação):
 - `AgendamentoService.aoLiberarVaga(manager, slot, agora)`: chamado por cancelar e remarcar. É onde nasce a oferta de adiantamento (RN-30 a RN-35). O cancelamento automático (RN-26) também deve passar por ele.
 - `PresencaService.aoRegistrarPresenca(manager, agendamento, statusAnterior, agora)`: onde entra a pontuação (RN-40 a RN-42).
 - `Notificacao.status = RESPONDIDA` já é gravado em toda ação (RN-62): o job de "sem resposta" (RN-25, RN-26) pode olhar para isso.
 - `Autor.tipo = CONTATO` já é aceito pelo `AgendamentoService` e pelo `LinkService` (RN-58); falta o cadastro do contato e o envio para ele (RN-55 a RN-57).
-- Antes da Camada 2, decidir a seção 9: "próximo paciente compatível" (tipo na UBS × mesmo profissional) e RN-56.
+- O "próximo paciente compatível" já está decidido (seção 9). Antes da Camada 2, falta decidir a RN-56.
 
 **Camadas 2, 3 e 4:** não iniciadas.
 
@@ -458,6 +475,11 @@ Preenchido conforme as partes são implementadas. Formato: regra → arquivo e m
 | Fluxo C: comparecimento ou falta | `PresencaService.registrar` em `src/services/PresencaService.ts` (de PENDENTE ou CONFIRMADO, a partir do dia da consulta; cancela lembretes; log PRESENCA com o status anterior) | `tests/presenca.test.ts` |
 | RN-40 a RN-42 (ponto de extensão) | `PresencaService.aoRegistrarPresenca` recebe o status anterior; vazio até a Camada 2 | — |
 
+| RN-06: consulta com o médico da rua | `exigirMedicoDaRua` e `validarMedicoDoSlot` em `src/services/medicoDeReferencia.ts`, chamados por `AgendamentoService.validarSlotParaAgendar` (criar e remarcar) e pelas listagens do `SlotService` | `tests/medicoPorRua.test.ts` |
+| RN-06: categoria do profissional | `SlotService.criarEmLote` recusa profissional de outra categoria | `tests/medicoPorRua.test.ts` ("lote de horários recusa") |
+| RN-06: endereço e médico de referência | `PacienteService.cadastrar` (exige rua) e `atualizarEndereco`; `PacienteMapper` devolve `rua` e `medicoReferencia`; `CatalogoService.listarRuas` | `tests/medicoPorRua.test.ts` |
+| RN-80: canais no Perfil | `PacienteService.atualizarCanais`; `Despachante.escolherCanal` ignora canal recusado | `tests/medicoPorRua.test.ts` ("canais de aviso no Perfil") |
+
 ## 13. Como rodar
 
 ```bash
@@ -485,7 +507,7 @@ As variáveis de teste ficam em `tests/setup.ts` (não há `.env.test`). O harne
 | Recepção | `recepcao@ubs.local` | `123456` |
 | ACS | `acs@ubs.local` | `123456` |
 | Gestor | `gestor@ubs.local` | `123456` |
-| Pacientes | CPF (ver `src/seeds/dados/pacientes.ts`, ex.: Maria `11122233396`) | `123456` (Fernanda ainda com troca obrigatória) |
+| Pacientes | CPF (ver `src/seeds/dados/pacientes.ts`). Osvaldo Menezes `12345678909` (Rua das Flores, Dra. Helena); Maria `11122233396`; Rita Lima está sem rua | `123456` (Fernanda ainda com troca obrigatória) |
 
 ### Roteiro de ponta a ponta (dev)
 
@@ -518,6 +540,9 @@ Base: `http://localhost:3333` em dev. JSON em tudo, exceto a página do link (HT
 | `POST /auth/paciente/entrar` | público | `{ cpf, senha }` (CPF com ou sem máscara) | `{ token, deveTrocarSenha, paciente }` |
 | `POST /auth/paciente/trocar-senha` | paciente (mesmo com senha provisória) | `{ senhaAtual, novaSenha }` | `{ token, deveTrocarSenha: false, paciente }` (use o token novo) |
 | `GET /auth/eu` | qualquer logado | — | `{ tipo: "EQUIPE", usuario }` ou `{ tipo: "PACIENTE", paciente }` |
+| `PATCH /auth/paciente/canais` | paciente | `{ canais: ["PUSH", "WHATSAPP", "SMS", "EMAIL"] }` (os ligados) | paciente; os canais fora da lista ficam `{ aceito: false, em }` (RN-80) |
+
+O paciente (para ele mesmo e para a equipe) traz também `rua: { id, nome } | null`, `numero` e `medicoReferencia: { id, nome } | null`, usado em "Seu médico: Dra. Helena (pela sua rua)".
 
 Enquanto `deveTrocarSenha` for `true`, o paciente só consegue usar `trocar-senha` e `/auth/eu` (403 no resto).
 
@@ -526,8 +551,9 @@ Enquanto `deveTrocarSenha` for `true`, o paciente só consegue usar `trocar-senh
 | Método e rota | Quem | Parâmetros | Resposta |
 |---|---|---|---|
 | `GET /tipos-atendimento` | equipe ou paciente | — | `[{ id, nome, categoria, duracaoMin, antecedenciaMaximaDias, permiteAgendamentoApp, instrucoesPreparo }]` (paciente: só liberados, RN-01) |
-| `GET /profissionais` | equipe ou paciente | — | `[{ id, nome, funcao }]` |
-| `GET /slots` | equipe ou paciente | `tipoAtendimentoId` (obrigatório para paciente), `profissionalId`, `de`, `ate` (AAAA-MM-DD), `status` (só equipe; padrão LIVRE) | `[{ id, inicio, fim, profissional, tipoAtendimento }]`; a equipe recebe também `origem` e `status` |
+| `GET /profissionais` | equipe ou paciente | — | `[{ id, nome, funcao, categoria }]` |
+| `GET /ruas` | equipe | — | `[{ id, nome, medicoReferencia: { id, nome } }]` (cadastro do paciente) |
+| `GET /slots` | equipe ou paciente | `tipoAtendimentoId` (obrigatório para paciente), `profissionalId`, `de`, `ate` (AAAA-MM-DD), `status` (só equipe; padrão LIVRE), `pacienteId` (só equipe; exige `tipoAtendimentoId`) | `[{ id, inicio, fim, profissional, tipoAtendimento }]`; a equipe recebe também `origem` e `status`. Em consulta médica, o paciente (e a equipe com `pacienteId`) só recebe horários do médico da rua (RN-06) |
 | `POST /slots/lote` | recepção, gestor | `{ profissionalId, tipoAtendimentoId, dataInicio, dataFim, horaInicio, horaFim, apenasDiasUteis? }` | `{ criados, ignorados, cotaApp, cotaAppPercentual }` |
 
 ### Agendamentos (app do paciente)
@@ -547,25 +573,28 @@ Formato do agendamento para o paciente:
   "id": 4, "status": "CONFIRMADO", "origem": "REMARCACAO",
   "inicio": "2026-11-30T11:40:00.000Z", "fim": "2026-11-30T12:00:00.000Z",
   "remarcadoDeId": 3, "confirmadoEm": "...", "canceladoEm": null, "criadoEm": "...",
-  "tipoAtendimento": { "id": 1, "nome": "Consulta médica", "categoria": "CONSULTA", "instrucoesPreparo": null },
-  "profissional": { "id": 1, "nome": "Dra. Ana Lima", "funcao": "médico" },
-  "ubs": { "nome": "UBS Centro", "endereco": "...", "telefone": "..." },
+  "tipoAtendimento": { "id": 1, "nome": "Consulta clínica geral", "categoria": "CONSULTA", "instrucoesPreparo": null },
+  "profissional": { "id": 1, "nome": "Dra. Helena", "funcao": "médico" },
+  "ubs": { "nome": "UBS Feitoria", "endereco": "...", "telefone": "..." },
   "acoes": { "confirmar": false, "cancelar": true, "remarcar": true }
 }
 ```
 
-`acoes` diz quais botões mostrar; a API valida de novo em cada ação.
+`acoes` diz quais botões mostrar; a API valida de novo em cada ação. `tipoAtendimento.categoria` é `CONSULTA` (etiqueta "Médico") ou `PROCEDIMENTO` (etiqueta "Enfermagem").
+
+Erros de RN-06: 400 "Cadastre a rua do paciente na recepção para agendar consulta médica" e 403 "Este horário é de outro médico. Consultas médicas são com o médico da sua rua".
 
 ### Painel da UBS
 
 | Método e rota | Quem | Corpo / parâmetros | Resposta |
 |---|---|---|---|
-| `POST /pacientes` | recepção, gestor | `{ nome, cpf, dataNascimento, cns?, telefone?, email?, possuiCelular, consentimentoCanais: ["WHATSAPP", "SMS", ...] }` | 201 `{ paciente, senhaProvisoria }` (a senha só aparece aqui) |
+| `POST /pacientes` | recepção, gestor | `{ nome, cpf, dataNascimento, ruaId, numero, cns?, telefone?, email?, possuiCelular, consentimentoCanais: ["WHATSAPP", "SMS", ...] }` | 201 `{ paciente, senhaProvisoria }` (a senha só aparece aqui) |
+| `PATCH /pacientes/:id/endereco` | recepção, gestor | `{ ruaId, numero }` | paciente, com o novo médico de referência |
 | `GET /pacientes` | equipe | `q` (nome ou início do CPF) | `[paciente]` com `pontuacao` e `vulneravel` |
 | `GET /pacientes/:id` | equipe | — | paciente |
 | `POST /pacientes/:id/redefinir-senha` | recepção, gestor | — | `{ paciente, senhaProvisoria }` |
 | `POST /equipe/agendamentos` | recepção, gestor | `{ pacienteId, slotId }` | 201 + agendamento da equipe |
-| `GET /equipe/agenda` | equipe | `data` (AAAA-MM-DD), `profissionalId?` | `[agendamento da equipe]` do dia |
+| `GET /equipe/agenda` | equipe | `data` (AAAA-MM-DD), `profissionalId?`, `categoria?` (`CONSULTA` = Médico, `PROCEDIMENTO` = Enfermagem) | `[agendamento da equipe]` do dia |
 | `POST /equipe/agendamentos/:id/confirmar` · `/cancelar` · `/remarcar` | recepção, gestor | remarcar: `{ slotId }` | agendamento da equipe |
 | `POST /equipe/agendamentos/:id/presenca` | recepção, gestor | `{ resultado: "COMPARECEU" \| "FALTOU" }` | agendamento da equipe |
 
