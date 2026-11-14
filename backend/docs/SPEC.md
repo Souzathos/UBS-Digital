@@ -284,7 +284,7 @@ Atualizado ao fim de cada parte. ☑ = feito e verificado, ☐ = pendente.
 | 6 | Equipe: pacientes com busca, cadastro com rua → médico, senha provisória, ficha, agendar pela recepção com "Só recepção" | RN-01, RN-02, RN-06, RN-52, RN-80 | ☑ | `d1dfc72` |
 | 7 | Equipe: relógio de testes (avançar, voltar ao real, caixa de saída) | RN-90 | ☑ | `972feb6` |
 | 8 | Camada 2 com dados falsos: avisos da consulta, sem resposta, oferta, ofertas e suplentes, ofertas em andamento, alertas, contato e selo, reaproveitadas | RN-25 a RN-27, RN-30 a RN-36, RN-40, RN-50, RN-55 a RN-57 | ☑ | `bb5605c` |
-| 9 | Fechamento: acessibilidade conferida nas telas reais, rotas que faltam no backend, roteiro de demonstração | — | ☑ | — |
+| 9 | Fechamento: acessibilidade conferida nas telas reais, rotas que faltam no backend, roteiro de demonstração | — | ☑ | `23e97db` |
 
 **Verificação:** 46 testes unitários (`npm test` em `frontend/`), typecheck e lint limpos, pacote iOS e web gerados. Roteiros de ponta a ponta no Expo Web contra a API real (Chrome automatizado): login e guardas (20 cenários), paciente do primeiro acesso ao cancelamento (20), painel (19), Camada 2 (16) e acessibilidade (3: letra muito grande, alto contraste, preferências salvas). Os roteiros criam pacientes de teste próprios e não mexem nos pacientes do seed.
 
